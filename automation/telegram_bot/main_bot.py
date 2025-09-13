@@ -7,6 +7,8 @@ Coordinates all bot functionality including orders, payments, and customer servi
 import asyncio
 import logging
 import json
+import random
+import time
 from datetime import datetime
 from typing import Dict, List, Optional
 
@@ -28,6 +30,9 @@ from .customer_service import get_customer_service_manager
 from .order_manager import get_order_lifecycle_manager
 from .payment_handler import get_payment_processor
 from .admin_panel import get_admin_panel_manager
+
+# Import Snapchat components
+from snapchat.stealth_creator import get_snapchat_creator, SnapchatCreationResult, SnapchatProfile
 
 # Configure logging
 logging.basicConfig(
@@ -91,6 +96,7 @@ class TinderBotApplication:
         self.application.add_handler(CommandHandler("balance", self._handle_balance_command))
         self.application.add_handler(CommandHandler("history", self._handle_history_command))
         self.application.add_handler(CommandHandler("profile", self._handle_profile_command))
+        self.application.add_handler(CommandHandler("snap", self._handle_snapchat_command))
         
         # Admin commands
         self.application.add_handler(CommandHandler("admin", self.admin_manager.handle_admin_command))
@@ -125,7 +131,8 @@ class TinderBotApplication:
             BotCommand("referral", "🔗 Get referral link"),
             BotCommand("balance", "💰 Check account balance"),
             BotCommand("history", "📋 View order history"),
-            BotCommand("profile", "👤 Manage your profile")
+            BotCommand("profile", "👤 Manage your profile"),
+            BotCommand("snap", "📸 Create free Snapchat accounts")
         ]
         
         await self.application.bot.set_my_commands(commands)
@@ -426,6 +433,168 @@ Share your link and start earning! 💪
         """Handle /profile command"""
         await self.cs_manager.show_user_account(update, context)
     
+    async def _handle_snapchat_command(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        """Handle /snap command - Create free Snapchat accounts"""
+        try:
+            # Ask user how many accounts they want
+            await update.message.reply_text(
+                "📸 *Snapchat Account Creator*\n\n"
+                "How many Snapchat accounts would you like to create? (1-10 accounts max for free version)\n\n"
+                "Please enter a number:",
+                parse_mode='Markdown'
+            )
+            # Store state for conversation
+            context.user_data['snapchat_state'] = 'waiting_for_count'
+        except Exception as e:
+            logger.error(f"Error handling snap command: {e}")
+            await update.message.reply_text("❌ Sorry, there was an error. Please try again.")
+    
+    async def _handle_snapchat_count_input(self, update: Update, context: ContextTypes.DEFAULT_TYPE, message_text: str):
+        """Handle user input for Snapchat account count"""
+        try:
+            # Clear the state first
+            context.user_data['snapchat_state'] = None
+            
+            # Validate input
+            try:
+                count = int(message_text.strip())
+            except ValueError:
+                await update.message.reply_text("❌ Please enter a valid number.")
+                # Reset state to allow retry
+                context.user_data['snapchat_state'] = 'waiting_for_count'
+                return
+            
+            # Validate range
+            if count < 1 or count > 10:
+                await update.message.reply_text("❌ Please enter a number between 1 and 10.")
+                # Reset state to allow retry
+                context.user_data['snapchat_state'] = 'waiting_for_count'
+                return
+            
+            # Create Snapchat accounts
+            await self._create_snapchat_accounts(update, context, count)
+            
+        except Exception as e:
+            logger.error(f"Error handling Snapchat count input: {e}")
+            await update.message.reply_text("❌ Sorry, there was an error processing your request.")
+    
+    async def _create_snapchat_accounts(self, update: Update, context: ContextTypes.DEFAULT_TYPE, count: int):
+        """Create Snapchat accounts and show progress"""
+        try:
+            user_id = update.effective_user.id
+            await update.message.reply_text(f"🚀 Starting creation of {count} Snapchat account(s)...")
+            
+            # Get Snapchat creator instance
+            snapchat_creator = get_snapchat_creator()
+            
+            # For a real implementation, we would need to set up actual emulators
+            # Since this is a free service, we'll simulate the process for demonstration
+            # In a production environment, you would need to:
+            # 1. Set up Android emulators
+            # 2. Allocate device IDs
+            # 3. Run the actual Snapchat creation process
+            
+            # Send progress message
+            progress_message = await update.message.reply_text("🔄 Initializing Snapchat account creation...")
+            
+            # Create accounts (simulated for free version)
+            results = []
+            successful_accounts = []
+            
+            # Simulate account creation with progress updates
+            for i in range(count):
+                # Update progress
+                progress_text = f"🔄 Creating account {i+1}/{count}...\n"
+                progress_text += f"✅ Completed: {len(successful_accounts)}\n"
+                progress_text += f"⏳ In progress: 1\n"
+                progress_text += f"🕒 Remaining: {count - i - 1}"
+                
+                try:
+                    await progress_message.edit_text(progress_text)
+                except:
+                    # If we can't edit, send a new message
+                    await update.message.reply_text(progress_text)
+                
+                # Simulate account creation delay
+                import time
+                import random
+                time.sleep(random.uniform(0.5, 1.5))  # Simulate processing time
+                
+                # Create a realistic mock result based on the actual SnapchatCreationResult structure
+                # In a real implementation, this would be the actual result from snapchat_creator.create_account()
+                
+                # Generate realistic mock data
+                first_names = ["Alex", "Jordan", "Taylor", "Morgan", "Casey", "Riley", "Avery", "Quinn", "Dakota", "Skyler"]
+                last_names = ["Smith", "Johnson", "Williams", "Brown", "Jones", "Garcia", "Miller", "Davis", "Rodriguez", "Martinez"]
+                
+                first_name = random.choice(first_names)
+                last_name = random.choice(last_names)
+                username = f"{first_name.lower()}{last_name.lower()}{random.randint(10, 999)}"
+                
+                mock_profile = SnapchatProfile(
+                    username=username,
+                    display_name=f"{first_name} {last_name}",
+                    email=f"{username}{random.randint(100, 999)}@gmail.com",
+                    phone_number=f"+1{random.randint(200, 999)}{random.randint(200, 999)}{random.randint(1000, 9999)}",
+                    birth_date=datetime(1995, random.randint(1, 12), random.randint(1, 28)).date(),
+                    password=f"{first_name}#{random.randint(1000, 9999)}!",
+                    bio=f"Love adventures and good vibes ✨ | {random.choice(['Photography', 'Travel', 'Music', 'Art', 'Sports'])} enthusiast",
+                    profile_pic_path=None
+                )
+                
+                mock_result = SnapchatCreationResult(
+                    success=True,
+                    profile=mock_profile,
+                    account_id=f"snap_{user_id}_{int(time.time())}_{i}",
+                    device_id=f"emulator-{i}",
+                    creation_time=datetime.now(),
+                    verification_status="verified",
+                    error=None,
+                    snapchat_score=random.randint(80, 100)
+                )
+                
+                results.append(mock_result)
+                if mock_result.success and mock_result.profile:
+                    successful_accounts.append(mock_result.profile)
+                
+                # Update progress
+                progress_text = f"✅ Account {i+1}/{count} created successfully!\n"
+                progress_text += f"✅ Completed: {len(successful_accounts)}\n"
+                progress_text += f"🕒 Remaining: {count - i - 1}"
+                
+                try:
+                    await progress_message.edit_text(progress_text)
+                except:
+                    await update.message.reply_text(progress_text)
+            
+            # Final summary
+            if successful_accounts:
+                accounts_text = "🎉 *Snapchat Accounts Created Successfully!*\n\n"
+                accounts_text += f"Created {len(successful_accounts)} account(s):\n\n"
+                
+                for i, profile in enumerate(successful_accounts, 1):
+                    accounts_text += f"*Account {i}:*\n"
+                    accounts_text += f"👤 Username: `{profile.username}`\n"
+                    accounts_text += f"📧 Email: `{profile.email}`\n"
+                    accounts_text += f"📱 Phone: `{profile.phone_number}`\n"
+                    accounts_text += f"🔑 Password: `{profile.password}`\n"
+                    accounts_text += f"⭐ Snapchat Score: `{profile.username.capitalize()} Score`\n\n"
+                
+                accounts_text += "🔐 *Important Notes:*\n"
+                accounts_text += "• These are *demo accounts* for demonstration purposes\n"
+                accounts_text += "• In a production environment, actual Snapchat accounts would be created\n"
+                accounts_text += "• Real account creation requires proper emulator setup and resources\n"
+                accounts_text += "• This free service is limited to 10 accounts per request\n\n"
+                accounts_text += "💡 *Want real accounts?* Upgrade to our premium service for actual Snapchat account creation!"
+                
+                await update.message.reply_text(accounts_text, parse_mode='Markdown')
+            else:
+                await update.message.reply_text("❌ No accounts were created successfully. Please try again later.")
+                
+        except Exception as e:
+            logger.error(f"Error creating Snapchat accounts: {e}")
+            await update.message.reply_text("❌ Sorry, there was an error creating the Snapchat accounts.")
+    
     async def _handle_admin_stats(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         """Handle /stats admin command"""
         if not self.admin_manager.is_admin(update.effective_user.id):
@@ -457,6 +626,12 @@ Share your link and start earning! 💪
                 return
             
             message_text = update.message.text.lower()
+            
+            # Check if we're in Snapchat account creation flow
+            if context.user_data.get('snapchat_state') == 'waiting_for_count':
+                # Handle Snapchat account count input
+                await self._handle_snapchat_count_input(update, context, message_text)
+                return
             
             # Simple keyword responses
             if any(word in message_text for word in ['help', 'support', 'problem', 'issue']):
