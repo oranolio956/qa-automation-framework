@@ -1,3 +1,33 @@
+# Christmas Light Contractor Registration Monorepo
+
+Monorepo containing the Next.js frontend, Node.js microservices, and shared packages for the contractor onboarding platform.
+
+## Structure
+
+- apps/
+  - web: Next.js PWA
+- services/
+  - contractor-service: contractor profiles and progress
+  - document-service: uploads and presigned URLs
+- packages/
+  - shared-types: shared TypeScript types
+- docs/: design and technical documentation
+
+## Quickstart
+
+1. Copy environment file
+   - cp .env.example .env
+2. Start dependencies
+   - docker compose up -d
+3. Start apps
+   - npm run dev:web
+   - npm run dev:contractor
+   - npm run dev:document
+
+## Documentation
+
+See docs/ for architecture, APIs, data models, security, and more.
+
 # QA Automation Framework
 
 A comprehensive, production-ready QA automation system with residential proxy integration, mobile app testing, and enterprise-scale infrastructure.
