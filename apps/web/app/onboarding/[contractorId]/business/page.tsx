@@ -3,6 +3,8 @@
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { getEnv } from "../../../../lib/config";
+import { loadDraft, saveDraft } from "../../../../lib/draftStore";
+import { ProgressTracker } from "../../../../components/ProgressTracker";
 
 export default function BusinessInfoPage() {
   const params = useParams<{ contractorId: string }>();
@@ -13,7 +15,18 @@ export default function BusinessInfoPage() {
 
   useEffect(() => {
     if (!params?.contractorId) return;
+    loadDraft<string>(`business:${params.contractorId}`).then((d) => {
+      if (d) setLegalName(d);
+    });
   }, [params?.contractorId]);
+
+  useEffect(() => {
+    if (!params?.contractorId) return;
+    const i = setInterval(() => {
+      void saveDraft(`business:${params.contractorId}`, legalName);
+    }, 30000);
+    return () => clearInterval(i);
+  }, [params?.contractorId, legalName]);
 
   async function saveAndNext() {
     setError(null);
@@ -36,6 +49,7 @@ export default function BusinessInfoPage() {
 
   return (
     <main style={{ padding: 24, maxWidth: 640 }}>
+      <ProgressTracker currentStep={2} totalSteps={5} completedSections={[1]} />
       <h1>Business Information</h1>
       <label htmlFor="legalName">Legal Business Name</label>
       <input

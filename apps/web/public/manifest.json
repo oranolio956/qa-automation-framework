@@ -1,0 +1,10 @@
+{
+  "name": "Contractor Onboarding",
+  "short_name": "Onboarding",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#0a7",
+  "icons": []
+}
+
