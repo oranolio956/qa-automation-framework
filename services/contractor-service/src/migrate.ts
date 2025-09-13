@@ -21,6 +21,37 @@ CREATE TABLE IF NOT EXISTS onboarding_progress (
   validation_errors JSONB,
   updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
+
+CREATE TABLE IF NOT EXISTS license (
+  id UUID PRIMARY KEY,
+  contractor_id UUID NOT NULL REFERENCES contractor(id) ON DELETE CASCADE,
+  state TEXT NOT NULL,
+  license_number TEXT NOT NULL,
+  license_type TEXT,
+  expiration_date DATE,
+  status TEXT NOT NULL DEFAULT 'unverified',
+  verified_at TIMESTAMPTZ,
+  UNIQUE(contractor_id, state, license_number)
+);
+
+CREATE TYPE IF NOT EXISTS insurance_coverage AS ENUM ('gl', 'wc', 'auto', 'umbrella');
+DO $$ BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'insurance_coverage') THEN
+    CREATE TYPE insurance_coverage AS ENUM ('gl', 'wc', 'auto', 'umbrella');
+  END IF;
+END $$;
+
+CREATE TABLE IF NOT EXISTS insurance_policy (
+  id UUID PRIMARY KEY,
+  contractor_id UUID NOT NULL REFERENCES contractor(id) ON DELETE CASCADE,
+  provider TEXT NOT NULL,
+  policy_number TEXT NOT NULL,
+  coverage_types insurance_coverage[] DEFAULT ARRAY['gl']::insurance_coverage[],
+  expiration_date DATE,
+  verification_status TEXT NOT NULL DEFAULT 'pending',
+  additional_insured BOOLEAN DEFAULT false,
+  last_checked_at TIMESTAMPTZ
+);
 `;
 
 async function run() {

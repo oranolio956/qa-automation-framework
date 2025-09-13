@@ -50,6 +50,14 @@ app.patch('/api/v1/contractors/:id/progress', async (req, res) => {
        DO UPDATE SET current_step = EXCLUDED.current_step, completed_steps = EXCLUDED.completed_steps, validation_errors = EXCLUDED.validation_errors, updated_at = now()`,
       [id, currentStep ?? 1, completedSteps ?? [], validationErrors ?? null]
     );
+    if (process.env.REALTIME_EMIT_URL && process.env.INTERNAL_EMIT_TOKEN) {
+      // Fire and forget; no blocking
+      fetch(process.env.REALTIME_EMIT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-internal-token': process.env.INTERNAL_EMIT_TOKEN },
+        body: JSON.stringify({ room: `contractor:${id}`, event: 'progress:updated', payload: { contractorId: id, progress: currentStep } })
+      }).catch(() => undefined);
+    }
     res.json({ ok: true });
   } catch (err) {
     res.status(500).json({ error: 'Failed to update progress' });
@@ -69,6 +77,43 @@ app.get('/api/v1/contractors/:id/status', async (req, res) => {
     res.json({ status, currentStep: progress.current_step, completedSteps: progress.completed_steps });
   } catch (err) {
     res.status(500).json({ error: 'Failed to fetch status' });
+  }
+});
+
+// License persistence (minimal)
+app.post('/api/v1/contractors/:id/license', async (req, res) => {
+  const { id } = req.params;
+  const { state, licenseNumber, licenseType, expirationDate } = req.body || {};
+  if (!state || !licenseNumber) return res.status(400).json({ error: 'state and licenseNumber required' });
+  try {
+    await pool.query(
+      `INSERT INTO license (id, contractor_id, state, license_number, license_type, expiration_date, status)
+       VALUES ($1, $2, $3, $4, $5, $6, 'unverified')
+       ON CONFLICT (contractor_id, state, license_number)
+       DO UPDATE SET license_type = EXCLUDED.license_type, expiration_date = EXCLUDED.expiration_date`,
+      [randomUUID(), id, state, licenseNumber, licenseType ?? null, expirationDate ?? null]
+    );
+    res.status(201).json({ ok: true });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to save license' });
+  }
+});
+
+// Insurance persistence (minimal)
+app.post('/api/v1/contractors/:id/insurance', async (req, res) => {
+  const { id } = req.params;
+  const { provider, policyNumber, coverageTypes, expirationDate, additionalInsured } = req.body || {};
+  if (!provider || !policyNumber) return res.status(400).json({ error: 'provider and policyNumber required' });
+  try {
+    await pool.query(
+      `INSERT INTO insurance_policy (id, contractor_id, provider, policy_number, coverage_types, expiration_date, verification_status, additional_insured)
+       VALUES ($1, $2, $3, $4, $5, $6, 'pending', $7)
+       ON CONFLICT (id) DO NOTHING`,
+      [randomUUID(), id, provider, policyNumber, coverageTypes ?? ['gl'], expirationDate ?? null, additionalInsured ?? false]
+    );
+    res.status(201).json({ ok: true });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to save insurance' });
   }
 });
 

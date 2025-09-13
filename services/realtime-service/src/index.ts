@@ -27,6 +27,18 @@ io.on('connection', (socket) => {
 
 app.get('/health', (_req, res) => res.json({ ok: true }));
 
+// Simple token auth via header for internal emits
+app.post('/emit', (req, res) => {
+  const token = req.header('x-internal-token');
+  if (!process.env.INTERNAL_EMIT_TOKEN || token !== process.env.INTERNAL_EMIT_TOKEN) {
+    return res.status(401).json({ error: 'unauthorized' });
+  }
+  const { room, event, payload } = req.body || {};
+  if (!room || !event) return res.status(400).json({ error: 'room and event required' });
+  io.to(room).emit(event, payload);
+  res.json({ ok: true });
+});
+
 const port = Number(process.env.REALTIME_SERVICE_PORT || 4005);
 httpServer.listen(port, () => {
   // eslint-disable-next-line no-console
