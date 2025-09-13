@@ -2,6 +2,9 @@
 
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { getEnv } from "../../../../lib/config";
 import { loadDraft, saveDraft } from "../../../../lib/draftStore";
 import { ProgressTracker } from "../../../../components/ProgressTracker";
@@ -9,7 +12,11 @@ import { ProgressTracker } from "../../../../components/ProgressTracker";
 export default function BusinessInfoPage() {
   const params = useParams<{ contractorId: string }>();
   const router = useRouter();
-  const [legalName, setLegalName] = useState("");
+  const schema = z.object({
+    legalName: z.string().min(2, 'Enter a valid legal name')
+  });
+  const { register, handleSubmit, formState: { errors }, watch } = useForm<{ legalName: string }>({ resolver: zodResolver(schema), defaultValues: { legalName: "" } });
+  const legalName = watch('legalName');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -51,17 +58,21 @@ export default function BusinessInfoPage() {
     <main style={{ padding: 24, maxWidth: 640 }}>
       <ProgressTracker currentStep={2} totalSteps={5} completedSections={[1]} />
       <h1>Business Information</h1>
-      <label htmlFor="legalName">Legal Business Name</label>
-      <input
-        id="legalName"
-        value={legalName}
-        onChange={(e) => setLegalName(e.target.value)}
-        placeholder="Acme Lights LLC"
-        style={{ display: "block", width: "100%", padding: 12, marginTop: 8, marginBottom: 12 }}
-      />
-      <button onClick={saveAndNext} disabled={loading} style={{ padding: 12 }}>
+      <form onSubmit={handleSubmit(saveAndNext)}>
+        <label htmlFor="legalName">Legal Business Name</label>
+        <input
+          id="legalName"
+          {...register('legalName')}
+          placeholder="Acme Lights LLC"
+          style={{ display: "block", width: "100%", padding: 12, marginTop: 8, marginBottom: 4 }}
+        />
+        {errors.legalName && (
+          <span role="alert" style={{ color: '#b00020', display: 'block', marginBottom: 12 }}>{errors.legalName.message}</span>
+        )}
+        <button type="submit" disabled={loading} style={{ padding: 12 }}>
         {loading ? "Saving..." : "Continue"}
-      </button>
+        </button>
+      </form>
       {error && (
         <p role="alert" style={{ color: "#b00020", marginTop: 12 }}>
           {error}

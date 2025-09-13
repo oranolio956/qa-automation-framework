@@ -1,7 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
-import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
+import { S3Client, PutObjectCommand, CreateMultipartUploadCommand, UploadPartCommand, CompleteMultipartUploadCommand, AbortMultipartUploadCommand } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { randomUUID } from 'node:crypto';
 
@@ -42,6 +42,59 @@ app.post('/api/v1/documents/upload-intent', async (req, res) => {
     res.json({ documentId, uploadUrl, expiresAt, checksum: checksum ?? null });
   } catch (err) {
     res.status(500).json({ error: 'Failed to create upload intent' });
+  }
+});
+
+// Multipart API (server-signed URLs per part)
+app.post('/api/v1/documents/multipart/initiate', async (req, res) => {
+  const { type, mimeType } = req.body || {};
+  if (!type || !mimeType) return res.status(400).json({ error: 'type, mimeType required' });
+  try {
+    const documentId = randomUUID();
+    const key = `${type}/${documentId}`;
+    const bucket = process.env.S3_BUCKET as string;
+    const cmd = new CreateMultipartUploadCommand({ Bucket: bucket, Key: key, ContentType: mimeType });
+    const out = await s3.send(cmd);
+    res.json({ documentId, uploadId: out.UploadId, key });
+  } catch {
+    res.status(500).json({ error: 'Failed to initiate multipart' });
+  }
+});
+
+app.post('/api/v1/documents/multipart/part-url', async (req, res) => {
+  const { key, uploadId, partNumber, mimeType } = req.body || {};
+  if (!key || !uploadId || !partNumber) return res.status(400).json({ error: 'key, uploadId, partNumber required' });
+  try {
+    const bucket = process.env.S3_BUCKET as string;
+    const command = new UploadPartCommand({ Bucket: bucket, Key: key, UploadId: uploadId, PartNumber: Number(partNumber), ContentType: mimeType });
+    const url = await getSignedUrl(s3, command, { expiresIn: 60 * 10 });
+    res.json({ url });
+  } catch {
+    res.status(500).json({ error: 'Failed to sign part' });
+  }
+});
+
+app.post('/api/v1/documents/multipart/complete', async (req, res) => {
+  const { key, uploadId, parts } = req.body || {};
+  try {
+    const bucket = process.env.S3_BUCKET as string;
+    const cmd = new CompleteMultipartUploadCommand({ Bucket: bucket, Key: key, UploadId: uploadId, MultipartUpload: { Parts: parts } });
+    await s3.send(cmd);
+    res.json({ ok: true });
+  } catch {
+    res.status(500).json({ error: 'Failed to complete multipart' });
+  }
+});
+
+app.post('/api/v1/documents/multipart/abort', async (req, res) => {
+  const { key, uploadId } = req.body || {};
+  try {
+    const bucket = process.env.S3_BUCKET as string;
+    const cmd = new AbortMultipartUploadCommand({ Bucket: bucket, Key: key, UploadId: uploadId });
+    await s3.send(cmd);
+    res.json({ ok: true });
+  } catch {
+    res.status(500).json({ error: 'Failed to abort multipart' });
   }
 });
 
