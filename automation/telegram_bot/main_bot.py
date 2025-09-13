@@ -289,6 +289,15 @@ class TinderBotApplication:
                 await update.callback_query.answer("❌ Payment error", show_alert=True)
                 return
             
+            # In demo mode, do not attempt real payments
+            if invoice_data.get('demo_mode'):
+                await update.callback_query.edit_message_text(
+                    f"\n💳 Payment (Demo Mode)\n\nThis environment has payments disabled. Simulated invoice for order `{order_id}`:\n\n• Title: {invoice_data['title']}\n• Amount: ${order['total_amount']:.2f}\n\nAsk an administrator to configure PAYMENT_PROVIDER_TOKEN/STRIPE to enable real payments.",
+                    parse_mode='Markdown',
+                    reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("🏠 Main Menu", callback_data="main_menu")]])
+                )
+                return
+            
             # Send invoice
             await context.bot.send_invoice(
                 chat_id=user_id,

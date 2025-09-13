@@ -46,21 +46,9 @@ pip install -r requirements.txt
 ```
 
 2. **Environment Configuration**
-Create `.env` file:
+Copy the example and then edit:
 ```env
-# Bot Configuration
-TELEGRAM_BOT_TOKEN=8163343176:AAGnfDmoyeL7NSU0nLfLMqEohWxL5hZA6_0
-ADMIN_USER_IDS=123456789,987654321
-
-# Payment Configuration
-PAYMENT_PROVIDER_TOKEN=your_telegram_payment_token
-STRIPE_SECRET_KEY=sk_test_your_stripe_key
-WEBHOOK_SECRET=your_webhook_secret
-WEBHOOK_URL=https://yourdomain.com/webhook
-
-# Database Configuration
-DATABASE_URL=postgresql://user:password@localhost:5432/tinder_bot
-REDIS_URL=redis://localhost:6379/0
+cp .env.example .env
 ```
 
 3. **Database Setup**

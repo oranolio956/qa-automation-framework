@@ -25,31 +25,12 @@ Complete guide to deploy the Tinder Account Services Telegram bot in production.
 git clone <your-repo>
 cd automation/telegram_bot
 
-# Copy environment template
+# Copy environment template and edit
 cp .env.example .env
-
-# Edit configuration
 nano .env
 ```
 
-**Required Environment Variables:**
-```env
-# Bot Configuration
-TELEGRAM_BOT_TOKEN=8163343176:AAGnfDmoyeL7NSU0nLfLMqEohWxL5hZA6_0
-ADMIN_USER_IDS=123456789,987654321
-
-# Payment Configuration  
-PAYMENT_PROVIDER_TOKEN=your_telegram_payment_token
-STRIPE_SECRET_KEY=sk_live_your_stripe_secret_key
-
-# Database Configuration
-DATABASE_URL=postgresql://tinder_user:secure_password@localhost:5432/tinder_bot
-REDIS_URL=redis://localhost:6379/0
-
-# Webhook Configuration
-WEBHOOK_SECRET=your_secure_webhook_secret_key
-WEBHOOK_URL=https://yourdomain.com/webhook
-```
+See `.env.example` for all environment variables.
 
 ### 3. Database Setup
 
