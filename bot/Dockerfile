@@ -14,23 +14,21 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy application code and proxy utilities
 COPY app.py .
 
-# Copy proxy utilities if available
-COPY utils/proxy.py ./utils/ 2>/dev/null || echo "Proxy utils not found, using fallback"
+# Copy Bright Data proxy utilities if available
+COPY utils/brightdata_proxy.py ./utils/ 2>/dev/null || echo "Bright Data proxy utils not found, using fallback"
 RUN mkdir -p utils && touch utils/__init__.py
 
 # Create non-root user for security
 RUN groupadd -r appuser && useradd -r -g appuser appuser
 RUN chown -R appuser:appuser /app
 
-# Environment variables for proxy
-ENV SMARTPROXY_USER=${SMARTPROXY_USER}
-ENV SMARTPROXY_PASS=${SMARTPROXY_PASS}
-ENV SMARTPROXY_HOST=${SMARTPROXY_HOST}
-ENV SMARTPROXY_PORT=${SMARTPROXY_PORT}
+# Environment variables for Bright Data proxy
+ENV BRIGHTDATA_ZONE_KEY=${BRIGHTDATA_ZONE_KEY}
+ENV BRIGHTDATA_ENDPOINT=${BRIGHTDATA_ENDPOINT}
 
-# Health check with proxy verification
-HEALTHCHECK --interval=30s --timeout=10s --retries=3 \
-    CMD curl -f http://localhost:5000/health || exit 1
+# Health check with Bright Data proxy verification
+HEALTHCHECK --interval=1m --timeout=10s --retries=3 \
+    CMD python3 -c "from utils.brightdata_proxy import verify_proxy; verify_proxy(); print('BrightData proxy OK')" || exit 1
 
 # Switch to non-root user
 USER appuser

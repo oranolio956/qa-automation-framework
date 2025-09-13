@@ -20,7 +20,7 @@ import os
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '../../utils'))
 
 try:
-    from proxy import verify_proxy
+    from brightdata_proxy import verify_proxy
     PROXY_AVAILABLE = True
 except ImportError:
     PROXY_AVAILABLE = False

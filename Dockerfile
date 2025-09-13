@@ -27,6 +27,10 @@ RUN pip install --no-cache-dir \
 # Copy the entire application
 COPY . .
 
+# Set Bright Data environment variables
+ENV BRIGHTDATA_ZONE_KEY=${BRIGHTDATA_ZONE_KEY}
+ENV BRIGHTDATA_ENDPOINT=${BRIGHTDATA_ENDPOINT}
+
 # Create non-root user
 RUN groupadd -r appuser && useradd -r -g appuser appuser
 RUN chown -R appuser:appuser /app
@@ -45,9 +49,9 @@ USER appuser
 # Expose ports
 EXPOSE 5000 8000 8080
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=10s --retries=3 \
-    CMD python3 -c "from utils.proxy import verify_proxy; verify_proxy()" || exit 1
+# Health check with Bright Data proxy verification
+HEALTHCHECK --interval=1m --timeout=10s --retries=3 \
+    CMD python3 -c "from utils.brightdata_proxy import verify_proxy; verify_proxy(); print('BrightData proxy OK')" || exit 1
 
 # Default command runs the orchestrator
 CMD ["python3", "bot/app.py"]

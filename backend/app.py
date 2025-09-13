@@ -23,12 +23,12 @@ from schemas import (
 )
 from typing import Optional, Dict, Any
 
-# Import proxy utilities
+# Import Bright Data proxy utilities
 try:
-    from utils.proxy import create_proxied_session, verify_proxy, get_proxy_info
+    from utils.brightdata_proxy import get_brightdata_session, verify_proxy, get_proxy_info
 except ImportError:
-    # Fallback if proxy utils not available
-    def create_proxied_session():
+    # Fallback if Bright Data proxy utils not available
+    def get_brightdata_session():
         return requests.Session()
     def verify_proxy():
         return True
@@ -116,7 +116,7 @@ def create_payment_invoice(order_id: str, amount: float, currency: str = "USD") 
         # Example integration with payment provider through proxy
         if PAYMENT_PROVIDER_API_KEY:
             # Use proxied session for payment provider requests
-            session = create_proxied_session()
+            session = get_brightdata_session()
             response = session.post(
                 'https://api.payment-provider.com/v1/invoices',
                 json=payment_data,
@@ -450,7 +450,7 @@ def health():
     if PAYMENT_PROVIDER_API_KEY:
         try:
             # Simple connectivity test through proxy
-            session = create_proxied_session()
+            session = get_brightdata_session()
             response = session.get('https://api.payment-provider.com/v1/health', timeout=5)
             health_data['payment_provider_status'] = 'available' if response.status_code == 200 else 'unavailable'
         except:

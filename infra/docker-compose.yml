@@ -45,11 +45,12 @@ services:
       - CLOUD_API_TOKEN=${CLOUD_API_TOKEN}
       - GCP_PROJECT=${GCP_PROJECT}
       - HETZNER_API_TOKEN=${HETZNER_API_TOKEN}
-      # Smartproxy configuration
-      - SMARTPROXY_USER=${SMARTPROXY_USER}
-      - SMARTPROXY_PASS=${SMARTPROXY_PASS}
-      - SMARTPROXY_HOST=${SMARTPROXY_HOST}
-      - SMARTPROXY_PORT=${SMARTPROXY_PORT}
+      # Bright Data proxy configuration
+      - BRIGHTDATA_PROXY_URL=${BRIGHTDATA_PROXY_URL}
+      # Twilio SMS configuration
+      - TWILIO_ACCOUNT_SID=${TWILIO_ACCOUNT_SID}
+      - TWILIO_AUTH_TOKEN=${TWILIO_AUTH_TOKEN}
+      - TWILIO_AREA_CODE=${TWILIO_AREA_CODE}
     volumes:
       - ./scripts:/app/scripts:ro
       - ./config:/app/config:ro
@@ -71,11 +72,12 @@ services:
       - VAULT_TOKEN=dev-token
       - REDIS_URL=redis://redis:6379
       - ORCHESTRATOR_URL=http://orchestrator:5000
-      # Smartproxy configuration
-      - SMARTPROXY_USER=${SMARTPROXY_USER}
-      - SMARTPROXY_PASS=${SMARTPROXY_PASS}
-      - SMARTPROXY_HOST=${SMARTPROXY_HOST}
-      - SMARTPROXY_PORT=${SMARTPROXY_PORT}
+      # Bright Data proxy configuration
+      - BRIGHTDATA_PROXY_URL=${BRIGHTDATA_PROXY_URL}
+      # Twilio SMS configuration
+      - TWILIO_ACCOUNT_SID=${TWILIO_ACCOUNT_SID}
+      - TWILIO_AUTH_TOKEN=${TWILIO_AUTH_TOKEN}
+      - TWILIO_AREA_CODE=${TWILIO_AREA_CODE}
     volumes:
       - worker_logs:/var/log/workers
     depends_on:
@@ -94,11 +96,12 @@ services:
       - REDIS_URL=redis://redis:6379
       - CHAT_API_TOKEN=${CHAT_API_TOKEN}
       - RATE_LIMIT_PER_MIN=100
-      # Smartproxy configuration
-      - SMARTPROXY_USER=${SMARTPROXY_USER}
-      - SMARTPROXY_PASS=${SMARTPROXY_PASS}
-      - SMARTPROXY_HOST=${SMARTPROXY_HOST}
-      - SMARTPROXY_PORT=${SMARTPROXY_PORT}
+      # Bright Data proxy configuration
+      - BRIGHTDATA_PROXY_URL=${BRIGHTDATA_PROXY_URL}
+      # Twilio SMS configuration
+      - TWILIO_ACCOUNT_SID=${TWILIO_ACCOUNT_SID}
+      - TWILIO_AUTH_TOKEN=${TWILIO_AUTH_TOKEN}
+      - TWILIO_AREA_CODE=${TWILIO_AREA_CODE}
     ports:
       - "5000:5000"
     depends_on:

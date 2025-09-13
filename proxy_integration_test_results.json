@@ -1,11 +1,12 @@
 {
   "status": "PARTIAL",
-  "success_rate": 37.5,
-  "passed_tests": 3,
+  "success_rate": 25.0,
+  "passed_tests": 2,
   "total_tests": 8,
   "failed_tests": [
     "Proxy Utils Module",
     "Shell Script Proxy",
+    "Docker Proxy Config",
     "End-to-End Proxy Flow",
     "Backend API Proxy",
     "Bot Service Proxy"
@@ -14,57 +15,57 @@
     {
       "test_name": "Proxy Utils Module",
       "success": false,
-      "timestamp": "2025-09-13T06:01:04.286619",
-      "details": "Module import/test failed: Proxy connection failed: SOCKSHTTPSConnectionPool(host='ipinfo.io', port=443): Max retries exceeded with url: /json (Caused by NewConnectionError('<urllib3.contrib.socks.SOCKSHTTPSConnection object at 0x105b0aca0>: Failed to establish a new connection: [Errno 8] nodename nor servname provided, or not known'))",
+      "timestamp": "2025-09-13T06:45:42.100309",
+      "details": "Module import/test failed: Bright Data proxy connection failed: HTTPSConnectionPool(host='ipinfo.io', port=443): Max retries exceeded with url: /json (Caused by ProxyError('Unable to connect to proxy', NameResolutionError(\"<urllib3.connection.HTTPSConnection object at 0x103c06c70>: Failed to resolve 'browser.tinder-emulation.brightdata.com' ([Errno 8] nodename nor servname provided, or not known)\")))",
       "ip_address": ""
     },
     {
       "test_name": "Shell Script Proxy",
       "success": false,
-      "timestamp": "2025-09-13T06:01:04.303360",
-      "details": "Shell script proxy test failed",
+      "timestamp": "2025-09-13T06:45:42.101204",
+      "details": "Shell script missing proxy configuration",
       "ip_address": ""
     },
     {
       "test_name": "Docker Proxy Config",
-      "success": true,
-      "timestamp": "2025-09-13T06:01:04.303771",
-      "details": "All proxy environment variables configured in docker-compose.yml",
+      "success": false,
+      "timestamp": "2025-09-13T06:45:42.101605",
+      "details": "Missing proxy variables in docker-compose.yml: ['SMARTPROXY_USER', 'SMARTPROXY_PASS', 'SMARTPROXY_HOST', 'SMARTPROXY_PORT']",
       "ip_address": ""
     },
     {
       "test_name": "Dockerfile Proxy Integration",
       "success": true,
-      "timestamp": "2025-09-13T06:01:04.304395",
-      "details": "Proxy configuration found in: backend/Dockerfile, bot/Dockerfile, infra/Dockerfile.provisioner, infra/Dockerfile.manager",
+      "timestamp": "2025-09-13T06:45:42.102359",
+      "details": "Proxy configuration found in: infra/Dockerfile.provisioner, infra/Dockerfile.manager",
       "ip_address": ""
     },
     {
       "test_name": "Worker VM Proxy Setup",
       "success": true,
-      "timestamp": "2025-09-13T06:01:04.304529",
+      "timestamp": "2025-09-13T06:45:42.102542",
       "details": "Worker VM proxy configuration includes: SMARTPROXY, proxychains, curl_proxy, adb-proxy, socks5",
       "ip_address": ""
     },
     {
       "test_name": "End-to-End Proxy Flow",
       "success": false,
-      "timestamp": "2025-09-13T06:01:04.306270",
+      "timestamp": "2025-09-13T06:45:42.104716",
       "details": "Integration test failed",
       "ip_address": ""
     },
     {
       "test_name": "Backend API Proxy",
       "success": false,
-      "timestamp": "2025-09-13T06:01:14.308919",
+      "timestamp": "2025-09-13T06:45:52.107593",
       "details": "Backend API test failed: HTTPConnectionPool(host='localhost', port=8000): Read timed out. (read timeout=10)",
       "ip_address": ""
     },
     {
       "test_name": "Bot Service Proxy",
       "success": false,
-      "timestamp": "2025-09-13T06:01:14.311197",
-      "details": "Bot service test failed: HTTPConnectionPool(host='localhost', port=5000): Max retries exceeded with url: /health (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x105afc5b0>: Failed to establish a new connection: [Errno 61] Connection refused'))",
+      "timestamp": "2025-09-13T06:45:52.121961",
+      "details": "Proxy status: unverified",
       "ip_address": ""
     }
   ]

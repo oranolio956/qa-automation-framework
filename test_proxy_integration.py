@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-Comprehensive Smartproxy Integration Test Suite
-Verifies that all system components properly route traffic through residential proxy
+Comprehensive Bright Data Integration Test Suite
+Verifies that all system components properly route traffic through Bright Data Browser API proxy
 """
 
 import os
@@ -22,11 +22,9 @@ class ProxyIntegrationTester:
     """Test suite for verifying proxy integration across all system components"""
     
     def __init__(self):
-        # Load proxy configuration
-        self.proxy_user = os.environ.get('SMARTPROXY_USER', 'your_trial_user')
-        self.proxy_pass = os.environ.get('SMARTPROXY_PASS', 'your_trial_pass')
-        self.proxy_host = os.environ.get('SMARTPROXY_HOST', 'proxy.smartproxy.com')
-        self.proxy_port = os.environ.get('SMARTPROXY_PORT', '7000')
+        # Load Bright Data proxy configuration
+        self.brightdata_endpoint = os.environ.get('BRIGHTDATA_ENDPOINT', 'browser.tinder-emulation.brightdata.com:24000')
+        self.zone_key = os.environ.get('BRIGHTDATA_ZONE_KEY', 'your_zone_access_key')
         
         self.test_results = []
         self.failed_tests = []
@@ -53,7 +51,7 @@ class ProxyIntegrationTester:
         try:
             # Import proxy utilities
             sys.path.append('.')
-            from utils.proxy import verify_proxy, get_proxy_info, create_proxied_session, test_proxy_integration
+            from utils.brightdata_proxy import verify_proxy, get_proxy_info, get_brightdata_session, test_brightdata_integration
             
             # Test proxy verification
             if verify_proxy(force_check=True):
@@ -62,9 +60,9 @@ class ProxyIntegrationTester:
                 location = f"{proxy_info.get('city', 'unknown')}, {proxy_info.get('country', 'unknown')}"
                 
                 self.log_result(
-                    "Proxy Utils Module", 
+                    "Bright Data Utils Module", 
                     True, 
-                    f"Module loaded and proxy verified - Location: {location}", 
+                    f"Module loaded and Bright Data proxy verified - Location: {location}", 
                     ip_address
                 )
                 return True
@@ -322,10 +320,10 @@ class ProxyIntegrationTester:
         """Test end-to-end proxy flow using the proxy utilities directly"""
         try:
             sys.path.append('.')
-            from utils.proxy import test_proxy_integration
+            from utils.brightdata_proxy import test_brightdata_integration
             
             # Run the built-in integration test
-            if test_proxy_integration():
+            if test_brightdata_integration():
                 self.log_result(
                     "End-to-End Proxy Flow", 
                     True, 
@@ -342,8 +340,8 @@ class ProxyIntegrationTester:
     
     def run_all_tests(self) -> Dict:
         """Run complete test suite"""
-        logger.info("🚀 Starting Smartproxy Integration Test Suite")
-        logger.info(f"Proxy: {self.proxy_host}:{self.proxy_port}")
+        logger.info("🚀 Starting Bright Data Integration Test Suite")
+        logger.info(f"Endpoint: {self.brightdata_endpoint}")
         logger.info("=" * 60)
         
         # Run all test methods

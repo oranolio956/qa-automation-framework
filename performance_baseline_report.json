@@ -1,0 +1,43 @@
+{
+  "timestamp": "2025-09-13T07:01:55.444122",
+  "system_resources": {
+    "cpu_usage_percent": 11.1,
+    "memory_usage_percent": 70.0,
+    "available_memory_gb": 4.7975616455078125,
+    "disk_usage_percent": 11.0
+  },
+  "network_performance": {
+    "average_latency_ms": 713.6744658152262,
+    "test_results": [
+      {
+        "url": "https://httpbin.org/get",
+        "latency_ms": 1376.6872882843018,
+        "status_code": 200,
+        "response_size": 308
+      },
+      {
+        "url": "https://jsonplaceholder.typicode.com/posts/1",
+        "latency_ms": 164.49809074401855,
+        "status_code": 200,
+        "response_size": 292
+      },
+      {
+        "url": "https://api.github.com/zen",
+        "latency_ms": 599.8380184173584,
+        "status_code": 200,
+        "response_size": 26
+      }
+    ]
+  },
+  "cpu_performance": {
+    "benchmark_time_seconds": 0.061842918395996094
+  },
+  "memory_performance": {
+    "allocation_test_mb": 30.90625
+  },
+  "io_performance": {
+    "write_time_seconds": 0.0009000301361083984,
+    "read_time_seconds": 0.0004420280456542969
+  },
+  "overall_score": 90
+}

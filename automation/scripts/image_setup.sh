@@ -9,17 +9,12 @@ TEST_DIR="${TEST_DIR:-/tmp/qa-test-images}"
 IMAGE_SERVICE_URL="${IMAGE_SERVICE_URL:-http://localhost:3001/api/generate}"
 
 # Smartproxy configuration
-SMARTPROXY_USER="${SMARTPROXY_USER:-your_trial_user}"
-SMARTPROXY_PASS="${SMARTPROXY_PASS:-your_trial_pass}"
-SMARTPROXY_HOST="${SMARTPROXY_HOST:-proxy.smartproxy.com}"
-SMARTPROXY_PORT="${SMARTPROXY_PORT:-7000}"
-PROXY_URL="socks5://${SMARTPROXY_USER}:${SMARTPROXY_PASS}@${SMARTPROXY_HOST}:${SMARTPROXY_PORT}"
+BRIGHTDATA_ZONE_KEY="${BRIGHTDATA_ZONE_KEY:-your_zone_access_key}"
+BRIGHTDATA_ENDPOINT="${BRIGHTDATA_ENDPOINT:-browser.tinder-emulation.brightdata.com:24000}"
 
-# Proxy-enabled curl function
+# Bright Data proxy-enabled curl function
 curl_proxy() {
-    curl --proxy-user "${SMARTPROXY_USER}:${SMARTPROXY_PASS}" \
-         --socks5-hostname "${SMARTPROXY_HOST}:${SMARTPROXY_PORT}" \
-         "$@"
+    curl -x "http://${BRIGHTDATA_ZONE_KEY}:@${BRIGHTDATA_ENDPOINT}" "$@"
 }
 
 log() {

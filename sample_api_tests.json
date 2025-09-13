@@ -1,0 +1,49 @@
+{
+  "name": "Sample API Test Suite",
+  "base_url": "http://localhost:8081/api",
+  "tests": [
+    {
+      "name": "Get Users List",
+      "type": "functional",
+      "method": "GET",
+      "endpoint": "/users"
+    },
+    {
+      "name": "Get Single User",
+      "type": "functional",
+      "method": "GET",
+      "endpoint": "/users/1"
+    },
+    {
+      "name": "User Login",
+      "type": "functional",
+      "method": "POST",
+      "endpoint": "/auth/login",
+      "kwargs": {
+        "json": {
+          "username": "testuser",
+          "password": "testpass"
+        }
+      }
+    },
+    {
+      "name": "Performance Test - Users",
+      "type": "performance",
+      "method": "GET",
+      "endpoint": "/users",
+      "iterations": 20
+    },
+    {
+      "name": "Concurrent Test - Health Check",
+      "type": "concurrent",
+      "method": "GET",
+      "endpoint": "/health",
+      "concurrent_users": 10,
+      "requests_per_user": 5
+    },
+    {
+      "name": "Data Validation - User Schema",
+      "type": "validation",
+      "endpoint": "/users/1",
+      "expected_schema": {
+        "id": 

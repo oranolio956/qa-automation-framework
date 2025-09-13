@@ -29,13 +29,23 @@ A comprehensive, production-ready QA automation system with residential proxy in
 - **Payment Processing**: Webhook-based payment with retry mechanisms
 - **Customer Management**: Multi-tenant architecture with usage analytics
 
-## 🌐 Smartproxy Integration
+## 🌐 Bright Data Browser API Integration
 
-All network traffic routes through **Smartproxy residential proxies** for:
-- ✅ **Residential IP Attribution**: Every request appears from real residential connections
-- ✅ **Per-Session Pinning**: Consistent IP per worker for authentic behavior patterns
-- ✅ **Global Coverage**: Access to 40M+ residential IPs worldwide
-- ✅ **Automatic Verification**: Built-in proxy health monitoring and validation
+All network traffic routes through **Bright Data Browser API proxies** for:
+- ✅ **Premium Residential IPs**: Every request appears from genuine residential connections
+- ✅ **Browser-Grade Sessions**: Full browser context with cookies, headers, and fingerprints
+- ✅ **Global Coverage**: Access to millions of residential IPs worldwide
+- ✅ **Auto-Rotating Sessions**: Dynamic IP rotation with session management
+- ✅ **Built-in Verification**: Automatic proxy health monitoring via ipinfo.io
+
+## 📱 Twilio SMS Integration
+
+**Dynamic SMS verification** with enterprise phone number pooling:
+- ✅ **Auto-Provisioning**: Automatically purchases Twilio numbers as needed
+- ✅ **24-Hour Cooldown**: Smart number rotation to prevent carrier blocks
+- ✅ **Redis-Based Pool**: Distributed number management with cooldown tracking
+- ✅ **6-Digit Codes**: Industry-standard verification with 10-minute expiration
+- ✅ **Retry Logic**: 3-attempt verification with rate limiting protection
 
 ## 📦 Quick Start
 
@@ -47,7 +57,7 @@ cd qa-automation-framework
 
 # Configure environment
 cp .env.example .env
-# Edit .env with your Smartproxy credentials
+# Edit .env with your Bright Data and Twilio credentials
 
 # Deploy infrastructure
 ./deploy.sh
@@ -65,7 +75,7 @@ curl -L https://fly.io/install.sh | sh
 
 # Deploy to production
 flyctl launch --name qa-automation-prod --region ord
-flyctl secrets set SMARTPROXY_USER=your_user SMARTPROXY_PASS=your_pass
+flyctl secrets set BRIGHTDATA_PROXY_URL=your_proxy_url TWILIO_ACCOUNT_SID=your_sid TWILIO_AUTH_TOKEN=your_token
 flyctl deploy
 ```
 
@@ -80,9 +90,9 @@ flyctl deploy
          └───────────────────────┼───────────────────────┘
                                  │
                     ┌──────────────────┐
-                    │  Smartproxy      │
-                    │  Residential     │
-                    │  Network         │
+                    │  Bright Data     │
+                    │  Browser API     │
+                    │  + Twilio SMS    │
                     └──────────────────┘
 ```
 
@@ -90,14 +100,16 @@ flyctl deploy
 
 ### Environment Variables
 ```bash
-# Smartproxy Configuration
-SMARTPROXY_USER=your_trial_user
-SMARTPROXY_PASS=your_trial_pass
-SMARTPROXY_HOST=proxy.smartproxy.com
-SMARTPROXY_PORT=7000
+# Bright Data Browser API Configuration
+BRIGHTDATA_PROXY_URL=http://brd-customer-hl_ed59da04-zone-scraping_browser1:9vopp69suv46@brd.superproxy.io:9222
+
+# Twilio SMS Configuration
+TWILIO_ACCOUNT_SID=YOUR_TWILIO_ACCOUNT_SID
+TWILIO_AUTH_TOKEN=YOUR_TWILIO_AUTH_TOKEN
+TWILIO_AREA_CODE=720
 
 # Service Configuration
-REDIS_URL=redis://localhost:6379
+REDIS_URL=redis://default:AeH6AAIncDEzMWI4OTRhZTI0NTM0MDFiYTI1MTNhOTE2ZWRkMWVhNnAxNTc4NTA@lucky-snipe-57850.upstash.io:6379
 JWT_SECRET=your-jwt-secret-here
 API_RATE_LIMIT=200
 
@@ -119,11 +131,17 @@ MAX_REPLICAS=10
 
 ### Integration Tests
 ```bash
-# Test all components
+# Run comprehensive audit
+./scripts/full_audit.sh
+
+# Test individual components
 python3 -m pytest tests/ -v
 
-# Test proxy integration
-python3 utils/proxy.py
+# Test Bright Data proxy integration
+python3 utils/brightdata_proxy.py
+
+# Test Twilio SMS verification
+python3 utils/sms_verifier.py
 
 # Load testing
 python3 tests/load_test.py --workers 10 --duration 300
@@ -142,7 +160,8 @@ python3 tests/load_test.py --workers 10 --duration 300
 - ✅ **Input Validation**: Pydantic schema validation
 - ✅ **Container Security**: Non-root execution, minimal attack surface
 - ✅ **Secrets Management**: HashiCorp Vault integration
-- ✅ **Network Security**: All traffic through residential proxies
+- ✅ **Network Security**: All traffic through Bright Data residential proxies
+- ✅ **SMS Security**: Dynamic phone number rotation with cooldown protection
 
 ## 📊 Monitoring
 
@@ -150,8 +169,16 @@ python3 tests/load_test.py --workers 10 --duration 300
 - Request/response latencies
 - Job success/failure rates
 - Worker pool utilization
-- Proxy health and IP rotation
+- Bright Data proxy health and IP rotation
+- Twilio SMS pool status and usage
 - Resource consumption (CPU/memory)
+
+### New Audit Features
+- **Comprehensive Testing**: Full-stack audit with `./scripts/full_audit.sh`
+- **Proxy Verification**: Automatic IP validation via ipinfo.io
+- **SMS Pool Monitoring**: Real-time phone number availability tracking
+- **Performance Benchmarks**: Response time and throughput validation
+- **Security Scanning**: API key and credential exposure detection
 
 ### External Integrations
 - **Prometheus**: Metrics collection

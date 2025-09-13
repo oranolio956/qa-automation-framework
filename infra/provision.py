@@ -15,12 +15,12 @@ from typing import List, Dict, Optional
 from dataclasses import dataclass
 import uuid
 
-# Import proxy utilities
+# Import Bright Data proxy utilities
 try:
-    from utils.proxy import create_proxied_session, verify_proxy, get_proxy_info
+    from utils.brightdata_proxy import get_brightdata_session, verify_proxy, get_proxy_info
 except ImportError:
-    # Fallback if proxy utils not available
-    def create_proxied_session():
+    # Fallback if Bright Data proxy utils not available
+    def get_brightdata_session():
         return requests.Session()
     def verify_proxy():
         return True
@@ -120,7 +120,7 @@ class WorkerProvisioner:
         
         try:
             # Use proxied session for all cloud provider API calls
-            session = create_proxied_session()
+            session = get_brightdata_session()
             
             if method.upper() == "POST":
                 response = session.post(f"{provider.api_endpoint}{endpoint}", 

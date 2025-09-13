@@ -47,6 +47,16 @@ log "Configuring network..."
 svc wifi enable
 svc data enable
 
+# Configure Bright Data proxy for network traffic
+log "Setting up Bright Data proxy..."
+if [ -n "${BRIGHTDATA_ENDPOINT:-}" ]; then
+    settings put global http_proxy "${BRIGHTDATA_ENDPOINT}"
+    settings put global https_proxy "${BRIGHTDATA_ENDPOINT}"
+    log "Bright Data proxy configured: ${BRIGHTDATA_ENDPOINT}"
+else
+    log "Warning: BRIGHTDATA_ENDPOINT not set, proxy not configured"
+fi
+
 # Set up test user profile
 log "Setting up test user profile..."
 am start -n com.android.settings/.Settings

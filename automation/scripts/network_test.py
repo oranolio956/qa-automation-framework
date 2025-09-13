@@ -23,11 +23,11 @@ import os
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '../../utils'))
 
 try:
-    from proxy import verify_proxy, get_session_proxy, proxied_get
+    from brightdata_proxy import verify_proxy, get_brightdata_session
     PROXY_AVAILABLE = True
 except ImportError:
     PROXY_AVAILABLE = False
-    print("Warning: Proxy module not available, using direct connections")
+    print("Warning: Bright Data proxy module not available, using direct connections")
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
@@ -218,9 +218,10 @@ class NetworkTester:
         start_time = time.time()
         
         try:
-            # Use proxied request if proxy is available
+            # Use Bright Data proxied request if proxy is available
             if PROXY_AVAILABLE:
-                response = proxied_get(url, timeout=30)
+                session = get_brightdata_session()
+                response = session.get(url, timeout=30)
             else:
                 response = requests.get(url, timeout=30)
             end_time = time.time()

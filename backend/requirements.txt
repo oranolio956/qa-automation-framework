@@ -5,3 +5,4 @@ PyJWT==2.8.0
 redis==4.6.0
 requests==2.31.0
 tenacity==8.2.2
+twilio>=8.0.0

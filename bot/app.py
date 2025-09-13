@@ -16,12 +16,12 @@ from datetime import datetime
 import uuid
 import requests
 
-# Import proxy utilities
+# Import Bright Data proxy utilities
 try:
-    from utils.proxy import create_proxied_session, verify_proxy, get_proxy_info
+    from utils.brightdata_proxy import get_brightdata_session, verify_proxy, get_proxy_info
 except ImportError:
-    # Fallback if proxy utils not available
-    def create_proxied_session():
+    # Fallback if Bright Data proxy utils not available
+    def get_brightdata_session():
         return requests.Session()
     def verify_proxy():
         return True
@@ -34,11 +34,12 @@ logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
 
-# Rate limiting configuration
+# Rate limiting configuration (with Redis storage)
 limiter = Limiter(
-    app,
+    app=app,
     key_func=get_remote_address,
-    default_limits=[f"{os.environ.get('RATE_LIMIT_PER_MIN', '100')} per minute"]
+    default_limits=[f"{os.environ.get('RATE_LIMIT_PER_MIN', '100')} per minute"],
+    storage_uri=os.environ.get('REDIS_URL', 'redis://localhost:6379')
 )
 
 # Redis connection
