@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  android-dev-tools:
+    image: thyrlian/android-sdk:latest
+    container_name: android-dev-tools
+    volumes:
+      - android-sdk-data:/opt/android-sdk
+      - ./projects:/workspace
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+    environment:
+      - DISPLAY=${DISPLAY}
+    network_mode: host
+    stdin_open: true
+    tty: true
+    command: /bin/bash
+
+  gradle-cache:
+    image: gradle:7.6-jdk11
+    container_name: gradle-build
+    volumes:
+      - gradle-cache:/home/gradle/.gradle
+      - ./projects:/workspace
+    working_dir: /workspace
+    command: tail -f /dev/null
+
+volumes:
+  android-sdk-data:
+  gradle-cache:

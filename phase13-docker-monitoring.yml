@@ -1,0 +1,533 @@
+# Phase 13: Docker Compose with Monitoring Stack
+# Complete autonomous engagement system with monitoring, security, and compliance
+
+version: '3.8'
+
+networks:
+  telegram-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
+
+volumes:
+  mongodb-data:
+    driver: local
+  redis-data:
+    driver: local
+  prometheus-data:
+    driver: local
+  grafana-data:
+    driver: local
+  vault-data:
+    driver: local
+  elasticsearch-data:
+    driver: local
+
+services:
+  # Main Telegram Engagement Bot
+  telegram-bot:
+    build:
+      context: ./phase13-autonomous-system/telegram-bot
+      dockerfile: Dockerfile
+    image: telegram-engagement-bot:latest
+    container_name: telegram-engagement-bot
+    restart: unless-stopped
+    depends_on:
+      - redis
+      - mongodb
+      - vault
+    environment:
+      - NODE_ENV=production
+      - LOG_LEVEL=info
+      - PORT=3000
+      - REDIS_URL=redis://redis:6379
+      - MONGODB_URL=mongodb://mongodb:27017/telegram-engagement
+      - VAULT_URL=http://vault:8200
+      - VAULT_TOKEN=${VAULT_ROOT_TOKEN}
+      - PROMETHEUS_GATEWAY=http://prometheus-gateway:9091
+    env_file:
+      - .env.production
+    ports:
+      - "3000:3000"
+      - "9090:9090"  # Metrics endpoint
+    networks:
+      - telegram-network
+    volumes:
+      - ./logs:/app/logs
+      - /tmp:/tmp
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: '0.5'
+        reservations:
+          memory: 512M
+          cpus: '0.2'
+
+  # Engagement Engine Service (separate microservice)
+  engagement-engine:
+    build:
+      context: ./phase13-autonomous-system/engagement-engine
+      dockerfile: Dockerfile
+    image: engagement-engine:latest
+    container_name: engagement-engine
+    restart: unless-stopped
+    depends_on:
+      - redis
+      - mongodb
+    environment:
+      - NODE_ENV=production
+      - REDIS_URL=redis://redis:6379
+      - MONGODB_URL=mongodb://mongodb:27017/telegram-engagement
+    networks:
+      - telegram-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Redis for caching and session management
+  redis:
+    image: redis:7-alpine
+    container_name: redis-cache
+    restart: unless-stopped
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD}
+    environment:
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    networks:
+      - telegram-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: '0.3'
+
+  # MongoDB for persistent data
+  mongodb:
+    image: mongo:7
+    container_name: mongodb-primary
+    restart: unless-stopped
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGODB_PASSWORD}
+      - MONGO_INITDB_DATABASE=telegram-engagement
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb-data:/data/db
+      - ./mongodb-init:/docker-entrypoint-initdb.d
+    networks:
+      - telegram-network
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+          cpus: '1.0'
+
+  # HashiCorp Vault for secrets management
+  vault:
+    image: vault:latest
+    container_name: vault-secrets
+    restart: unless-stopped
+    cap_add:
+      - IPC_LOCK
+    environment:
+      - VAULT_DEV_ROOT_TOKEN_ID=${VAULT_ROOT_TOKEN}
+      - VAULT_DEV_LISTEN_ADDRESS=0.0.0.0:8200
+    ports:
+      - "8200:8200"
+    volumes:
+      - vault-data:/vault/data
+      - ./vault-config:/vault/config
+    networks:
+      - telegram-network
+    command: vault server -dev -dev-listen-address="0.0.0.0:8200"
+    healthcheck:
+      test: ["CMD", "vault", "status"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Prometheus for metrics collection
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus-monitoring
+    restart: unless-stopped
+    ports:
+      - "9091:9090"
+    volumes:
+      - prometheus-data:/prometheus
+      - ./monitoring/prometheus:/etc/prometheus
+    networks:
+      - telegram-network
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--storage.tsdb.retention.time=90d'
+      - '--web.enable-lifecycle'
+      - '--web.enable-admin-api'
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:9090/-/healthy"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Grafana for visualization
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana-dashboard
+    restart: unless-stopped
+    depends_on:
+      - prometheus
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD}
+      - GF_USERS_ALLOW_SIGN_UP=false
+      - GF_INSTALL_PLUGINS=grafana-clock-panel,grafana-simple-json-datasource,grafana-piechart-panel
+    ports:
+      - "3001:3000"
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./monitoring/grafana/dashboards:/etc/grafana/provisioning/dashboards
+      - ./monitoring/grafana/datasources:/etc/grafana/provisioning/datasources
+    networks:
+      - telegram-network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:3000/api/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Elasticsearch for log aggregation
+  elasticsearch:
+    image: elasticsearch:8.11.0
+    container_name: elasticsearch-logs
+    restart: unless-stopped
+    environment:
+      - discovery.type=single-node
+      - ES_JAVA_OPTS=-Xms512m -Xmx1g
+      - xpack.security.enabled=false
+      - xpack.security.enrollment.enabled=false
+    ports:
+      - "9200:9200"
+    volumes:
+      - elasticsearch-data:/usr/share/elasticsearch/data
+    networks:
+      - telegram-network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:9200/_cluster/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+          cpus: '1.0'
+
+  # Kibana for log visualization
+  kibana:
+    image: kibana:8.11.0
+    container_name: kibana-logs
+    restart: unless-stopped
+    depends_on:
+      - elasticsearch
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+      - SERVER_NAME=kibana
+      - SERVER_HOST=0.0.0.0
+    ports:
+      - "5601:5601"
+    networks:
+      - telegram-network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:5601/api/status || exit 1"]
+      interval: 60s
+      timeout: 10s
+      retries: 3
+
+  # Logstash for log processing
+  logstash:
+    image: logstash:8.11.0
+    container_name: logstash-processor
+    restart: unless-stopped
+    depends_on:
+      - elasticsearch
+    volumes:
+      - ./monitoring/logstash:/usr/share/logstash/pipeline
+    environment:
+      - "LS_JAVA_OPTS=-Xmx512m -Xms512m"
+    networks:
+      - telegram-network
+    ports:
+      - "5044:5044"  # Beats input
+      - "9600:9600"  # Logstash monitoring API
+
+  # Filebeat for log shipping
+  filebeat:
+    image: elastic/filebeat:8.11.0
+    container_name: filebeat-shipper
+    restart: unless-stopped
+    user: root
+    depends_on:
+      - elasticsearch
+    volumes:
+      - ./monitoring/filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml:ro
+      - ./logs:/var/log/telegram-bot:ro
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks:
+      - telegram-network
+    command: filebeat -e -strict.perms=false
+
+  # Alert Manager for notifications
+  alertmanager:
+    image: prom/alertmanager:latest
+    container_name: alertmanager-notifications
+    restart: unless-stopped
+    ports:
+      - "9093:9093"
+    volumes:
+      - ./monitoring/alertmanager:/etc/alertmanager
+    networks:
+      - telegram-network
+    command:
+      - '--config.file=/etc/alertmanager/alertmanager.yml'
+      - '--storage.path=/alertmanager'
+      - '--web.external-url=http://localhost:9093'
+      - '--web.route-prefix=/'
+      - '--cluster.listen-address=0.0.0.0:9094'
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:9093/-/healthy"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Node Exporter for system metrics
+  node-exporter:
+    image: prom/node-exporter:latest
+    container_name: node-exporter-metrics
+    restart: unless-stopped
+    ports:
+      - "9100:9100"
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    networks:
+      - telegram-network
+    command:
+      - '--path.procfs=/host/proc'
+      - '--path.rootfs=/rootfs'
+      - '--path.sysfs=/host/sys'
+      - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
+
+  # cAdvisor for container metrics
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:latest
+    container_name: cadvisor-metrics
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:rw
+      - /sys:/sys:ro
+      - /var/lib/docker:/var/lib/docker:ro
+    networks:
+      - telegram-network
+    privileged: true
+    devices:
+      - /dev/kmsg
+
+  # NGINX as reverse proxy and load balancer
+  nginx:
+    image: nginx:alpine
+    container_name: nginx-proxy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx/ssl:/etc/nginx/ssl
+      - ./nginx/logs:/var/log/nginx
+    networks:
+      - telegram-network
+    depends_on:
+      - telegram-bot
+      - grafana
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Backup service for data protection
+  backup-service:
+    build:
+      context: ./backup
+      dockerfile: Dockerfile
+    container_name: backup-service
+    restart: unless-stopped
+    environment:
+      - MONGODB_URL=mongodb://admin:${MONGODB_PASSWORD}@mongodb:27017
+      - REDIS_URL=redis://redis:6379
+      - S3_BUCKET=${BACKUP_S3_BUCKET}
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+    volumes:
+      - mongodb-data:/data/mongodb:ro
+      - redis-data:/data/redis:ro
+      - ./backups:/backups
+    networks:
+      - telegram-network
+    depends_on:
+      - mongodb
+      - redis
+
+  # Security scanner
+  security-scanner:
+    image: aquasec/trivy:latest
+    container_name: security-scanner
+    restart: "no"  # Run on-demand only
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./security-reports:/reports
+    networks:
+      - telegram-network
+    command: ["sleep", "3600"]  # Keep alive for manual scans
+
+  # Health check aggregator
+  health-checker:
+    build:
+      context: ./health-checker
+      dockerfile: Dockerfile
+    container_name: health-checker
+    restart: unless-stopped
+    environment:
+      - CHECK_INTERVAL=60
+      - ALERT_WEBHOOK=${HEALTH_CHECK_WEBHOOK}
+    ports:
+      - "8090:8090"
+    networks:
+      - telegram-network
+    depends_on:
+      - telegram-bot
+      - redis
+      - mongodb
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8090/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Performance testing service
+  performance-tester:
+    image: loadimpact/k6:latest
+    container_name: performance-tester
+    restart: "no"  # Run on-demand only
+    volumes:
+      - ./performance-tests:/scripts
+      - ./performance-reports:/reports
+    networks:
+      - telegram-network
+    command: ["sleep", "3600"]  # Keep alive for manual tests
+
+  # Compliance monitoring
+  compliance-monitor:
+    build:
+      context: ./compliance
+      dockerfile: Dockerfile
+    container_name: compliance-monitor
+    restart: unless-stopped
+    environment:
+      - MONGODB_URL=mongodb://admin:${MONGODB_PASSWORD}@mongodb:27017
+      - REDIS_URL=redis://redis:6379
+      - AUDIT_RETENTION_DAYS=365
+      - COMPLIANCE_REPORT_SCHEDULE=0 2 * * 0  # Weekly on Sunday at 2 AM
+    volumes:
+      - ./compliance-reports:/reports
+    networks:
+      - telegram-network
+    depends_on:
+      - mongodb
+      - redis
+
+  # SMS/Fallback notification service
+  notification-service:
+    build:
+      context: ./notifications
+      dockerfile: Dockerfile
+    container_name: notification-service
+    restart: unless-stopped
+    environment:
+      - TWILIO_ACCOUNT_SID=${TWILIO_ACCOUNT_SID}
+      - TWILIO_AUTH_TOKEN=${TWILIO_AUTH_TOKEN}
+      - SENDGRID_API_KEY=${SENDGRID_API_KEY}
+      - SLACK_WEBHOOK_URL=${SLACK_WEBHOOK_URL}
+    ports:
+      - "5000:5000"
+    networks:
+      - telegram-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Database maintenance service
+  db-maintenance:
+    build:
+      context: ./db-maintenance
+      dockerfile: Dockerfile
+    container_name: db-maintenance
+    restart: "no"  # Runs via cron
+    environment:
+      - MONGODB_URL=mongodb://admin:${MONGODB_PASSWORD}@mongodb:27017
+      - REDIS_URL=redis://redis:6379
+      - MAINTENANCE_SCHEDULE=0 2 * * *  # Daily at 2 AM
+    volumes:
+      - ./maintenance-logs:/logs
+    networks:
+      - telegram-network
+    depends_on:
+      - mongodb
+      - redis
+
+  # API documentation service
+  api-docs:
+    image: swaggerapi/swagger-ui:latest
+    container_name: api-documentation
+    restart: unless-stopped
+    environment:
+      - SWAGGER_JSON=/docs/openapi.json
+    ports:
+      - "8081:8080"
+    volumes:
+      - ./api-docs:/docs
+    networks:
+      - telegram-network
