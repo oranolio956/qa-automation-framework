@@ -117,6 +117,37 @@ app.post('/api/v1/contractors/:id/insurance', async (req, res) => {
   }
 });
 
+// Update statuses from verification-service
+app.post('/api/v1/contractors/:id/license/status', async (req, res) => {
+  const { id } = req.params;
+  const { state, licenseNumber, status, verifiedAt } = req.body || {};
+  if (!state || !licenseNumber || !status) return res.status(400).json({ error: 'state, licenseNumber, status required' });
+  try {
+    await pool.query(
+      `UPDATE license SET status = $1, verified_at = $2 WHERE contractor_id = $3 AND state = $4 AND license_number = $5`,
+      [status, verifiedAt ?? null, id, state, licenseNumber]
+    );
+    res.json({ ok: true });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to update license status' });
+  }
+});
+
+app.post('/api/v1/contractors/:id/insurance/status', async (req, res) => {
+  const { id } = req.params;
+  const { policyNumber, verificationStatus, expirationDate, additionalInsured } = req.body || {};
+  if (!policyNumber || !verificationStatus) return res.status(400).json({ error: 'policyNumber, verificationStatus required' });
+  try {
+    await pool.query(
+      `UPDATE insurance_policy SET verification_status = $1, expiration_date = COALESCE($2, expiration_date), additional_insured = COALESCE($3, additional_insured), last_checked_at = now() WHERE contractor_id = $4 AND policy_number = $5`,
+      [verificationStatus, expirationDate ?? null, additionalInsured ?? null, id, policyNumber]
+    );
+    res.json({ ok: true });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to update insurance status' });
+  }
+});
+
 app.listen(port, () => {
   // eslint-disable-next-line no-console
   console.log(`contractor-service listening on http://localhost:${port}`);

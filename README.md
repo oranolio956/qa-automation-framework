@@ -17,12 +17,27 @@ Monorepo containing the Next.js frontend, Node.js microservices, and shared pack
 
 1. Copy environment file
    - cp .env.example .env
-2. Start dependencies
+2. Start dependencies (Docker required; or point env to managed services)
    - docker compose up -d
-3. Start apps
+3. Install and build workspaces
+   - npm install
+4. Start apps
    - npm run dev:web
    - npm run dev:contractor
    - npm run dev:document
+   - npm --workspace services/realtime-service run dev
+   - npm --workspace services/verification-service run dev
+   - npm --workspace services/gamification-service run dev
+
+Environment variables for realtime and verification forwarding (set in .env):
+
+```
+INTERNAL_EMIT_TOKEN=dev-token
+REALTIME_EMIT_URL=http://localhost:4005/emit
+CONTRACTOR_BASE=http://localhost:4001
+WEBHOOK_SECRET=dev-webhook
+```
+
 
 ## Documentation
 

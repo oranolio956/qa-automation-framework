@@ -1,14 +1,23 @@
 "use client";
 
 import { useParams } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { getEnv } from "../../../../lib/config";
+import { getSocket } from "../../../../lib/socket";
 
 export default function DocumentsPage() {
   const params = useParams<{ contractorId: string }>();
   const [file, setFile] = useState<File | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [events, setEvents] = useState<string[]>([]);
+
+  useEffect(() => {
+    const s = getSocket(localStorage.getItem('contractorId') || undefined);
+    const handler = (e: unknown) => setEvents((prev) => [JSON.stringify(e), ...prev].slice(0, 5));
+    s.on('verification:completed', handler);
+    return () => { s.off('verification:completed', handler); };
+  }, []);
 
   async function requestUpload() {
     setError(null);
@@ -70,6 +79,16 @@ export default function DocumentsPage() {
       <input type="file" onChange={(e) => setFile(e.target.files?.[0] ?? null)} />
       <button onClick={requestUpload} style={{ padding: 12, marginLeft: 12 }}>Upload</button>
       {message && <p style={{ color: '#0a7' }}>{message}</p>}
+      {events.length > 0 && (
+        <div style={{ marginTop: 12 }}>
+          <h3>Latest Verification Events</h3>
+          <ul>
+            {events.map((e, i) => (
+              <li key={i} style={{ fontFamily: 'monospace' }}>{e}</li>
+            ))}
+          </ul>
+        </div>
+      )}
       {error && <p style={{ color: '#b00020' }}>{error}</p>}
     </main>
   );
