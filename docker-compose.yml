@@ -35,6 +35,71 @@ services:
     volumes:
       - ./docker-data/minio:/data
 
+  contractor-service:
+    build: ./services/contractor-service
+    environment:
+      POSTGRES_URL: postgres://postgres:postgres@postgres:5432/contractors
+      CONTRACTOR_SERVICE_PORT: 4001
+      REALTIME_EMIT_URL: http://realtime-service:4005/emit
+      INTERNAL_EMIT_TOKEN: dev-token
+    depends_on:
+      - postgres
+    ports:
+      - "4001:4001"
+
+  document-service:
+    build: ./services/document-service
+    environment:
+      DOCUMENT_SERVICE_PORT: 4002
+      S3_ENDPOINT: http://minio:9000
+      S3_REGION: us-east-1
+      S3_ACCESS_KEY: minioadmin
+      S3_SECRET_KEY: minioadmin
+      S3_BUCKET: uploads
+      S3_USE_PATH_STYLE: "true"
+    depends_on:
+      - minio
+    ports:
+      - "4002:4002"
+
+  realtime-service:
+    build: ./services/realtime-service
+    environment:
+      REALTIME_SERVICE_PORT: 4005
+      INTERNAL_EMIT_TOKEN: dev-token
+    ports:
+      - "4005:4005"
+
+  verification-service:
+    build: ./services/verification-service
+    environment:
+      VERIFICATION_SERVICE_PORT: 4007
+      WEBHOOK_SECRET: dev-webhook
+      CONTRACTOR_BASE: http://contractor-service:4001
+      REALTIME_EMIT_URL: http://realtime-service:4005/emit
+      INTERNAL_EMIT_TOKEN: dev-token
+    depends_on:
+      - contractor-service
+      - realtime-service
+    ports:
+      - "4007:4007"
+
+  gamification-service:
+    build: ./services/gamification-service
+    environment:
+      GAMIFICATION_SERVICE_PORT: 4006
+    ports:
+      - "4006:4006"
+
+  web:
+    build: ./apps/web
+    environment:
+      NEXT_PUBLIC_CONTRACTOR_SERVICE_BASE: http://localhost:4001
+      NEXT_PUBLIC_DOCUMENT_SERVICE_BASE: http://localhost:4002
+      NEXT_PUBLIC_WEBSOCKET_URL: http://localhost:4005
+    ports:
+      - "3000:3000"
+
 version: '3.8'
 
 services:

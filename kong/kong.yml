@@ -1,0 +1,26 @@
+_format_version: "3.0"
+_transform: true
+
+services:
+  - name: contractor
+    url: http://contractor-service:4001
+    routes:
+      - name: contractor-api
+        paths: ["/api/v1/contractors"]
+  - name: document
+    url: http://document-service:4002
+    routes:
+      - name: documents-api
+        paths: ["/api/v1/documents"]
+  - name: verification
+    url: http://verification-service:4007
+    routes:
+      - name: verification-webhooks
+        paths: ["/webhooks"]
+
+plugins:
+  - name: rate-limiting
+    config:
+      minute: 600
+      policy: local
+
