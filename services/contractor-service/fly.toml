@@ -6,6 +6,7 @@ primary_region = "iad"
 
 [env]
   NODE_ENV = "production"
+  SKIP_DB_HEALTH = "true"
 
 [[services]]
   internal_port = 4001
