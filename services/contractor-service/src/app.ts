@@ -9,6 +9,7 @@ export function createApp(pool: Pool) {
   app.use(express.json());
 
   app.get('/health', async (_req, res) => {
+    if (process.env.SKIP_DB_HEALTH === 'true') return res.json({ ok: true, skipped: true });
     try { await pool.query('SELECT 1'); res.json({ ok: true }); } catch { res.status(500).json({ ok: false }); }
   });
 
