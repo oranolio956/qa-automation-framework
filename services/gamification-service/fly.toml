@@ -1,4 +1,4 @@
-app = "clm-gamification-service"
+app = "clm-gamification-service-xy7p2"
 primary_region = "iad"
 
 [build]

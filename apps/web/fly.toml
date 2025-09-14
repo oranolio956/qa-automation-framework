@@ -1,4 +1,4 @@
-app = "clm-web"
+app = "clm-web-xy7p2"
 primary_region = "iad"
 
 [build]

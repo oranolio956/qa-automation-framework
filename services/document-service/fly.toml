@@ -1,4 +1,4 @@
-app = "clm-document-service"
+app = "clm-document-service-xy7p2"
 primary_region = "iad"
 
 [build]

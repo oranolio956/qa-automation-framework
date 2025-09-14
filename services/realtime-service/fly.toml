@@ -1,4 +1,4 @@
-app = "clm-realtime-service"
+app = "clm-realtime-service-xy7p2"
 primary_region = "iad"
 
 [build]
