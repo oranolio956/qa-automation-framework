@@ -1,3 +1,105 @@
+version: "3.9"
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: contractors
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./docker-data/postgres:/var/lib/postgresql/data
+
+  mongo:
+    image: mongo:7
+    ports:
+      - "27017:27017"
+    volumes:
+      - ./docker-data/mongo:/data/db
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+
+  minio:
+    image: minio/minio:latest
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    command: server /data --console-address ":9001"
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - ./docker-data/minio:/data
+
+  contractor-service:
+    build: ./services/contractor-service
+    environment:
+      POSTGRES_URL: postgres://postgres:postgres@postgres:5432/contractors
+      CONTRACTOR_SERVICE_PORT: 4001
+      REALTIME_EMIT_URL: http://realtime-service:4005/emit
+      INTERNAL_EMIT_TOKEN: dev-token
+    depends_on:
+      - postgres
+    ports:
+      - "4001:4001"
+
+  document-service:
+    build: ./services/document-service
+    environment:
+      DOCUMENT_SERVICE_PORT: 4002
+      S3_ENDPOINT: http://minio:9000
+      S3_REGION: us-east-1
+      S3_ACCESS_KEY: minioadmin
+      S3_SECRET_KEY: minioadmin
+      S3_BUCKET: uploads
+      S3_USE_PATH_STYLE: "true"
+    depends_on:
+      - minio
+    ports:
+      - "4002:4002"
+
+  realtime-service:
+    build: ./services/realtime-service
+    environment:
+      REALTIME_SERVICE_PORT: 4005
+      INTERNAL_EMIT_TOKEN: dev-token
+    ports:
+      - "4005:4005"
+
+  verification-service:
+    build: ./services/verification-service
+    environment:
+      VERIFICATION_SERVICE_PORT: 4007
+      WEBHOOK_SECRET: dev-webhook
+      CONTRACTOR_BASE: http://contractor-service:4001
+      REALTIME_EMIT_URL: http://realtime-service:4005/emit
+      INTERNAL_EMIT_TOKEN: dev-token
+    depends_on:
+      - contractor-service
+      - realtime-service
+    ports:
+      - "4007:4007"
+
+  gamification-service:
+    build: ./services/gamification-service
+    environment:
+      GAMIFICATION_SERVICE_PORT: 4006
+    ports:
+      - "4006:4006"
+
+  web:
+    build: ./apps/web
+    environment:
+      NEXT_PUBLIC_CONTRACTOR_SERVICE_BASE: http://localhost:4001
+      NEXT_PUBLIC_DOCUMENT_SERVICE_BASE: http://localhost:4002
+      NEXT_PUBLIC_WEBSOCKET_URL: http://localhost:4005
+    ports:
+      - "3000:3000"
+
 version: '3.8'
 
 services:

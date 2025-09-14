@@ -1,0 +1,6 @@
+Deploying apps/web
+==> Verifying app config
+Validating /workspace/apps/web/fly.toml
+[32m✓[0m Configuration is valid
+--> Verified app config
+Error: Could not find App "clm-web"
