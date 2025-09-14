@@ -14,6 +14,16 @@ apps=(
 
 for dir in "${apps[@]}"; do
   echo "Deploying $dir"
-  (cd "$dir" && flyctl deploy --remote-only)
+  (
+    cd "$dir" || exit 1
+    appName=$(awk -F '"' '/^app\s*=\s*"/{print $2}' fly.toml)
+    if [ -n "$appName" ]; then
+      if ! flyctl apps show "$appName" >/dev/null 2>&1; then
+        echo "Creating app $appName"
+        flyctl apps create "$appName"
+      fi
+    fi
+    flyctl deploy --remote-only 2>&1 | tee -a /workspace/fly_deploy.log
+  )
 done
 
