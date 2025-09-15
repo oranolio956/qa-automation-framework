@@ -58,55 +58,8 @@ RUN pip3 install --no-cache-dir -r automation/requirements.txt
 # Create directories for Android automation
 RUN mkdir -p /app/device_farm /app/logs /app/.android
 
-# Create startup script
-RUN cat > /app/start_android_farm.sh << 'EOF'
-#!/bin/bash
-set -e
-
-# Start Xvfb (virtual display)
-export DISPLAY=:99
-Xvfb :99 -screen 0 1024x768x24 -ac &
-
-# Start VNC server for remote access
-x11vnc -display :99 -nopw -forever -shared -bg
-
-# Start Redis server
-redis-server --daemonize yes
-
-# Start Android emulator
-echo "Starting Android emulator..."
-cd $ANDROID_HOME/emulator
-./emulator -avd snapchat_device -no-window -no-audio -no-boot-anim -accel auto -netfast &
-
-# Wait for emulator to boot
-echo "Waiting for emulator to boot..."
-adb wait-for-device
-sleep 30
-
-# Enable developer options and USB debugging
-adb shell settings put global development_settings_enabled 1
-adb shell settings put global adb_enabled 1
-adb shell settings put global stay_on_while_plugged_in 3
-
-# Ensure ADB over TCP is enabled on port 5555
-adb tcpip 5555
-adb shell setprop service.adb.tcp.port 5555
-
-echo "Android emulator ready!"
-echo "ADB devices:"
-adb devices
-
-# Start the Snapchat automation service
-cd /app
-python3 -m automation.android.automation_orchestrator_fixed &
-
-# Start health server for Fly.io checks
-uvicorn automation.android.health_server:app --host 0.0.0.0 --port 5000 &
-
-# Keep container running
-tail -f /dev/null
-EOF
-
+# Copy startup script
+COPY scripts/start_android_farm.sh /app/start_android_farm.sh
 RUN chmod +x /app/start_android_farm.sh
 
 # Expose ports
