@@ -1,0 +1,24 @@
+http.host: "0.0.0.0"
+http.port: 9600
+
+path.data: /usr/share/logstash/data
+path.logs: /usr/share/logstash/logs
+
+pipeline.batch.size: 1000
+pipeline.batch.delay: 50
+
+pipeline.workers: 4
+pipeline.output.workers: 2
+
+node.name: "antibot-logstash"
+
+monitoring.enabled: true
+monitoring.elasticsearch.hosts: ["http://elasticsearch:9200"]
+
+log.level: info
+log.format: json
+
+config.reload.automatic: true
+config.reload.interval: 3s
+
+xpack.monitoring.enabled: false

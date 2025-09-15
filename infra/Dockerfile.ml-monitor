@@ -1,0 +1,44 @@
+FROM python:3.11-slim
+
+# Set working directory
+WORKDIR /app
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    gcc \
+    g++ \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy requirements first for better caching
+COPY requirements-monitoring.txt /app/
+RUN pip install --no-cache-dir -r requirements-monitoring.txt
+
+# Install additional ML dependencies
+RUN pip install --no-cache-dir \
+    scikit-learn>=1.3.0 \
+    xgboost>=1.7.0 \
+    scipy>=1.11.0 \
+    joblib>=1.3.0
+
+# Copy monitoring code
+COPY monitoring/ /app/monitoring/
+COPY config/ /app/config/
+
+# Create models directory
+RUN mkdir -p /app/models
+
+# Create non-root user
+RUN groupadd -r appuser && useradd -r -g appuser appuser
+RUN chown -R appuser:appuser /app
+USER appuser
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+  CMD python -c "import redis; r=redis.Redis(host='redis'); r.ping()" || exit 1
+
+# Expose metrics port
+EXPOSE 8005
+
+# Run the ML monitor
+CMD ["python", "-m", "monitoring.ml_monitor"]

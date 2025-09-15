@@ -1,0 +1,135 @@
+# Prometheus Configuration for Anti-Bot Security Framework
+# Comprehensive monitoring for all system components
+
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    cluster: 'antibot-security'
+    region: 'us-west-2'
+
+# Alertmanager configuration
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+          - alertmanager:9093
+
+# Load alerting rules
+rule_files:
+  - "alerts/*.yml"
+
+# Scrape configurations
+scrape_configs:
+  # Prometheus self-monitoring
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+    scrape_interval: 30s
+
+  # Kong API Gateway metrics
+  - job_name: 'kong'
+    static_configs:
+      - targets: ['kong:8001']
+    metrics_path: '/metrics'
+    scrape_interval: 10s
+    scrape_timeout: 5s
+
+  # Risk Engine metrics
+  - job_name: 'risk-engine'
+    static_configs:
+      - targets: 
+        - 'risk-engine-1:8001'
+        - 'risk-engine-2:8001'
+    metrics_path: '/api/v1/metrics/prometheus'
+    scrape_interval: 10s
+    scrape_timeout: 5s
+
+  # SMS Service metrics  
+  - job_name: 'sms-service'
+    static_configs:
+      - targets: 
+        - 'sms-service-1:8002'
+    metrics_path: '/metrics'
+    scrape_interval: 15s
+
+  # Pattern Recognition metrics
+  - job_name: 'pattern-recognition'
+    static_configs:
+      - targets: ['pattern-recognition:8003']
+    metrics_path: '/api/v1/metrics'
+    scrape_interval: 15s
+
+  # Redis metrics
+  - job_name: 'redis'
+    static_configs:
+      - targets: 
+        - 'redis-master:6379'
+        - 'redis-replica:6379'
+    metrics_path: '/metrics'
+    scrape_interval: 15s
+
+  # MongoDB metrics (using mongodb_exporter)
+  - job_name: 'mongodb'
+    static_configs:
+      - targets: ['mongodb-exporter:9216']
+    scrape_interval: 30s
+
+  # Node exporter for system metrics
+  - job_name: 'node-exporter'
+    static_configs:
+      - targets: 
+        - 'node-exporter:9100'
+    scrape_interval: 15s
+
+  # RabbitMQ metrics
+  - job_name: 'rabbitmq'
+    static_configs:
+      - targets: ['rabbitmq:15672']
+    metrics_path: '/api/metrics'
+    scrape_interval: 15s
+
+  # WAF (ModSecurity) metrics
+  - job_name: 'waf'
+    static_configs:
+      - targets: ['waf:80']
+    metrics_path: '/server-status?auto'
+    scrape_interval: 30s
+
+  # Application-specific bot detection metrics
+  - job_name: 'bot-detection-metrics'
+    static_configs:
+      - targets: 
+        - 'risk-engine-1:8001'
+        - 'risk-engine-2:8001'
+    metrics_path: '/api/v1/bot-metrics'
+    scrape_interval: 5s  # High frequency for real-time bot detection
+
+  # Custom threat intelligence metrics
+  - job_name: 'threat-intelligence'
+    static_configs:
+      - targets: ['threat-intel-service:8004']
+    metrics_path: '/metrics'
+    scrape_interval: 60s
+
+  # Circuit breaker metrics
+  - job_name: 'circuit-breaker'
+    static_configs:
+      - targets: 
+        - 'risk-engine-1:8001'
+        - 'risk-engine-2:8001'
+        - 'sms-service-1:8002'
+        - 'pattern-recognition:8003'
+    metrics_path: '/api/v1/circuit-breaker/metrics'
+    scrape_interval: 10s
+
+# Remote write for long-term storage (optional)
+remote_write:
+  - url: "https://prometheus-remote-write.example.com/api/v1/write"
+    basic_auth:
+      username: "prometheus"
+      password_file: "/etc/prometheus/remote_write_password"
+    queue_config:
+      max_samples_per_send: 1000
+      max_shards: 200
+      capacity: 2500

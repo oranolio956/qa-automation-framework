@@ -1,0 +1,68 @@
+# Kibana configuration for Anti-Bot Security monitoring
+
+server.host: "0.0.0.0"
+server.port: 5601
+server.name: "antibot-kibana"
+server.publicBaseUrl: "http://localhost:5601"
+
+# Elasticsearch connection
+elasticsearch.hosts: ["http://elasticsearch:9200"]
+elasticsearch.username: "kibana_system"
+elasticsearch.password: "${KIBANA_PASSWORD}"
+
+# Security settings
+elasticsearch.ssl.verificationMode: "none"
+elasticsearch.requestTimeout: 30000
+elasticsearch.pingTimeout: 3000
+
+# Logging
+logging.appenders.file.type: "file"
+logging.appenders.file.fileName: "/usr/share/kibana/logs/kibana.log"
+logging.appenders.file.layout.type: "json"
+
+logging.loggers:
+  - name: "http.server.response"
+    level: "debug"
+  - name: "elasticsearch.query"
+    level: "debug"
+
+logging.root.appenders: ["file", "default"]
+logging.root.level: "info"
+
+# UI settings
+map.includeElasticMapsService: true
+telemetry.enabled: false
+newsfeed.enabled: false
+
+# Monitoring
+monitoring.ui.container.elasticsearch.enabled: true
+monitoring.ui.container.logstash.enabled: true
+
+# Advanced settings
+data.search.aggs.shardDelay.enabled: true
+data.search.sessions.enabled: true
+
+# Dashboard and visualization settings
+vis.defaultEditor: "visualization:visualize"
+
+# Index patterns
+kibana.index: ".kibana"
+kibana.defaultAppId: "dashboard"
+
+# Session timeout
+xpack.security.session.idleTimeout: "8h"
+xpack.security.session.lifespan: "24h"
+
+# Dashboard auto-refresh
+dashboard.defaultDarkMode: false
+
+# Alerting configuration
+xpack.alerting.invalidateApiKeysTask.interval: "5m"
+xpack.alerting.healthCheck.interval: "60s"
+
+# Canvas and Maps
+xpack.canvas.enabled: true
+xpack.maps.enabled: true
+
+# Machine learning
+xpack.ml.enabled: true

@@ -1,0 +1,105 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    cluster: 'antibot-security'
+    environment: 'production'
+
+rule_files:
+  - "alert_rules.yml"
+
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+          - alertmanager:9093
+
+scrape_configs:
+  # Prometheus itself
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+    scrape_interval: 30s
+
+  # System metrics
+  - job_name: 'node-exporter'
+    static_configs:
+      - targets: ['node-exporter:9100']
+    scrape_interval: 15s
+    metrics_path: /metrics
+
+  # Redis metrics
+  - job_name: 'redis-exporter'
+    static_configs:
+      - targets: ['redis-exporter:9121']
+    scrape_interval: 15s
+
+  # ML Risk Engine metrics
+  - job_name: 'ml-risk-engine'
+    static_configs:
+      - targets: ['host.docker.internal:8001']
+    metrics_path: /metrics
+    scrape_interval: 10s
+    scrape_timeout: 5s
+
+  # Anti-bot security services
+  - job_name: 'antibot-services'
+    static_configs:
+      - targets:
+          - 'sms-service:8002'
+          - 'data-processor:8003'
+    metrics_path: /metrics
+    scrape_interval: 15s
+
+  # Infrastructure services
+  - job_name: 'infrastructure'
+    static_configs:
+      - targets:
+          - 'vault:8200'
+          - 'orchestrator:5000'
+          - 'worker-manager:8080'
+    metrics_path: /metrics
+    scrape_interval: 30s
+    scrape_timeout: 10s
+
+  # Security monitoring service
+  - job_name: 'security-monitor'
+    static_configs:
+      - targets: ['security-monitor:8004']
+    metrics_path: /metrics
+    scrape_interval: 10s
+
+  # ML monitoring service
+  - job_name: 'ml-monitor'
+    static_configs:
+      - targets: ['ml-monitor:8005']
+    metrics_path: /metrics
+    scrape_interval: 15s
+
+  # Elasticsearch metrics
+  - job_name: 'elasticsearch'
+    static_configs:
+      - targets: ['elasticsearch:9200']
+    metrics_path: /_prometheus/metrics
+    scrape_interval: 30s
+    scrape_timeout: 10s
+
+  # Custom pushgateway for batch metrics
+  - job_name: 'pushgateway'
+    static_configs:
+      - targets: ['pushgateway:9091']
+    honor_labels: true
+    scrape_interval: 15s
+
+# Remote write configuration for long-term storage
+# remote_write:
+#   - url: "https://your-remote-prometheus-endpoint/api/v1/write"
+#     headers:
+#       Authorization: "Bearer YOUR_TOKEN"
+
+# Storage configuration
+storage:
+  tsdb:
+    retention.time: 30d
+    retention.size: 50GB
+    wal-compression: true

@@ -1,0 +1,477 @@
+# Istio Service Mesh Installation Configuration
+# Production-ready setup with enhanced security and observability for Anti-Bot Security Framework
+
+apiVersion: install.istio.io/v1alpha1
+kind: IstioOperator
+metadata:
+  name: antibot-security-control-plane
+  namespace: istio-system
+spec:
+  # Production-grade control plane configuration
+  values:
+    global:
+      meshID: antibot-security-mesh
+      network: antibot-network
+      # Enable advanced security features
+      jwtPolicy: first-party-jwt
+      # Configure for production workloads
+      defaultPodDisruptionBudget:
+        enabled: true
+      # Enhanced logging and monitoring
+      logging:
+        level: "default:info"
+      # Production proxy settings
+      proxy:
+        # Advanced security hardening
+        privileged: false
+        # Performance optimization for high-throughput security workloads
+        concurrency: 4
+        # Enhanced resource limits
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 2000m
+            memory: 1Gi
+        # Enable comprehensive metrics collection
+        proxyStatsMatcher:
+          inclusionRegexps:
+          - ".*outlier_detection.*"
+          - ".*circuit_breaker.*" 
+          - ".*retry.*"
+          - ".*timeout.*"
+          - ".*_cx_.*"
+          exclusionRegexps:
+          - ".*osconfig.*"
+    # Pilot configuration for enhanced traffic management
+    pilot:
+      # Enable advanced traffic management features
+      env:
+        # Enhanced security validation
+        PILOT_ENABLE_WORKLOAD_ENTRY_AUTOREGISTRATION: true
+        PILOT_ENABLE_CROSS_CLUSTER_WORKLOAD_ENTRY: true
+        # Performance optimizations for high-frequency security checks
+        PILOT_PUSH_THROTTLE: 100
+        PILOT_DEBOUNCE_AFTER: 100ms
+        PILOT_DEBOUNCE_MAX: 10s
+        # Enable advanced security policies
+        PILOT_ENABLE_AUTHORIZATION_POLICY: true
+        PILOT_ENABLE_TELEMETRY_V2: true
+      # Production-grade resource allocation
+      resources:
+        requests:
+          cpu: 500m
+          memory: 2Gi
+        limits:
+          cpu: 2000m
+          memory: 4Gi
+      # High availability configuration
+      autoscaleEnabled: true
+      autoscaleMin: 2
+      autoscaleMax: 10
+  # Component-specific configurations
+  components:
+    # Istiod (control plane) configuration
+    pilot:
+      k8s:
+        # High availability deployment
+        replicaCount: 3
+        # Pod disruption budget for production
+        podDisruptionBudget:
+          minAvailable: 1
+        # Advanced scheduling
+        affinity:
+          podAntiAffinity:
+            preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app: istiod
+                topologyKey: kubernetes.io/hostname
+        # Production resource requirements
+        resources:
+          requests:
+            cpu: 500m
+            memory: 2Gi
+          limits:
+            cpu: 2000m
+            memory: 4Gi
+        # Enhanced environment for security workloads
+        env:
+        - name: PILOT_ENABLE_AUTHORIZATION_POLICY
+          value: "true"
+        - name: PILOT_ENABLE_TELEMETRY_V2
+          value: "true"
+        - name: PILOT_ENABLE_WORKLOAD_ENTRY_AUTOREGISTRATION
+          value: "true"
+    
+    # Ingress Gateway configuration for external traffic
+    ingressGateways:
+    - name: antibot-security-gateway
+      enabled: true
+      k8s:
+        # High availability
+        replicaCount: 3
+        # Production resource allocation
+        resources:
+          requests:
+            cpu: 1000m
+            memory: 512Mi
+          limits:
+            cpu: 4000m
+            memory: 2Gi
+        # Service configuration for load balancer
+        service:
+          type: LoadBalancer
+          ports:
+          - port: 80
+            targetPort: 8080
+            name: http2
+            protocol: TCP
+          - port: 443
+            targetPort: 8443
+            name: https
+            protocol: TCP
+          - port: 15021
+            targetPort: 15021
+            name: status-port
+            protocol: TCP
+        # Advanced pod anti-affinity
+        affinity:
+          podAntiAffinity:
+            requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchLabels:
+                  istio: ingressgateway
+              topologyKey: kubernetes.io/hostname
+
+    # Egress Gateway for controlled outbound traffic
+    egressGateways:
+    - name: antibot-security-egress
+      enabled: true
+      k8s:
+        replicaCount: 2
+        resources:
+          requests:
+            cpu: 200m
+            memory: 256Mi
+          limits:
+            cpu: 1000m
+            memory: 512Mi
+
+  # Advanced configuration
+  meshConfig:
+    # Enhanced access logging for security analysis
+    accessLogFile: /dev/stdout
+    accessLogFormat: |
+      [%START_TIME%] "%REQ(:METHOD)% %REQ(X-ENVOY-ORIGINAL-PATH?:PATH)% %PROTOCOL%"
+      %RESPONSE_CODE% %RESPONSE_FLAGS% %BYTES_RECEIVED% %BYTES_SENT%
+      %DURATION% %RESP(X-ENVOY-UPSTREAM-SERVICE-TIME)%
+      "%REQ(X-FORWARDED-FOR)%" "%REQ(USER-AGENT)%" "%REQ(X-REQUEST-ID)%"
+      "%REQ(:AUTHORITY)%" "%UPSTREAM_HOST%" %UPSTREAM_CLUSTER%
+      %UPSTREAM_LOCAL_ADDRESS% %DOWNSTREAM_LOCAL_ADDRESS%
+      %DOWNSTREAM_REMOTE_ADDRESS% %REQUESTED_SERVER_NAME%
+      "%REQ(X-FORWARDED-CLIENT-CERT)%"
+    # Default configuration for all workloads
+    defaultConfig:
+      # Enhanced proxy configuration for security workloads
+      proxyStatsMatcher:
+        inclusionRegexps:
+        - ".*circuit_breaker.*"
+        - ".*outlier_detection.*"
+        - ".*retry.*"
+        - ".*_cx_.*"
+      # Enable distributed tracing
+      tracing:
+        zipkin:
+          address: jaeger-collector.istio-system:9411
+      # Enhanced discovery refresh delay for security updates
+      discoveryRefreshDelay: 10s
+      # Connection pooling for performance
+      drainDuration: 45s
+      proxyAdminPort: 15000
+      # Comprehensive health check configuration
+      statusPort: 15020
+    # Extension providers for advanced observability
+    extensionProviders:
+    - name: jaeger
+      zipkin:
+        service: jaeger-collector.istio-system
+        port: 9411
+    - name: prometheus
+      prometheus:
+        configOverride:
+          metric_relabeling_configs:
+          - source_labels: [__name__]
+            regex: 'istio_.*'
+            target_label: __tmp_istio_metric
+          - source_labels: [__tmp_istio_metric]
+            regex: '.*'
+            target_label: __name__
+            replacement: '${1}'
+    # Automatic proxy injection configuration
+    defaultProviders:
+      tracing:
+      - jaeger
+      metrics:
+      - prometheus
+    # Service discovery configuration
+    discoverySelectors:
+    - matchLabels:
+        security-mesh: "enabled"
+
+---
+# Namespace for Istio system components
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: istio-system
+  labels:
+    name: istio-system
+    istio-injection: disabled
+
+---
+# Namespace for anti-bot security services
+apiVersion: v1  
+kind: Namespace
+metadata:
+  name: antibot-security
+  labels:
+    name: antibot-security
+    istio-injection: enabled
+    security-mesh: enabled
+
+---
+# Gateway configuration for external access
+apiVersion: networking.istio.io/v1beta1
+kind: Gateway
+metadata:
+  name: antibot-security-gateway
+  namespace: antibot-security
+spec:
+  selector:
+    istio: ingressgateway
+  servers:
+  # HTTPS configuration with TLS
+  - port:
+      number: 443
+      name: https
+      protocol: HTTPS
+    tls:
+      mode: SIMPLE
+      credentialName: antibot-security-tls
+    hosts:
+    - security-api.antibot.internal
+    - "*.antibot.internal"
+  # HTTP redirect to HTTPS
+  - port:
+      number: 80
+      name: http
+      protocol: HTTP
+    hosts:
+    - security-api.antibot.internal
+    - "*.antibot.internal"
+    tls:
+      httpsRedirect: true
+
+---
+# Virtual Service for traffic routing
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: antibot-security-routing
+  namespace: antibot-security
+spec:
+  hosts:
+  - security-api.antibot.internal
+  gateways:
+  - antibot-security-gateway
+  http:
+  # API v1 routing
+  - match:
+    - uri:
+        prefix: /api/v1/
+    route:
+    - destination:
+        host: risk-engine-service
+        port:
+          number: 8001
+    timeout: 30s
+    retries:
+      attempts: 3
+      perTryTimeout: 10s
+      retryOn: 5xx,reset,connect-failure,refused-stream
+  # Health check routing
+  - match:
+    - uri:
+        exact: /health
+    route:
+    - destination:
+        host: risk-engine-service
+        port:
+          number: 8001
+    timeout: 5s
+  # Metrics endpoint
+  - match:
+    - uri:
+        exact: /metrics
+    route:
+    - destination:
+        host: risk-engine-service
+        port:
+          number: 8001
+    timeout: 10s
+  # SMS service routing
+  - match:
+    - uri:
+        prefix: /api/v1/sms
+    route:
+    - destination:
+        host: sms-service
+        port:
+          number: 8002
+    timeout: 15s
+    retries:
+      attempts: 2
+      perTryTimeout: 7s
+
+---
+# Destination Rule for traffic policies
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: antibot-security-destinations
+  namespace: antibot-security
+spec:
+  host: "*.antibot-security.svc.cluster.local"
+  trafficPolicy:
+    # Load balancing for high availability
+    loadBalancer:
+      simple: LEAST_CONN
+    # Connection pooling for performance
+    connectionPool:
+      tcp:
+        maxConnections: 100
+        connectTimeout: 30s
+        keepAlive:
+          time: 7200s
+          interval: 75s
+      http:
+        http1MaxPendingRequests: 50
+        http2MaxRequests: 100
+        maxRequestsPerConnection: 10
+        maxRetries: 3
+        consecutiveGatewayFailure: 5
+        interval: 30s
+        baseEjectionTime: 30s
+        maxEjectionPercent: 50
+    # Circuit breaker for resilience
+    outlierDetection:
+      consecutiveGatewayFailure: 3
+      interval: 30s
+      baseEjectionTime: 30s
+      maxEjectionPercent: 50
+      minHealthPercent: 50
+  # Service-specific policies
+  portLevelSettings:
+  - port:
+      number: 8001
+    connectionPool:
+      tcp:
+        maxConnections: 50
+      http:
+        http1MaxPendingRequests: 30
+        maxRequestsPerConnection: 5
+
+---
+# Service Entry for external dependencies
+apiVersion: networking.istio.io/v1beta1
+kind: ServiceEntry
+metadata:
+  name: external-fraud-services
+  namespace: antibot-security
+spec:
+  hosts:
+  - fraud-intelligence.external.com
+  - threat-intel.security.com
+  ports:
+  - number: 443
+    name: https
+    protocol: HTTPS
+  location: MESH_EXTERNAL
+  resolution: DNS
+
+---
+# Authorization Policy for enhanced security
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: antibot-security-authz
+  namespace: antibot-security
+spec:
+  # Apply to all services in namespace
+  rules:
+  # Allow health checks from anywhere
+  - to:
+    - operation:
+        paths: ["/health", "/metrics"]
+  # Allow API access with proper authentication
+  - to:
+    - operation:
+        paths: ["/api/v1/*"]
+    when:
+    - key: source.principal
+      values: ["cluster.local/ns/antibot-security/sa/*"]
+  # Allow cross-service communication within namespace
+  - from:
+    - source:
+        namespaces: ["antibot-security"]
+    to:
+    - operation:
+        methods: ["GET", "POST", "PUT", "DELETE"]
+
+---
+# Peer Authentication for mTLS
+apiVersion: security.istio.io/v1beta1
+kind: PeerAuthentication
+metadata:
+  name: antibot-security-mtls
+  namespace: antibot-security
+spec:
+  mtls:
+    mode: STRICT
+
+---
+# Telemetry configuration for enhanced observability
+apiVersion: telemetry.istio.io/v1alpha1
+kind: Telemetry
+metadata:
+  name: antibot-security-telemetry
+  namespace: antibot-security
+spec:
+  # Enhanced access logging for security analysis
+  accessLogging:
+  - providers:
+    - name: otel
+  # Custom metrics for security monitoring
+  metrics:
+  - providers:
+    - name: prometheus
+  # Distributed tracing configuration  
+  tracing:
+  - providers:
+    - name: jaeger
+  # Advanced metric customization
+  - overrides:
+    - match:
+        mode: CLIENT
+        metric: ALL_METRICS
+      tagOverrides:
+        source_workload:
+          operation: UPSERT
+          value: "%{SOURCE_WORKLOAD}"
+        destination_service_name:
+          operation: UPSERT
+          value: "%{DESTINATION_SERVICE_NAME}"

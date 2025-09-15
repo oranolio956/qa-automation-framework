@@ -1,0 +1,1638 @@
+{
+  "report_metadata": {
+    "generated_at": "2025-09-13T13:15:14.617492",
+    "test_files_analyzed": [
+      "quick_load_test_results.json",
+      "proxy_integration_test_results.json",
+      "performance_analysis_1757790518.json",
+      "advanced_load_test_results_1757790678.json",
+      "network_performance_results_1757790812.json"
+    ],
+    "total_test_files": 5
+  },
+  "executive_summary": {
+    "overall_score": 95,
+    "grade": "A",
+    "performance_level": "Excellent",
+    "key_findings": {
+      "apis_tested": 3,
+      "critical_issues": 0,
+      "improvement_areas": 0
+    }
+  },
+  "detailed_analysis": {
+    "api_performance": {
+      "endpoints_tested": [
+        "/health",
+        "http://localhost:8888/health",
+        "http://localhost:5000/health"
+      ],
+      "average_response_times": {
+        "/health": {
+          "measurements": 2,
+          "mean_ms": 862.426563501358,
+          "min_ms": 790.9372687339783,
+          "max_ms": 933.9158582687378,
+          "trend": "stable"
+        },
+        "http://localhost:8888/health": {
+          "measurements": 2,
+          "mean_ms": 8.15822016071992,
+          "min_ms": 2.269279956817627,
+          "max_ms": 14.047160364622211,
+          "trend": "improving"
+        },
+        "http://localhost:5000/health": {
+          "measurements": 2,
+          "mean_ms": 4.087996461599694,
+          "min_ms": 1.3405084609985352,
+          "max_ms": 6.835484462200852,
+          "trend": "improving"
+        }
+      },
+      "throughput_metrics": {
+        "http://localhost:8888/health": [
+          130.63619687643185
+        ],
+        "http://localhost:5000/health": [
+          139.54358766902962
+        ]
+      },
+      "reliability_metrics": {},
+      "performance_trends": []
+    },
+    "database_performance": {
+      "redis_performance": {
+        "connection_tests": [],
+        "read_performance": [
+          0.05693674087524414
+        ],
+        "write_performance": [
+          0.09530305862426758
+        ],
+        "load_test_results": [
+          {
+            "write_ops_per_sec": 25168.869433201417,
+            "read_ops_per_sec": 36654.204790743606,
+            "operations_tested": 2000
+          }
+        ]
+      },
+      "performance_summary": {
+        "redis_read_avg_ms": 0.05693674087524414,
+        "redis_write_avg_ms": 0.09530305862426758,
+        "redis_read_ops_per_sec": 36654.204790743606,
+        "redis_write_ops_per_sec": 25168.869433201417
+      },
+      "issues_identified": []
+    },
+    "system_resources": {
+      "cpu_usage_patterns": [
+        {
+          "file": "performance_analysis_1757790518.json",
+          "cpu_percent": 23.7,
+          "cpu_count": 10
+        },
+        {
+          "file": "advanced_load_test_results_1757790678.json",
+          "cpu_percent": 21.7,
+          "cpu_avg_percent": 15.004347826086956,
+          "test_type": "load_test"
+        }
+      ],
+      "memory_usage_patterns": [
+        {
+          "file": "performance_analysis_1757790518.json",
+          "memory_percent": 64.9,
+          "memory_used_gb": 7.7704315185546875,
+          "memory_total_gb": 16.0
+        },
+        {
+          "file": "advanced_load_test_results_1757790678.json",
+          "memory_percent": 64.9,
+          "memory_avg_percent": 63.79565217391305,
+          "test_type": "load_test"
+        }
+      ],
+      "resource_peaks": {
+        "max_cpu_percent": 23.7,
+        "avg_cpu_percent": 22.7,
+        "max_memory_percent": 64.9,
+        "avg_memory_percent": 64.9
+      },
+      "resource_efficiency": {},
+      "scaling_indicators": []
+    },
+    "network_performance": {
+      "issues_identified": []
+    }
+  },
+  "performance_scoring": {
+    "total_score": 95,
+    "component_scores": {
+      "api_performance": 20,
+      "database_performance": 25,
+      "system_resources": 25,
+      "network_performance": 25
+    },
+    "grade": "A",
+    "performance_level": "Excellent",
+    "critical_issues": [],
+    "improvement_areas": []
+  },
+  "recommendations": [
+    "Performance Maintenance:",
+    "  - Continue monitoring performance metrics regularly",
+    "  - Implement automated performance testing in CI/CD pipeline",
+    "  - Set up alerting for performance degradation",
+    "  - Document current performance baselines"
+  ],
+  "test_data_sources": {
+    "quick_load_test_results.json": {
+      "test_start": "2025-09-13T07:08:48.638950",
+      "system_info": {
+        "cpu_count": 10,
+        "total_memory_gb": 16.0,
+        "available_memory_gb": 5.6226348876953125,
+        "cpu_percent": 20.2
+      },
+      "test_results": [
+        {
+          "test_type": "single_request",
+          "endpoint": "/health",
+          "iterations": 20,
+          "successful_requests": 20,
+          "failed_requests": 0,
+          "avg_response_time_ms": 790.9372687339783,
+          "median_response_time_ms": 484.5660924911499,
+          "min_response_time_ms": 59.309959411621094,
+          "max_response_time_ms": 2708.112955093384,
+          "p95_response_time_ms": 2708.112955093384,
+          "p99_response_time_ms": 2708.112955093384,
+          "requests_per_second": 7.38521632282149,
+          "success_rate": 100.0,
+          "errors": []
+        },
+        {
+          "test_type": "concurrent_load",
+          "endpoint": "/health",
+          "concurrent_users": 10,
+          "requests_per_user": 5,
+          "total_requests": 50,
+          "successful_requests": 50,
+          "failed_requests": 0,
+          "test_duration_seconds": 7.744408130645752,
+          "requests_per_second": 6.456271306536998,
+          "avg_response_time_ms": 933.9158582687378,
+          "median_response_time_ms": 642.0935392379761,
+          "p95_response_time_ms": 2722.566843032837,
+          "p99_response_time_ms": 4060.1730346679688,
+          "min_response_time_ms": 58.09617042541504,
+          "max_response_time_ms": 4060.1730346679688,
+          "success_rate": 100.0,
+          "system_impact": {
+            "memory_increase_percent": 0.20000000000000284,
+            "cpu_usage_during_test": 7.3,
+            "start_memory_percent": 64.3,
+            "end_memory_percent": 64.5
+          }
+        }
+      ]
+    },
+    "proxy_integration_test_results.json": {
+      "status": "PARTIAL",
+      "success_rate": 25.0,
+      "passed_tests": 2,
+      "total_tests": 8,
+      "failed_tests": [
+        "Proxy Utils Module",
+        "Shell Script Proxy",
+        "Docker Proxy Config",
+        "End-to-End Proxy Flow",
+        "Backend API Proxy",
+        "Bot Service Proxy"
+      ],
+      "detailed_results": [
+        {
+          "test_name": "Proxy Utils Module",
+          "success": false,
+          "timestamp": "2025-09-13T06:45:42.100309",
+          "details": "Module import/test failed: Bright Data proxy connection failed: HTTPSConnectionPool(host='ipinfo.io', port=443): Max retries exceeded with url: /json (Caused by ProxyError('Unable to connect to proxy', NameResolutionError(\"<urllib3.connection.HTTPSConnection object at 0x103c06c70>: Failed to resolve 'browser.tinder-emulation.brightdata.com' ([Errno 8] nodename nor servname provided, or not known)\")))",
+          "ip_address": ""
+        },
+        {
+          "test_name": "Shell Script Proxy",
+          "success": false,
+          "timestamp": "2025-09-13T06:45:42.101204",
+          "details": "Shell script missing proxy configuration",
+          "ip_address": ""
+        },
+        {
+          "test_name": "Docker Proxy Config",
+          "success": false,
+          "timestamp": "2025-09-13T06:45:42.101605",
+          "details": "Missing proxy variables in docker-compose.yml: ['SMARTPROXY_USER', 'SMARTPROXY_PASS', 'SMARTPROXY_HOST', 'SMARTPROXY_PORT']",
+          "ip_address": ""
+        },
+        {
+          "test_name": "Dockerfile Proxy Integration",
+          "success": true,
+          "timestamp": "2025-09-13T06:45:42.102359",
+          "details": "Proxy configuration found in: infra/Dockerfile.provisioner, infra/Dockerfile.manager",
+          "ip_address": ""
+        },
+        {
+          "test_name": "Worker VM Proxy Setup",
+          "success": true,
+          "timestamp": "2025-09-13T06:45:42.102542",
+          "details": "Worker VM proxy configuration includes: SMARTPROXY, proxychains, curl_proxy, adb-proxy, socks5",
+          "ip_address": ""
+        },
+        {
+          "test_name": "End-to-End Proxy Flow",
+          "success": false,
+          "timestamp": "2025-09-13T06:45:42.104716",
+          "details": "Integration test failed",
+          "ip_address": ""
+        },
+        {
+          "test_name": "Backend API Proxy",
+          "success": false,
+          "timestamp": "2025-09-13T06:45:52.107593",
+          "details": "Backend API test failed: HTTPConnectionPool(host='localhost', port=8000): Read timed out. (read timeout=10)",
+          "ip_address": ""
+        },
+        {
+          "test_name": "Bot Service Proxy",
+          "success": false,
+          "timestamp": "2025-09-13T06:45:52.121961",
+          "details": "Proxy status: unverified",
+          "ip_address": ""
+        }
+      ]
+    },
+    "performance_analysis_1757790518.json": {
+      "existing_data_analysis": {
+        "quick_load_test_results.json": {
+          "test_start": "2025-09-13T07:08:48.638950",
+          "system_info": {
+            "cpu_count": 10,
+            "total_memory_gb": 16.0,
+            "available_memory_gb": 5.6226348876953125,
+            "cpu_percent": 20.2
+          },
+          "test_results": [
+            {
+              "test_type": "single_request",
+              "endpoint": "/health",
+              "iterations": 20,
+              "successful_requests": 20,
+              "failed_requests": 0,
+              "avg_response_time_ms": 790.9372687339783,
+              "median_response_time_ms": 484.5660924911499,
+              "min_response_time_ms": 59.309959411621094,
+              "max_response_time_ms": 2708.112955093384,
+              "p95_response_time_ms": 2708.112955093384,
+              "p99_response_time_ms": 2708.112955093384,
+              "requests_per_second": 7.38521632282149,
+              "success_rate": 100.0,
+              "errors": []
+            },
+            {
+              "test_type": "concurrent_load",
+              "endpoint": "/health",
+              "concurrent_users": 10,
+              "requests_per_user": 5,
+              "total_requests": 50,
+              "successful_requests": 50,
+              "failed_requests": 0,
+              "test_duration_seconds": 7.744408130645752,
+              "requests_per_second": 6.456271306536998,
+              "avg_response_time_ms": 933.9158582687378,
+              "median_response_time_ms": 642.0935392379761,
+              "p95_response_time_ms": 2722.566843032837,
+              "p99_response_time_ms": 4060.1730346679688,
+              "min_response_time_ms": 58.09617042541504,
+              "max_response_time_ms": 4060.1730346679688,
+              "success_rate": 100.0,
+              "system_impact": {
+                "memory_increase_percent": 0.20000000000000284,
+                "cpu_usage_during_test": 7.3,
+                "start_memory_percent": 64.3,
+                "end_memory_percent": 64.5
+              }
+            }
+          ]
+        },
+        "proxy_integration_test_results.json": {
+          "status": "PARTIAL",
+          "success_rate": 25.0,
+          "passed_tests": 2,
+          "total_tests": 8,
+          "failed_tests": [
+            "Proxy Utils Module",
+            "Shell Script Proxy",
+            "Docker Proxy Config",
+            "End-to-End Proxy Flow",
+            "Backend API Proxy",
+            "Bot Service Proxy"
+          ],
+          "detailed_results": [
+            {
+              "test_name": "Proxy Utils Module",
+              "success": false,
+              "timestamp": "2025-09-13T06:45:42.100309",
+              "details": "Module import/test failed: Bright Data proxy connection failed: HTTPSConnectionPool(host='ipinfo.io', port=443): Max retries exceeded with url: /json (Caused by ProxyError('Unable to connect to proxy', NameResolutionError(\"<urllib3.connection.HTTPSConnection object at 0x103c06c70>: Failed to resolve 'browser.tinder-emulation.brightdata.com' ([Errno 8] nodename nor servname provided, or not known)\")))",
+              "ip_address": ""
+            },
+            {
+              "test_name": "Shell Script Proxy",
+              "success": false,
+              "timestamp": "2025-09-13T06:45:42.101204",
+              "details": "Shell script missing proxy configuration",
+              "ip_address": ""
+            },
+            {
+              "test_name": "Docker Proxy Config",
+              "success": false,
+              "timestamp": "2025-09-13T06:45:42.101605",
+              "details": "Missing proxy variables in docker-compose.yml: ['SMARTPROXY_USER', 'SMARTPROXY_PASS', 'SMARTPROXY_HOST', 'SMARTPROXY_PORT']",
+              "ip_address": ""
+            },
+            {
+              "test_name": "Dockerfile Proxy Integration",
+              "success": true,
+              "timestamp": "2025-09-13T06:45:42.102359",
+              "details": "Proxy configuration found in: infra/Dockerfile.provisioner, infra/Dockerfile.manager",
+              "ip_address": ""
+            },
+            {
+              "test_name": "Worker VM Proxy Setup",
+              "success": true,
+              "timestamp": "2025-09-13T06:45:42.102542",
+              "details": "Worker VM proxy configuration includes: SMARTPROXY, proxychains, curl_proxy, adb-proxy, socks5",
+              "ip_address": ""
+            },
+            {
+              "test_name": "End-to-End Proxy Flow",
+              "success": false,
+              "timestamp": "2025-09-13T06:45:42.104716",
+              "details": "Integration test failed",
+              "ip_address": ""
+            },
+            {
+              "test_name": "Backend API Proxy",
+              "success": false,
+              "timestamp": "2025-09-13T06:45:52.107593",
+              "details": "Backend API test failed: HTTPConnectionPool(host='localhost', port=8000): Read timed out. (read timeout=10)",
+              "ip_address": ""
+            },
+            {
+              "test_name": "Bot Service Proxy",
+              "success": false,
+              "timestamp": "2025-09-13T06:45:52.121961",
+              "details": "Proxy status: unverified",
+              "ip_address": ""
+            }
+          ]
+        }
+      },
+      "current_system_metrics": {
+        "timestamp": "2025-09-13T13:08:27.518003",
+        "cpu": {
+          "count": 10,
+          "percent": 23.7,
+          "freq": {
+            "current": 4,
+            "min": 0,
+            "max": 4
+          }
+        },
+        "memory": {
+          "total_gb": 16.0,
+          "available_gb": 5.6143798828125,
+          "percent": 64.9,
+          "used_gb": 7.7704315185546875
+        },
+        "disk": {
+          "usage_percent": 11.1,
+          "free_gb": 109.6912612915039,
+          "total_gb": 228.27386474609375
+        },
+        "network": {
+          "bytes_sent": 19454039871,
+          "bytes_recv": 43174905156,
+          "packets_sent": 33873693,
+          "packets_recv": 51973795,
+          "errin": 0,
+          "errout": 0,
+          "dropin": 0,
+          "dropout": 0
+        },
+        "processes": 753,
+        "boot_time": 1757090560.0
+      },
+      "bottleneck_analysis": {
+        "critical_issues": [
+          "Very low proxy integration success rate: 25.0%"
+        ],
+        "warnings": [],
+        "recommendations": [
+          "Investigate and optimize high-impact performance issues immediately",
+          "Consider scaling resources (CPU, memory) or optimizing algorithms",
+          "Implement performance monitoring and alerting",
+          "System performance is good - minor optimizations recommended"
+        ],
+        "performance_score": 75
+      },
+      "recommendations": [],
+      "endpoint_tests": [
+        {
+          "url": "http://localhost:8000/health",
+          "accessible": false,
+          "response_time_ms": null,
+          "status_code": null,
+          "error": "HTTPConnectionPool(host='localhost', port=8000): Read timed out. (read timeout=10)"
+        },
+        {
+          "url": "http://localhost:8888/health",
+          "accessible": true,
+          "response_time_ms": 204.82802391052246,
+          "status_code": 200,
+          "error": null,
+          "response_size_bytes": 225
+        },
+        {
+          "url": "http://localhost:5000/health",
+          "accessible": true,
+          "response_time_ms": 24.238109588623047,
+          "status_code": 200,
+          "error": null,
+          "response_size_bytes": 140
+        }
+      ],
+      "database_tests": [
+        {
+          "type": "Redis",
+          "accessible": true,
+          "ping_time_ms": 0.6062984466552734,
+          "avg_write_time_ms": 0.09530305862426758,
+          "avg_read_time_ms": 0.05693674087524414,
+          "p95_write_time_ms": 0.11396408081054688,
+          "p95_read_time_ms": 0.07772445678710938
+        }
+      ],
+      "running_processes": [
+        {
+          "pid": 4750,
+          "name": "Python",
+          "cmdline": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python /Users/daltonmetzler/privastra/backend/venv/bin/celery -A app.core.cele",
+          "cpu_percent": 0.0,
+          "memory_mb": 15.953125
+        },
+        {
+          "pid": 4781,
+          "name": "Python",
+          "cmdline": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python /Users/daltonmetzler/privastra/backend/venv/bin/celery -A app.core.cele",
+          "cpu_percent": 0.0,
+          "memory_mb": 0.015625
+        },
+        {
+          "pid": 4782,
+          "name": "Python",
+          "cmdline": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python /Users/daltonmetzler/privastra/backend/venv/bin/celery -A app.core.cele",
+          "cpu_percent": 0.0,
+          "memory_mb": 0.015625
+        },
+        {
+          "pid": 4783,
+          "name": "Python",
+          "cmdline": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python /Users/daltonmetzler/privastra/backend/venv/bin/celery -A app.core.cele",
+          "cpu_percent": 0.0,
+          "memory_mb": 0.015625
+        },
+        {
+          "pid": 4784,
+          "name": "Python",
+          "cmdline": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python /Users/daltonmetzler/privastra/backend/venv/bin/celery -A app.core.cele",
+          "cpu_percent": 0.0,
+          "memory_mb": 0.015625
+        },
+        {
+          "pid": 4785,
+          "name": "Python",
+          "cmdline": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python /Users/daltonmetzler/privastra/backend/venv/bin/celery -A app.core.cele",
+          "cpu_percent": 0.0,
+          "memory_mb": 0.015625
+        },
+        {
+          "pid": 4786,
+          "name": "Python",
+          "cmdline": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python /Users/daltonmetzler/privastra/backend/venv/bin/celery -A app.core.cele",
+          "cpu_percent": 0.0,
+          "memory_mb": 0.015625
+        },
+        {
+          "pid": 4787,
+          "name": "Python",
+          "cmdline": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python /Users/daltonmetzler/privastra/backend/venv/bin/celery -A app.core.cele",
+          "cpu_percent": 0.0,
+          "memory_mb": 0.015625
+        },
+        {
+          "pid": 4788,
+          "name": "Python",
+          "cmdline": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python /Users/daltonmetzler/privastra/backend/venv/bin/celery -A app.core.cele",
+          "cpu_percent": 0.0,
+          "memory_mb": 0.015625
+        },
+        {
+          "pid": 4789,
+          "name": "Python",
+          "cmdline": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python /Users/daltonmetzler/privastra/backend/venv/bin/celery -A app.core.cele",
+          "cpu_percent": 0.0,
+          "memory_mb": 0.015625
+        },
+        {
+          "pid": 4790,
+          "name": "Python",
+          "cmdline": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python /Users/daltonmetzler/privastra/backend/venv/bin/celery -A app.core.cele",
+          "cpu_percent": 0.0,
+          "memory_mb": 0.015625
+        },
+        {
+          "pid": 4800,
+          "name": "Python",
+          "cmdline": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python /Users/daltonmetzler/privastra/backend/venv/bin/celery -A app.core.cele",
+          "cpu_percent": 0.0,
+          "memory_mb": 18.203125
+        },
+        {
+          "pid": 16262,
+          "name": "Python",
+          "cmdline": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python -c from multiprocessing.resource_tracker import main;main(5)",
+          "cpu_percent": 0.0,
+          "memory_mb": 0.015625
+        },
+        {
+          "pid": 17086,
+          "name": "Python",
+          "cmdline": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python -c from multiprocessing.spawn import spawn_main; spawn_main(tracker_fd=",
+          "cpu_percent": 0.0,
+          "memory_mb": 0.890625
+        },
+        {
+          "pid": 20240,
+          "name": "zsh",
+          "cmdline": "/bin/zsh -c -l source /Users/daltonmetzler/.claude/shell-snapshots/snapshot-zsh-1757742192881-dyqp61.sh && eval 'cd \"/Users/daltonmetzler/Desktop/untitled folder 3/backend\" && node simple-server.js' \\",
+          "cpu_percent": 0.0,
+          "memory_mb": 0.015625
+        },
+        {
+          "pid": 20242,
+          "name": "node",
+          "cmdline": "node simple-server.js",
+          "cpu_percent": 0.0,
+          "memory_mb": 3.5625
+        },
+        {
+          "pid": 24140,
+          "name": "node",
+          "cmdline": "npm run dev --port 3002      ",
+          "cpu_percent": 0.0,
+          "memory_mb": 0.53125
+        },
+        {
+          "pid": 24159,
+          "name": "node",
+          "cmdline": "node /Users/daltonmetzler/Desktop/untitled folder 3/node_modules/.bin/next dev --turbopack --port 3002",
+          "cpu_percent": 0.0,
+          "memory_mb": 0.015625
+        },
+        {
+          "pid": 24160,
+          "name": "node",
+          "cmdline": "next-server (v15.5.3) ",
+          "cpu_percent": 0.0,
+          "memory_mb": 26.859375
+        },
+        {
+          "pid": 24224,
+          "name": "node",
+          "cmdline": "node /Users/daltonmetzler/Desktop/untitled folder 3/frontend/.next/postcss.js 49237",
+          "cpu_percent": 0.0,
+          "memory_mb": 0.015625
+        },
+        {
+          "pid": 24474,
+          "name": "Python",
+          "cmdline": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python /Users/daltonmetzler/Desktop/privastra/backend/venv/bin/celery -A app.c",
+          "cpu_percent": 0.0,
+          "memory_mb": 19.6875
+        },
+        {
+          "pid": 24811,
+          "name": "node",
+          "cmdline": "npm run dev --port 3003      ",
+          "cpu_percent": 0.0,
+          "memory_mb": 0.578125
+        },
+        {
+          "pid": 24831,
+          "name": "node",
+          "cmdline": "node /Users/daltonmetzler/Desktop/untitled folder 3/node_modules/.bin/next dev --turbopack --port 3003",
+          "cpu_percent": 0.0,
+          "memory_mb": 0.015625
+        },
+        {
+          "pid": 24832,
+          "name": "node",
+          "cmdline": "next-server (v15.5.3) ",
+          "cpu_percent": 0.0,
+          "memory_mb": 16.28125
+        },
+        {
+          "pid": 24935,
+          "name": "node",
+          "cmdline": "node /Users/daltonmetzler/Desktop/untitled folder 3/frontend/.next/postcss.js 49537",
+          "cpu_percent": 0.0,
+          "memory_mb": 0.015625
+        },
+        {
+          "pid": 27401,
+          "name": "Python",
+          "cmdline": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python -m uvicorn app.main:app --reload --host 127.0.0.1 --port 8888",
+          "cpu_percent": 0.0,
+          "memory_mb": 2.9375
+        },
+        {
+          "pid": 27402,
+          "name": "Python",
+          "cmdline": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python -c from multiprocessing.resource_tracker import main;main(5)",
+          "cpu_percent": 0.0,
+          "memory_mb": 0.015625
+        },
+        {
+          "pid": 31592,
+          "name": "bash",
+          "cmdline": "/bin/sh /Users/daltonmetzler/Desktop/privastra/backend/venv/lib/python3.9/site-packages/playwright/driver/playwright.sh run-driver",
+          "cpu_percent": 0.0,
+          "memory_mb": 0.015625
+        },
+        {
+          "pid": 31593,
+          "name": "bash",
+          "cmdline": "/bin/sh /Users/daltonmetzler/Desktop/privastra/backend/venv/lib/python3.9/site-packages/playwright/driver/playwright.sh run-driver",
+          "cpu_percent": 0.0,
+          "memory_mb": 0.015625
+        },
+        {
+          "pid": 31594,
+          "name": "bash",
+          "cmdline": "/bin/sh /Users/daltonmetzler/Desktop/privastra/backend/venv/lib/python3.9/site-packages/playwright/driver/playwright.sh run-driver",
+          "cpu_percent": 0.0,
+          "memory_mb": 0.015625
+        },
+        {
+          "pid": 31595,
+          "name": "bash",
+          "cmdline": "/bin/sh /Users/daltonmetzler/Desktop/privastra/backend/venv/lib/python3.9/site-packages/playwright/driver/playwright.sh run-driver",
+          "cpu_percent": 0.0,
+          "memory_mb": 0.015625
+        },
+        {
+          "pid": 31604,
+          "name": "bash",
+          "cmdline": "/bin/sh /Users/daltonmetzler/Desktop/privastra/backend/venv/lib/python3.9/site-packages/playwright/driver/playwright.sh run-driver",
+          "cpu_percent": 0.0,
+          "memory_mb": 0.015625
+        },
+        {
+          "pid": 31606,
+          "name": "node",
+          "cmdline": "/Users/daltonmetzler/Desktop/privastra/backend/venv/lib/python3.9/site-packages/playwright/driver/node /Users/daltonmetzler/Desktop/privastra/backend/venv/lib/python3.9/site-packages/playwright/driver",
+          "cpu_percent": 0.0,
+          "memory_mb": 0.015625
+        },
+        {
+          "pid": 31607,
+          "name": "node",
+          "cmdline": "/Users/daltonmetzler/Desktop/privastra/backend/venv/lib/python3.9/site-packages/playwright/driver/node /Users/daltonmetzler/Desktop/privastra/backend/venv/lib/python3.9/site-packages/playwright/driver",
+          "cpu_percent": 0.0,
+          "memory_mb": 0.015625
+        },
+        {
+          "pid": 31609,
+          "name": "node",
+          "cmdline": "/Users/daltonmetzler/Desktop/privastra/backend/venv/lib/python3.9/site-packages/playwright/driver/node /Users/daltonmetzler/Desktop/privastra/backend/venv/lib/python3.9/site-packages/playwright/driver",
+          "cpu_percent": 0.0,
+          "memory_mb": 0.015625
+        },
+        {
+          "pid": 31611,
+          "name": "bash",
+          "cmdline": "/bin/sh /Users/daltonmetzler/Desktop/privastra/backend/venv/lib/python3.9/site-packages/playwright/driver/playwright.sh run-driver",
+          "cpu_percent": 0.0,
+          "memory_mb": 0.015625
+        },
+        {
+          "pid": 31616,
+          "name": "node",
+          "cmdline": "/Users/daltonmetzler/Desktop/privastra/backend/venv/lib/python3.9/site-packages/playwright/driver/node /Users/daltonmetzler/Desktop/privastra/backend/venv/lib/python3.9/site-packages/playwright/driver",
+          "cpu_percent": 0.0,
+          "memory_mb": 0.015625
+        },
+        {
+          "pid": 31617,
+          "name": "node",
+          "cmdline": "/Users/daltonmetzler/Desktop/privastra/backend/venv/lib/python3.9/site-packages/playwright/driver/node /Users/daltonmetzler/Desktop/privastra/backend/venv/lib/python3.9/site-packages/playwright/driver",
+          "cpu_percent": 0.0,
+          "memory_mb": 0.015625
+        },
+        {
+          "pid": 31621,
+          "name": "node",
+          "cmdline": "/Users/daltonmetzler/Desktop/privastra/backend/venv/lib/python3.9/site-packages/playwright/driver/node /Users/daltonmetzler/Desktop/privastra/backend/venv/lib/python3.9/site-packages/playwright/driver",
+          "cpu_percent": 0.0,
+          "memory_mb": 0.015625
+        },
+        {
+          "pid": 31656,
+          "name": "bash",
+          "cmdline": "/bin/sh /Users/daltonmetzler/Desktop/privastra/backend/venv/lib/python3.9/site-packages/playwright/driver/playwright.sh run-driver",
+          "cpu_percent": 0.0,
+          "memory_mb": 0.015625
+        },
+        {
+          "pid": 31657,
+          "name": "bash",
+          "cmdline": "/bin/sh /Users/daltonmetzler/Desktop/privastra/backend/venv/lib/python3.9/site-packages/playwright/driver/playwright.sh run-driver",
+          "cpu_percent": 0.0,
+          "memory_mb": 0.015625
+        },
+        {
+          "pid": 31658,
+          "name": "bash",
+          "cmdline": "/bin/sh /Users/daltonmetzler/Desktop/privastra/backend/venv/lib/python3.9/site-packages/playwright/driver/playwright.sh run-driver",
+          "cpu_percent": 0.0,
+          "memory_mb": 0.015625
+        },
+        {
+          "pid": 31664,
+          "name": "bash",
+          "cmdline": "/bin/sh /Users/daltonmetzler/Desktop/privastra/backend/venv/lib/python3.9/site-packages/playwright/driver/playwright.sh run-driver",
+          "cpu_percent": 0.0,
+          "memory_mb": 0.015625
+        },
+        {
+          "pid": 31666,
+          "name": "node",
+          "cmdline": "/Users/daltonmetzler/Desktop/privastra/backend/venv/lib/python3.9/site-packages/playwright/driver/node /Users/daltonmetzler/Desktop/privastra/backend/venv/lib/python3.9/site-packages/playwright/driver",
+          "cpu_percent": 0.0,
+          "memory_mb": 0.015625
+        },
+        {
+          "pid": 31670,
+          "name": "node",
+          "cmdline": "/Users/daltonmetzler/Desktop/privastra/backend/venv/lib/python3.9/site-packages/playwright/driver/node /Users/daltonmetzler/Desktop/privastra/backend/venv/lib/python3.9/site-packages/playwright/driver",
+          "cpu_percent": 0.0,
+          "memory_mb": 0.015625
+        },
+        {
+          "pid": 31671,
+          "name": "bash",
+          "cmdline": "/bin/sh /Users/daltonmetzler/Desktop/privastra/backend/venv/lib/python3.9/site-packages/playwright/driver/playwright.sh run-driver",
+          "cpu_percent": 0.0,
+          "memory_mb": 0.015625
+        },
+        {
+          "pid": 31672,
+          "name": "node",
+          "cmdline": "/Users/daltonmetzler/Desktop/privastra/backend/venv/lib/python3.9/site-packages/playwright/driver/node /Users/daltonmetzler/Desktop/privastra/backend/venv/lib/python3.9/site-packages/playwright/driver",
+          "cpu_percent": 0.0,
+          "memory_mb": 0.015625
+        },
+        {
+          "pid": 31676,
+          "name": "node",
+          "cmdline": "/Users/daltonmetzler/Desktop/privastra/backend/venv/lib/python3.9/site-packages/playwright/driver/node /Users/daltonmetzler/Desktop/privastra/backend/venv/lib/python3.9/site-packages/playwright/driver",
+          "cpu_percent": 0.0,
+          "memory_mb": 0.015625
+        },
+        {
+          "pid": 31680,
+          "name": "node",
+          "cmdline": "/Users/daltonmetzler/Desktop/privastra/backend/venv/lib/python3.9/site-packages/playwright/driver/node /Users/daltonmetzler/Desktop/privastra/backend/venv/lib/python3.9/site-packages/playwright/driver",
+          "cpu_percent": 0.0,
+          "memory_mb": 0.015625
+        },
+        {
+          "pid": 31795,
+          "name": "bash",
+          "cmdline": "/bin/sh /Users/daltonmetzler/Desktop/privastra/backend/venv/lib/python3.9/site-packages/playwright/driver/playwright.sh run-driver",
+          "cpu_percent": 0.0,
+          "memory_mb": 0.015625
+        },
+        {
+          "pid": 31796,
+          "name": "bash",
+          "cmdline": "/bin/sh /Users/daltonmetzler/Desktop/privastra/backend/venv/lib/python3.9/site-packages/playwright/driver/playwright.sh run-driver",
+          "cpu_percent": 0.0,
+          "memory_mb": 0.015625
+        },
+        {
+          "pid": 31797,
+          "name": "bash",
+          "cmdline": "/bin/sh /Users/daltonmetzler/Desktop/privastra/backend/venv/lib/python3.9/site-packages/playwright/driver/playwright.sh run-driver",
+          "cpu_percent": 0.0,
+          "memory_mb": 0.015625
+        },
+        {
+          "pid": 31804,
+          "name": "bash",
+          "cmdline": "/bin/sh /Users/daltonmetzler/Desktop/privastra/backend/venv/lib/python3.9/site-packages/playwright/driver/playwright.sh run-driver",
+          "cpu_percent": 0.0,
+          "memory_mb": 0.015625
+        },
+        {
+          "pid": 31805,
+          "name": "node",
+          "cmdline": "/Users/daltonmetzler/Desktop/privastra/backend/venv/lib/python3.9/site-packages/playwright/driver/node /Users/daltonmetzler/Desktop/privastra/backend/venv/lib/python3.9/site-packages/playwright/driver",
+          "cpu_percent": 0.0,
+          "memory_mb": 0.015625
+        },
+        {
+          "pid": 31806,
+          "name": "node",
+          "cmdline": "/Users/daltonmetzler/Desktop/privastra/backend/venv/lib/python3.9/site-packages/playwright/driver/node /Users/daltonmetzler/Desktop/privastra/backend/venv/lib/python3.9/site-packages/playwright/driver",
+          "cpu_percent": 0.0,
+          "memory_mb": 0.015625
+        },
+        {
+          "pid": 31809,
+          "name": "bash",
+          "cmdline": "/bin/sh /Users/daltonmetzler/Desktop/privastra/backend/venv/lib/python3.9/site-packages/playwright/driver/playwright.sh run-driver",
+          "cpu_percent": 0.0,
+          "memory_mb": 0.015625
+        },
+        {
+          "pid": 31812,
+          "name": "node",
+          "cmdline": "/Users/daltonmetzler/Desktop/privastra/backend/venv/lib/python3.9/site-packages/playwright/driver/node /Users/daltonmetzler/Desktop/privastra/backend/venv/lib/python3.9/site-packages/playwright/driver",
+          "cpu_percent": 0.0,
+          "memory_mb": 0.015625
+        },
+        {
+          "pid": 31815,
+          "name": "bash",
+          "cmdline": "/bin/sh /Users/daltonmetzler/Desktop/privastra/backend/venv/lib/python3.9/site-packages/playwright/driver/playwright.sh run-driver",
+          "cpu_percent": 0.0,
+          "memory_mb": 0.015625
+        },
+        {
+          "pid": 31818,
+          "name": "node",
+          "cmdline": "/Users/daltonmetzler/Desktop/privastra/backend/venv/lib/python3.9/site-packages/playwright/driver/node /Users/daltonmetzler/Desktop/privastra/backend/venv/lib/python3.9/site-packages/playwright/driver",
+          "cpu_percent": 0.0,
+          "memory_mb": 0.015625
+        },
+        {
+          "pid": 31820,
+          "name": "node",
+          "cmdline": "/Users/daltonmetzler/Desktop/privastra/backend/venv/lib/python3.9/site-packages/playwright/driver/node /Users/daltonmetzler/Desktop/privastra/backend/venv/lib/python3.9/site-packages/playwright/driver",
+          "cpu_percent": 0.0,
+          "memory_mb": 0.015625
+        },
+        {
+          "pid": 31824,
+          "name": "node",
+          "cmdline": "/Users/daltonmetzler/Desktop/privastra/backend/venv/lib/python3.9/site-packages/playwright/driver/node /Users/daltonmetzler/Desktop/privastra/backend/venv/lib/python3.9/site-packages/playwright/driver",
+          "cpu_percent": 0.0,
+          "memory_mb": 0.015625
+        },
+        {
+          "pid": 31863,
+          "name": "bash",
+          "cmdline": "/bin/sh /Users/daltonmetzler/Desktop/privastra/backend/venv/lib/python3.9/site-packages/playwright/driver/playwright.sh run-driver",
+          "cpu_percent": 0.0,
+          "memory_mb": 0.015625
+        },
+        {
+          "pid": 31864,
+          "name": "bash",
+          "cmdline": "/bin/sh /Users/daltonmetzler/Desktop/privastra/backend/venv/lib/python3.9/site-packages/playwright/driver/playwright.sh run-driver",
+          "cpu_percent": 0.0,
+          "memory_mb": 0.015625
+        },
+        {
+          "pid": 31866,
+          "name": "bash",
+          "cmdline": "/bin/sh /Users/daltonmetzler/Desktop/privastra/backend/venv/lib/python3.9/site-packages/playwright/driver/playwright.sh run-driver",
+          "cpu_percent": 0.0,
+          "memory_mb": 0.015625
+        },
+        {
+          "pid": 31872,
+          "name": "bash",
+          "cmdline": "/bin/sh /Users/daltonmetzler/Desktop/privastra/backend/venv/lib/python3.9/site-packages/playwright/driver/playwright.sh run-driver",
+          "cpu_percent": 0.0,
+          "memory_mb": 0.015625
+        },
+        {
+          "pid": 31873,
+          "name": "node",
+          "cmdline": "/Users/daltonmetzler/Desktop/privastra/backend/venv/lib/python3.9/site-packages/playwright/driver/node /Users/daltonmetzler/Desktop/privastra/backend/venv/lib/python3.9/site-packages/playwright/driver",
+          "cpu_percent": 0.0,
+          "memory_mb": 0.015625
+        },
+        {
+          "pid": 31876,
+          "name": "bash",
+          "cmdline": "/bin/sh /Users/daltonmetzler/Desktop/privastra/backend/venv/lib/python3.9/site-packages/playwright/driver/playwright.sh run-driver",
+          "cpu_percent": 0.0,
+          "memory_mb": 0.015625
+        },
+        {
+          "pid": 31878,
+          "name": "node",
+          "cmdline": "/Users/daltonmetzler/Desktop/privastra/backend/venv/lib/python3.9/site-packages/playwright/driver/node /Users/daltonmetzler/Desktop/privastra/backend/venv/lib/python3.9/site-packages/playwright/driver",
+          "cpu_percent": 0.0,
+          "memory_mb": 0.015625
+        },
+        {
+          "pid": 31881,
+          "name": "node",
+          "cmdline": "/Users/daltonmetzler/Desktop/privastra/backend/venv/lib/python3.9/site-packages/playwright/driver/node /Users/daltonmetzler/Desktop/privastra/backend/venv/lib/python3.9/site-packages/playwright/driver",
+          "cpu_percent": 0.0,
+          "memory_mb": 0.015625
+        },
+        {
+          "pid": 31884,
+          "name": "node",
+          "cmdline": "/Users/daltonmetzler/Desktop/privastra/backend/venv/lib/python3.9/site-packages/playwright/driver/node /Users/daltonmetzler/Desktop/privastra/backend/venv/lib/python3.9/site-packages/playwright/driver",
+          "cpu_percent": 0.0,
+          "memory_mb": 0.015625
+        },
+        {
+          "pid": 31887,
+          "name": "node",
+          "cmdline": "/Users/daltonmetzler/Desktop/privastra/backend/venv/lib/python3.9/site-packages/playwright/driver/node /Users/daltonmetzler/Desktop/privastra/backend/venv/lib/python3.9/site-packages/playwright/driver",
+          "cpu_percent": 0.0,
+          "memory_mb": 0.015625
+        },
+        {
+          "pid": 31936,
+          "name": "Python",
+          "cmdline": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python -c from app import app; app.run(host='0.0.0.0', port=5000, debug=False)",
+          "cpu_percent": 0.0,
+          "memory_mb": 15.765625
+        },
+        {
+          "pid": 32769,
+          "name": "Python",
+          "cmdline": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python -c from multiprocessing.spawn import spawn_main; spawn_main(tracker_fd=",
+          "cpu_percent": 0.0,
+          "memory_mb": 53.40625
+        },
+        {
+          "pid": 33612,
+          "name": "zsh",
+          "cmdline": "/bin/zsh -c -l source /Users/daltonmetzler/.claude/shell-snapshots/snapshot-zsh-1757388771158-ezudz6.sh && eval 'cd \"/Users/daltonmetzler/Desktop/Reddit - bot\" && TELEGRAM_API_ID=0 TELEGRAM_API_HASH=\"",
+          "cpu_percent": 0.0,
+          "memory_mb": 0.015625
+        },
+        {
+          "pid": 33614,
+          "name": "Python",
+          "cmdline": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python test_api.py",
+          "cpu_percent": 0.0,
+          "memory_mb": 13.578125
+        },
+        {
+          "pid": 43467,
+          "name": "zsh",
+          "cmdline": "/bin/zsh -c -l source /Users/daltonmetzler/.claude/shell-snapshots/snapshot-zsh-1757775479341-go6xxq.sh && eval 'cd /Users/daltonmetzler/Desktop/Tinder/telegram_bot && python3 simple_bot.py' \\< /dev/n",
+          "cpu_percent": 0.0,
+          "memory_mb": 0.015625
+        },
+        {
+          "pid": 43469,
+          "name": "Python",
+          "cmdline": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python simple_bot.py",
+          "cpu_percent": 0.0,
+          "memory_mb": 27.390625
+        },
+        {
+          "pid": 45451,
+          "name": "node",
+          "cmdline": "claude ",
+          "cpu_percent": 0.0,
+          "memory_mb": 205.25
+        },
+        {
+          "pid": 46808,
+          "name": "node",
+          "cmdline": "claude ",
+          "cpu_percent": 0.0,
+          "memory_mb": 1223.265625
+        },
+        {
+          "pid": 48967,
+          "name": "zsh",
+          "cmdline": "/bin/zsh -c -l source /Users/daltonmetzler/.claude/shell-snapshots/snapshot-zsh-1757788838057-ii1um6.sh && eval 'python3 quick_performance_analysis.py' \\< /dev/null && pwd -P >| /var/folders/bg/1kqs1q",
+          "cpu_percent": 0.0,
+          "memory_mb": 2.53125
+        },
+        {
+          "pid": 48969,
+          "name": "Python",
+          "cmdline": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python quick_performance_analysis.py",
+          "cpu_percent": 0.0,
+          "memory_mb": 32.640625
+        },
+        {
+          "pid": 75686,
+          "name": "zsh",
+          "cmdline": "/bin/zsh -c -l source /Users/daltonmetzler/.claude/shell-snapshots/snapshot-zsh-1757543590829-kcgu64.sh && eval 'cd \"/Users/daltonmetzler/Desktop/untitled folder/privastra/backend\" && ALLOW_UNVERIFIED",
+          "cpu_percent": 0.0,
+          "memory_mb": 0.015625
+        },
+        {
+          "pid": 75688,
+          "name": "Python",
+          "cmdline": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python minimal_auth_test.py",
+          "cpu_percent": 0.0,
+          "memory_mb": 4.671875
+        }
+      ]
+    },
+    "advanced_load_test_results_1757790678.json": {
+      "test_results": {
+        "test_metadata": {
+          "timestamp": "2025-09-13T13:11:18.650691",
+          "total_test_duration_minutes": 1.2217645009358724
+        },
+        "endpoint_load_tests": [
+          {
+            "url": "http://localhost:8888/health",
+            "test_config": {
+              "concurrent_users": 15,
+              "test_duration_seconds": 20,
+              "actual_duration_seconds": 20.109281063079834
+            },
+            "performance_metrics": {
+              "total_requests": 2627,
+              "requests_per_second": 130.63619687643185,
+              "success_rate": 100.0,
+              "error_count": 0
+            },
+            "response_times": {
+              "mean_ms": 14.047160364622211,
+              "median_ms": 12.388944625854492,
+              "p95_ms": 25.084447860717773,
+              "p99_ms": 28.415307998657227,
+              "min_ms": 1.8279552459716797,
+              "max_ms": 319.6148872375488,
+              "stddev_ms": 23.478302623809288
+            },
+            "status_codes": {
+              "200": 2627
+            },
+            "errors": []
+          },
+          {
+            "url": "http://localhost:5000/health",
+            "test_config": {
+              "concurrent_users": 15,
+              "test_duration_seconds": 20,
+              "actual_duration_seconds": 20.101246118545532
+            },
+            "performance_metrics": {
+              "total_requests": 2805,
+              "requests_per_second": 139.54358766902962,
+              "success_rate": 100.0,
+              "error_count": 0
+            },
+            "response_times": {
+              "mean_ms": 6.835484462200852,
+              "median_ms": 6.4182281494140625,
+              "p95_ms": 12.742805480957031,
+              "p99_ms": 18.889899253845215,
+              "min_ms": 0.8602142333984375,
+              "max_ms": 25.38299560546875,
+              "stddev_ms": 3.452784358743779
+            },
+            "status_codes": {
+              "200": 100,
+              "429": 2705
+            },
+            "errors": []
+          }
+        ],
+        "database_load_test": {
+          "database_type": "Redis",
+          "operations_tested": 2000,
+          "write_performance": {
+            "total_time_seconds": 0.07946324348449707,
+            "operations_per_second": 25168.869433201417,
+            "mean_time_ms": 0.03962373733520508,
+            "p95_time_ms": 0.07104873657226562,
+            "max_time_ms": 1.2478828430175781
+          },
+          "read_performance": {
+            "total_time_seconds": 0.05456399917602539,
+            "operations_per_second": 36654.204790743606,
+            "mean_time_ms": 0.027165889739990234,
+            "p95_time_ms": 0.031948089599609375,
+            "max_time_ms": 0.06890296936035156
+          },
+          "status": "success"
+        },
+        "system_resource_monitoring": {
+          "monitoring_duration_seconds": 25,
+          "sample_count": 23,
+          "cpu_usage": {
+            "mean_percent": 15.004347826086956,
+            "max_percent": 21.7,
+            "min_percent": 8.7,
+            "stddev_percent": 3.6358665668172705
+          },
+          "memory_usage": {
+            "mean_percent": 63.79565217391305,
+            "max_percent": 64.9,
+            "min_percent": 62.7,
+            "peak_used_gb": 7.7947845458984375
+          },
+          "samples": [
+            {
+              "timestamp": 20.015094995498657,
+              "cpu_percent": 10.5,
+              "memory_percent": 64.4,
+              "memory_used_gb": 7.729278564453125,
+              "disk_io": {
+                "read_count": 25652969,
+                "write_count": 14637887,
+                "read_bytes": 532059399168,
+                "write_bytes": 367310901248,
+                "read_time": 10010203,
+                "write_time": 756687
+              },
+              "network_io": {
+                "bytes_sent": 19473527194,
+                "bytes_recv": 43193026364,
+                "packets_sent": 34018788,
+                "packets_recv": 52117753,
+                "errin": 0,
+                "errout": 0,
+                "dropin": 0,
+                "dropout": 0
+              },
+              "active_processes": 731
+            },
+            {
+              "timestamp": 21.127642154693604,
+              "cpu_percent": 10.6,
+              "memory_percent": 64.4,
+              "memory_used_gb": 7.7290802001953125,
+              "disk_io": {
+                "read_count": 25652969,
+                "write_count": 14637891,
+                "read_bytes": 532059399168,
+                "write_bytes": 367310917632,
+                "read_time": 10010203,
+                "write_time": 756688
+              },
+              "network_io": {
+                "bytes_sent": 19473540700,
+                "bytes_recv": 43193042009,
+                "packets_sent": 34018842,
+                "packets_recv": 52117804,
+                "errin": 0,
+                "errout": 0,
+                "dropin": 0,
+                "dropout": 0
+              },
+              "active_processes": 731
+            },
+            {
+              "timestamp": 22.242663145065308,
+              "cpu_percent": 14.0,
+              "memory_percent": 64.3,
+              "memory_used_gb": 7.7228546142578125,
+              "disk_io": {
+                "read_count": 25652970,
+                "write_count": 14637897,
+                "read_bytes": 532059403264,
+                "write_bytes": 367310946304,
+                "read_time": 10010204,
+                "write_time": 756689
+              },
+              "network_io": {
+                "bytes_sent": 19473545843,
+                "bytes_recv": 43193048760,
+                "packets_sent": 34018871,
+                "packets_recv": 52117832,
+                "errin": 0,
+                "errout": 0,
+                "dropin": 0,
+                "dropout": 0
+              },
+              "active_processes": 731
+            },
+            {
+              "timestamp": 23.35219931602478,
+              "cpu_percent": 19.4,
+              "memory_percent": 64.4,
+              "memory_used_gb": 7.7289886474609375,
+              "disk_io": {
+                "read_count": 25652974,
+                "write_count": 14638011,
+                "read_bytes": 532059440128,
+                "write_bytes": 367311556608,
+                "read_time": 10010206,
+                "write_time": 756697
+              },
+              "network_io": {
+                "bytes_sent": 19473561027,
+                "bytes_recv": 43193066239,
+                "packets_sent": 34018926,
+                "packets_recv": 52117888,
+                "errin": 0,
+                "errout": 0,
+                "dropin": 0,
+                "dropout": 0
+              },
+              "active_processes": 731
+            },
+            {
+              "timestamp": 24.461809158325195,
+              "cpu_percent": 14.4,
+              "memory_percent": 64.4,
+              "memory_used_gb": 7.7270965576171875,
+              "disk_io": {
+                "read_count": 25652974,
+                "write_count": 14638070,
+                "read_bytes": 532059440128,
+                "write_bytes": 367311904768,
+                "read_time": 10010206,
+                "write_time": 756699
+              },
+              "network_io": {
+                "bytes_sent": 19473569727,
+                "bytes_recv": 43193074852,
+                "packets_sent": 34018966,
+                "packets_recv": 52117925,
+                "errin": 0,
+                "errout": 0,
+                "dropin": 0,
+                "dropout": 0
+              },
+              "active_processes": 731
+            }
+          ]
+        },
+        "memory_stress_test": {
+          "memory_stress_test": {
+            "target_memory_mb": 300,
+            "chunks_created": 6,
+            "initial_memory_percent": 64.3,
+            "peak_memory_percent": 65.6,
+            "final_memory_percent": 65.2,
+            "memory_increase_percent": 1.2999999999999972,
+            "memory_released_percent": 0.3999999999999915
+          }
+        }
+      },
+      "analysis": {
+        "performance_summary": {
+          "endpoints": {
+            "average_requests_per_second": 135.08989227273074,
+            "average_response_time_ms": 10.441322413411532,
+            "minimum_success_rate": 100.0,
+            "endpoints_tested": 2
+          },
+          "database": {
+            "write_operations_per_second": 25168.869433201417,
+            "read_operations_per_second": 36654.204790743606
+          },
+          "system_resources": {
+            "peak_cpu_percent": 21.7,
+            "average_cpu_percent": 15.004347826086956,
+            "peak_memory_percent": 64.9,
+            "average_memory_percent": 63.79565217391305
+          }
+        },
+        "bottlenecks_identified": [],
+        "recommendations": [
+          "System performance is good under current load levels"
+        ],
+        "scalability_assessment": {
+          "current_max_rps": 139.54358766902962,
+          "estimated_daily_capacity": 12056565,
+          "estimated_concurrent_users": 279,
+          "scaling_recommendation": "Good for small-medium scale"
+        }
+      }
+    },
+    "network_performance_results_1757790812.json": {
+      "test_results": {
+        "local_connection_tests": [
+          {
+            "host": "localhost",
+            "port": 8000,
+            "successful_connections": 20,
+            "total_attempts": 20,
+            "success_rate": 100.0,
+            "connection_times": {
+              "mean_ms": 0.2223491668701172,
+              "median_ms": 0.16951560974121094,
+              "min_ms": 0.1621246337890625,
+              "max_ms": 1.1320114135742188,
+              "p95_ms": 1.1320114135742188
+            }
+          },
+          {
+            "host": "localhost",
+            "port": 8888,
+            "successful_connections": 20,
+            "total_attempts": 20,
+            "success_rate": 100.0,
+            "connection_times": {
+              "mean_ms": 0.17380714416503906,
+              "median_ms": 0.17201900482177734,
+              "min_ms": 0.1609325408935547,
+              "max_ms": 0.20194053649902344,
+              "p95_ms": 0.20194053649902344
+            }
+          },
+          {
+            "host": "localhost",
+            "port": 5000,
+            "successful_connections": 20,
+            "total_attempts": 20,
+            "success_rate": 100.0,
+            "connection_times": {
+              "mean_ms": 0.12238025665283203,
+              "median_ms": 0.10836124420166016,
+              "min_ms": 0.09703636169433594,
+              "max_ms": 0.20003318786621094,
+              "p95_ms": 0.20003318786621094
+            }
+          },
+          {
+            "host": "localhost",
+            "port": 6379,
+            "successful_connections": 20,
+            "total_attempts": 20,
+            "success_rate": 100.0,
+            "connection_times": {
+              "mean_ms": 0.10807514190673828,
+              "median_ms": 0.10764598846435547,
+              "min_ms": 0.08082389831542969,
+              "max_ms": 0.14901161193847656,
+              "p95_ms": 0.14901161193847656
+            }
+          }
+        ],
+        "url_performance": {
+          "http://localhost:8888/health": {
+            "successful_requests": 20,
+            "total_requests": 20,
+            "success_rate": 100.0,
+            "response_times": {
+              "mean_ms": 2.269279956817627,
+              "median_ms": 2.1578073501586914,
+              "min_ms": 1.7507076263427734,
+              "max_ms": 5.151033401489258,
+              "p95_ms": 5.151033401489258
+            },
+            "status_codes": {
+              "200": 20
+            }
+          },
+          "http://localhost:5000/health": {
+            "successful_requests": 20,
+            "total_requests": 20,
+            "success_rate": 100.0,
+            "response_times": {
+              "mean_ms": 1.3405084609985352,
+              "median_ms": 1.3256072998046875,
+              "min_ms": 1.27410888671875,
+              "max_ms": 1.5828609466552734,
+              "p95_ms": 1.5828609466552734
+            },
+            "status_codes": {
+              "200": 20
+            }
+          }
+        },
+        "concurrent_connection_test": [
+          {
+            "concurrent_connections": 1,
+            "total_time_seconds": 0.003659963607788086,
+            "successful_requests": 1,
+            "failed_requests": 0,
+            "success_rate": 100.0,
+            "requests_per_second": 273.2267604716305,
+            "response_times": {
+              "mean_ms": 2.5739669799804688,
+              "max_ms": 2.5739669799804688,
+              "min_ms": 2.5739669799804688
+            }
+          },
+          {
+            "concurrent_connections": 5,
+            "total_time_seconds": 0.00849008560180664,
+            "successful_requests": 5,
+            "failed_requests": 0,
+            "success_rate": 100.0,
+            "requests_per_second": 588.9222128615557,
+            "response_times": {
+              "mean_ms": 7.54547119140625,
+              "max_ms": 7.948875427246094,
+              "min_ms": 7.331132888793945
+            }
+          },
+          {
+            "concurrent_connections": 10,
+            "total_time_seconds": 0.015685081481933594,
+            "successful_requests": 10,
+            "failed_requests": 0,
+            "success_rate": 100.0,
+            "requests_per_second": 637.5484890861555,
+            "response_times": {
+              "mean_ms": 13.338136672973633,
+              "max_ms": 13.840913772583008,
+              "min_ms": 11.811971664428711
+            }
+          },
+          {
+            "concurrent_connections": 15,
+            "total_time_seconds": 0.02050495147705078,
+            "successful_requests": 15,
+            "failed_requests": 0,
+            "success_rate": 100.0,
+            "requests_per_second": 731.5306264824892,
+            "response_times": {
+              "mean_ms": 15.322144826253256,
+              "max_ms": 18.312931060791016,
+              "min_ms": 9.76705551147461
+            }
+          }
+        ],
+        "external_service_latency": [
+          {
+            "host": "google.com",
+            "port": 80,
+            "ping_latency": {
+              "samples": 4,
+              "mean_ms": 19.554,
+              "min_ms": 13.263,
+              "max_ms": 33.796
+            },
+            "tcp_connection": {
+              "host": "google.com",
+              "port": 80,
+              "successful_connections": 5,
+              "total_attempts": 5,
+              "success_rate": 100.0,
+              "connection_times": {
+                "mean_ms": 17.426204681396484,
+                "median_ms": 17.606019973754883,
+                "min_ms": 14.394044876098633,
+                "max_ms": 22.31287956237793,
+                "p95_ms": 22.31287956237793
+              }
+            }
+          },
+          {
+            "host": "github.com",
+            "port": 443,
+            "ping_latency": {
+              "samples": 5,
+              "mean_ms": 59.5182,
+              "min_ms": 58.335,
+              "max_ms": 60.687
+            },
+            "tcp_connection": {
+              "host": "github.com",
+              "port": 443,
+              "successful_connections": 5,
+              "total_attempts": 5,
+              "success_rate": 100.0,
+              "connection_times": {
+                "mean_ms": 58.12215805053711,
+                "median_ms": 58.13193321228027,
+                "min_ms": 57.64269828796387,
+                "max_ms": 58.756113052368164,
+                "p95_ms": 58.756113052368164
+              }
+            }
+          },
+          {
+            "host": "api.github.com",
+            "port": 443,
+            "ping_latency": {
+              "samples": 5,
+              "mean_ms": 62.9282,
+              "min_ms": 59.944,
+              "max_ms": 64.786
+            },
+            "tcp_connection": {
+              "host": "api.github.com",
+              "port": 443,
+              "successful_connections": 5,
+              "total_attempts": 5,
+              "success_rate": 100.0,
+              "connection_times": {
+                "mean_ms": 59.04197692871094,
+                "median_ms": 58.29310417175293,
+                "min_ms": 57.86895751953125,
+                "max_ms": 61.798810958862305,
+                "p95_ms": 61.798810958862305
+              }
+            }
+          },
+          {
+            "host": "httpbin.org",
+            "port": 80,
+            "ping_latency": {
+              "samples": 0,
+              "mean_ms": null,
+              "min_ms": null,
+              "max_ms": null
+            },
+            "tcp_connection": {
+              "host": "httpbin.org",
+              "port": 80,
+              "successful_connections": 5,
+              "total_attempts": 5,
+              "success_rate": 100.0,
+              "connection_times": {
+                "mean_ms": 58.39815139770508,
+                "median_ms": 58.049917221069336,
+                "min_ms": 57.373046875,
+                "max_ms": 59.9980354309082,
+                "p95_ms": 59.9980354309082
+              }
+            }
+          },
+          {
+            "host": "jsonplaceholder.typicode.com",
+            "port": 80,
+            "ping_latency": {
+              "samples": 5,
+              "mean_ms": 17.71,
+              "min_ms": 15.668,
+              "max_ms": 19.02
+            },
+            "tcp_connection": {
+              "host": "jsonplaceholder.typicode.com",
+              "port": 80,
+              "successful_connections": 5,
+              "total_attempts": 5,
+              "success_rate": 100.0,
+              "connection_times": {
+                "mean_ms": 17.479944229125977,
+                "median_ms": 17.630338668823242,
+                "min_ms": 16.79205894470215,
+                "max_ms": 18.029212951660156,
+                "p95_ms": 18.029212951660156
+              }
+            }
+          }
+        ],
+        "proxy_performance": {
+          "test_url": "http://httpbin.org/ip",
+          "direct_requests": {
+            "successful_requests": 10,
+            "mean_response_time_ms": 204.90024089813232,
+            "min_response_time_ms": 116.70923233032227,
+            "max_response_time_ms": 736.0949516296387
+          },
+          "proxy_requests": {
+            "successful_requests": 0,
+            "mean_response_time_ms": null,
+            "min_response_time_ms": null,
+            "max_response_time_ms": null
+          }
+        }
+      },
+      "analysis": {
+        "network_health_score": 100,
+        "performance_issues": [],
+        "recommendations": [
+          "Network performance is excellent - maintain current configuration"
+        ],
+        "summary": {
+          "local_connections": {
+            "successful_services": 4,
+            "total_services_tested": 4,
+            "success_rate": 100.0
+          }
+        }
+      },
+      "timestamp": "2025-09-13T13:13:32.302490"
+    }
+  }
+}

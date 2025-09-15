@@ -1,0 +1,349 @@
+{
+  "test_execution": {
+    "test_id": "cf68cdd5-93eb-4f1c-bcd7-70b00d9e054e",
+    "timestamp": "2025-09-13T14:45:22.103593",
+    "duration_seconds": 77.04925727844238,
+    "total_tests": 4,
+    "passed_tests": 3,
+    "failed_tests": 1,
+    "mock_tests": 3
+  },
+  "component_health": {
+    "api_gateway": {
+      "component_name": "api_gateway",
+      "available": true,
+      "response_time": 1.0581016540527344,
+      "last_error": null,
+      "mock_mode": false,
+      "performance_score": 1.0
+    },
+    "websocket_server": {
+      "component_name": "websocket_server",
+      "available": false,
+      "response_time": 0.21719932556152344,
+      "last_error": "Connection refused",
+      "mock_mode": true,
+      "performance_score": 0.0
+    },
+    "database": {
+      "component_name": "database",
+      "available": true,
+      "response_time": 0.2079010009765625,
+      "last_error": null,
+      "mock_mode": false,
+      "performance_score": 1.0
+    },
+    "redis_cache": {
+      "component_name": "redis_cache",
+      "available": true,
+      "response_time": 0.19931793212890625,
+      "last_error": null,
+      "mock_mode": false,
+      "performance_score": 1.0
+    },
+    "prometheus": {
+      "component_name": "prometheus",
+      "available": false,
+      "response_time": 0.19288063049316406,
+      "last_error": "Connection refused",
+      "mock_mode": true,
+      "performance_score": 0.0
+    },
+    "grafana": {
+      "component_name": "grafana",
+      "available": false,
+      "response_time": 0.18906593322753906,
+      "last_error": "Connection refused",
+      "mock_mode": true,
+      "performance_score": 0.0
+    }
+  },
+  "category_scores": {
+    "System": {
+      "score": 1.0,
+      "passed": 1,
+      "total": 1,
+      "mock_used": true,
+      "error_count": 0
+    },
+    "Performance": {
+      "score": 0.0,
+      "passed": 0,
+      "total": 1,
+      "mock_used": true,
+      "error_count": 4
+    },
+    "Security": {
+      "score": 1.0,
+      "passed": 1,
+      "total": 1,
+      "mock_used": true,
+      "error_count": 1
+    },
+    "Production": {
+      "score": 1.0,
+      "passed": 1,
+      "total": 1,
+      "mock_used": false,
+      "error_count": 1
+    }
+  },
+  "overall_assessment": {
+    "overall_score": 0.75,
+    "grade": "B",
+    "deployment_ready": true,
+    "confidence_level": "Medium"
+  },
+  "infrastructure_status": {
+    "available_components": 3,
+    "total_components": 6,
+    "mock_services_used": [
+      "sms_service",
+      "behavioral_analytics",
+      "risk_engine"
+    ],
+    "avg_response_time": 0.34407774607340497
+  },
+  "recommendations": {
+    "critical_issues": [],
+    "improvements": [
+      "Address: baseline: Error rate 2.0% > 0.1%",
+      "Address: moderate_load: Error rate 2.4% > 0.1%",
+      "Address: high_load: Error rate 1.9% > 0.1%",
+      "Address: spike_test: Error rate 2.4% > 0.1%"
+    ],
+    "next_steps": [
+      "Set up full infrastructure for production testing",
+      "Security validation passed",
+      "Performance targets met",
+      "Monitoring configured"
+    ]
+  },
+  "performance_summary": {
+    "max_throughput_achieved": 31.236284086928958,
+    "min_response_time_p95": 50.704240798950195,
+    "performance_score": 0.5
+  },
+  "security_summary": {
+    "bot_detection_accuracy": 0.8,
+    "security_response_compliance": 1.0,
+    "security_score": 0.75
+  },
+  "detailed_results": [
+    {
+      "test_name": "System Integration",
+      "status": "PASS",
+      "duration": 0.07320880889892578,
+      "details": {
+        "passed_tests": 3,
+        "total_tests": 3,
+        "component_health": {
+          "api_gateway": {
+            "component_name": "api_gateway",
+            "available": true,
+            "response_time": 1.0581016540527344,
+            "last_error": null,
+            "mock_mode": false,
+            "performance_score": 1.0
+          },
+          "websocket_server": {
+            "component_name": "websocket_server",
+            "available": false,
+            "response_time": 0.21719932556152344,
+            "last_error": "Connection refused",
+            "mock_mode": true,
+            "performance_score": 0.0
+          },
+          "database": {
+            "component_name": "database",
+            "available": true,
+            "response_time": 0.2079010009765625,
+            "last_error": null,
+            "mock_mode": false,
+            "performance_score": 1.0
+          },
+          "redis_cache": {
+            "component_name": "redis_cache",
+            "available": true,
+            "response_time": 0.19931793212890625,
+            "last_error": null,
+            "mock_mode": false,
+            "performance_score": 1.0
+          },
+          "prometheus": {
+            "component_name": "prometheus",
+            "available": false,
+            "response_time": 0.19288063049316406,
+            "last_error": "Connection refused",
+            "mock_mode": true,
+            "performance_score": 0.0
+          },
+          "grafana": {
+            "component_name": "grafana",
+            "available": false,
+            "response_time": 0.18906593322753906,
+            "last_error": "Connection refused",
+            "mock_mode": true,
+            "performance_score": 0.0
+          }
+        },
+        "integration_score": 1.0,
+        "mock_services_used": [
+          "risk_engine",
+          "sms_service",
+          "behavioral_analytics"
+        ]
+      },
+      "timestamp": "2025-09-13T14:44:05.130076",
+      "errors": [],
+      "metrics": {
+        "integration_success_rate": 1.0,
+        "available_components": 3,
+        "avg_component_response_time": 0.34407774607340497
+      },
+      "mock_used": true
+    },
+    {
+      "test_name": "Performance Validation",
+      "status": "FAIL",
+      "duration": 75.6962878704071,
+      "details": {
+        "performance_results": {
+          "baseline": {
+            "concurrent_requests": 10,
+            "total_requests": 100,
+            "duration_seconds": 3.1373770236968994,
+            "successful_requests": 98,
+            "failed_requests": 2,
+            "throughput_rps": 31.236284086928958,
+            "avg_response_time_ms": 31.351382732391357,
+            "p95_response_time_ms": 50.704240798950195,
+            "p99_response_time_ms": 54.804086685180664,
+            "min_response_time_ms": 12.942075729370117,
+            "max_response_time_ms": 54.804086685180664,
+            "error_rate": 0.02
+          },
+          "moderate_load": {
+            "concurrent_requests": 50,
+            "total_requests": 500,
+            "duration_seconds": 17.307119131088257,
+            "successful_requests": 488,
+            "failed_requests": 12,
+            "throughput_rps": 28.196489335040187,
+            "avg_response_time_ms": 34.59812927246094,
+            "p95_response_time_ms": 52.845001220703125,
+            "p99_response_time_ms": 54.72397804260254,
+            "min_response_time_ms": 12.177228927612305,
+            "max_response_time_ms": 55.0389289855957,
+            "error_rate": 0.024
+          },
+          "high_load": {
+            "concurrent_requests": 100,
+            "total_requests": 1000,
+            "duration_seconds": 33.9264440536499,
+            "successful_requests": 981,
+            "failed_requests": 19,
+            "throughput_rps": 28.91549725779355,
+            "avg_response_time_ms": 33.89612698554993,
+            "p95_response_time_ms": 52.455902099609375,
+            "p99_response_time_ms": 54.721832275390625,
+            "min_response_time_ms": 11.641740798950195,
+            "max_response_time_ms": 55.101871490478516,
+            "error_rate": 0.019
+          },
+          "spike_test": {
+            "concurrent_requests": 200,
+            "total_requests": 500,
+            "duration_seconds": 17.141937732696533,
+            "successful_requests": 488,
+            "failed_requests": 12,
+            "throughput_rps": 28.468193480203162,
+            "avg_response_time_ms": 34.25532293319702,
+            "p95_response_time_ms": 53.289175033569336,
+            "p99_response_time_ms": 54.425954818725586,
+            "min_response_time_ms": 10.782241821289062,
+            "max_response_time_ms": 54.84485626220703,
+            "error_rate": 0.024
+          }
+        },
+        "performance_score": 50,
+        "targets": {
+          "max_response_time": 100,
+          "min_throughput": 1000,
+          "max_error_rate": 0.001,
+          "p95_response_time": 50,
+          "p99_response_time": 80
+        }
+      },
+      "timestamp": "2025-09-13T14:45:20.826484",
+      "errors": [
+        "baseline: Error rate 2.0% > 0.1%",
+        "moderate_load: Error rate 2.4% > 0.1%",
+        "high_load: Error rate 1.9% > 0.1%",
+        "spike_test: Error rate 2.4% > 0.1%"
+      ],
+      "metrics": {
+        "performance_score": 0.5,
+        "max_throughput": 31.236284086928958,
+        "min_p95_response": 50.704240798950195
+      },
+      "mock_used": true
+    },
+    {
+      "test_name": "Security Framework",
+      "status": "MOCK",
+      "duration": 1.27323317527771,
+      "details": {
+        "passed_tests": 3,
+        "total_tests": 4,
+        "security_score": 75.0
+      },
+      "timestamp": "2025-09-13T14:45:22.101525",
+      "errors": [
+        "Bot detection accuracy: 1/3"
+      ],
+      "metrics": {
+        "security_success_rate": 0.75,
+        "bot_detection_accuracy": 0.8,
+        "human_detection_accuracy": 0.85,
+        "response_time_compliance": 1.0
+      },
+      "mock_used": true
+    },
+    {
+      "test_name": "Production Readiness",
+      "status": "PASS",
+      "duration": 0.001585245132446289,
+      "details": {
+        "passed_tests": 4,
+        "total_tests": 5,
+        "readiness_score": 80.0,
+        "deployment_ready": true,
+        "component_availability": {
+          "api_gateway": true,
+          "websocket_server": false,
+          "database": true,
+          "redis_cache": true,
+          "prometheus": false,
+          "grafana": false
+        }
+      },
+      "timestamp": "2025-09-13T14:45:22.103362",
+      "errors": [
+        "Configuration contains placeholder values"
+      ],
+      "metrics": {
+        "readiness_score": 0.8,
+        "component_availability_ratio": 0.5,
+        "critical_errors": 0
+      },
+      "mock_used": false
+    }
+  ],
+  "test_suite_results": {
+    "system_integration": true,
+    "performance_validation": false,
+    "security_framework": true,
+    "production_readiness": true
+  }
+}

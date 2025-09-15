@@ -1,0 +1,35 @@
+============================================================
+ACCOUNT EXPORT REPORT
+Generated: 2025-09-14T15:45:52.599693
+Total Accounts: 2
+Security Level: full
+============================================================
+
+ACCOUNT #1
+------------------------------
+Username: snapking_2024
+Display Name: Jake Miller
+Email: snapking2024@tempmail.org
+Phone: +15551234567
+Password: SnapKing@2024!
+Birth Date: 1998-05-15
+Status: ACTIVE
+Verification: VERIFIED
+Registration: 2025-09-14T15:45:52.599575
+Trust Score: 94/100
+Export ID: f4371cfafe631eaf
+
+ACCOUNT #2
+------------------------------
+Username: socialqueen24
+Display Name: Emma Davis
+Email: socialqueen24@tempmail.org
+Phone: +15551234568
+Password: SocialQ@24
+Birth Date: 1999-08-22
+Status: ACTIVE
+Verification: VERIFIED
+Registration: 2025-09-14T15:45:52.599588
+Trust Score: 91/100
+Export ID: 01e3b18dc22c7f63
+

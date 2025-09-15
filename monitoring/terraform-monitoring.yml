@@ -1,0 +1,383 @@
+# Enhanced Monitoring Configuration for Terraform-managed Infrastructure
+# This file defines modern observability patterns for the Fly.io deployment
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: terraform-monitoring-config
+data:
+  prometheus.yml: |
+    global:
+      scrape_interval: 15s
+      evaluation_interval: 15s
+      external_labels:
+        environment: "${ENVIRONMENT}"
+        infrastructure: "terraform-managed"
+        
+    rule_files:
+      - "/etc/prometheus/rules/*.yml"
+      
+    alerting:
+      alertmanagers:
+        - static_configs:
+            - targets:
+              - alertmanager:9093
+              
+    scrape_configs:
+      # Fly.io application metrics
+      - job_name: 'fly-apps'
+        static_configs:
+          - targets:
+            - 'snapchat-automation-prod.fly.dev:8000'
+            - 'android-device-farm-prod.fly.dev:5000'
+        metrics_path: /metrics
+        scrape_interval: 30s
+        
+      # Infrastructure health metrics
+      - job_name: 'fly-health'
+        static_configs:
+          - targets:
+            - 'snapchat-automation-prod.fly.dev:8000'
+            - 'android-device-farm-prod.fly.dev:5000'
+        metrics_path: /health
+        scrape_interval: 15s
+        
+      # Node exporter for system metrics
+      - job_name: 'node-exporter'
+        static_configs:
+          - targets: ['node-exporter:9100']
+            
+      # Redis metrics
+      - job_name: 'redis'
+        static_configs:
+          - targets: ['redis-exporter:9121']
+          
+      # Custom application metrics
+      - job_name: 'android-automation'
+        static_configs:
+          - targets: ['android-device-farm-prod.fly.dev:5000']
+        metrics_path: /metrics/automation
+        scrape_interval: 60s
+        
+      # Terraform state monitoring
+      - job_name: 'terraform-state'
+        file_sd_configs:
+          - files:
+            - '/etc/prometheus/terraform-targets.json'
+        relabel_configs:
+          - source_labels: [__meta_terraform_app_name]
+            target_label: app_name
+          - source_labels: [__meta_terraform_environment]
+            target_label: environment
+
+  alert_rules.yml: |
+    groups:
+      - name: infrastructure.rules
+        rules:
+          # High-level infrastructure alerts
+          - alert: InfrastructureDown
+            expr: up{job=~"fly-.*"} == 0
+            for: 2m
+            labels:
+              severity: critical
+              category: infrastructure
+            annotations:
+              summary: "Infrastructure component {{ $labels.instance }} is down"
+              description: "{{ $labels.job }} has been down for more than 2 minutes"
+              runbook_url: "https://docs.company.com/runbooks/infrastructure-down"
+              
+          - alert: HighErrorRate
+            expr: rate(http_requests_total{status=~"5.."}[5m]) > 0.1
+            for: 5m
+            labels:
+              severity: warning
+              category: application
+            annotations:
+              summary: "High error rate detected"
+              description: "Error rate is {{ $value }} errors per second"
+              
+          - alert: AndroidFarmDeviceShortage
+            expr: android_devices_available < 2
+            for: 3m
+            labels:
+              severity: warning
+              category: automation
+            annotations:
+              summary: "Android farm running low on devices"
+              description: "Only {{ $value }} devices available, consider scaling up"
+              
+          - alert: MemoryUsageHigh
+            expr: container_memory_usage_bytes / container_spec_memory_limit_bytes > 0.85
+            for: 10m
+            labels:
+              severity: warning
+              category: resource
+            annotations:
+              summary: "High memory usage on {{ $labels.instance }}"
+              description: "Memory usage is {{ $value | humanizePercentage }}"
+              
+          - alert: TerraformDrift
+            expr: terraform_resource_drift > 0
+            for: 1m
+            labels:
+              severity: warning
+              category: infrastructure
+            annotations:
+              summary: "Terraform drift detected"
+              description: "{{ $value }} resources have drifted from desired state"
+              
+      - name: automation.rules
+        rules:
+          - alert: SnapchatAutomationFailureRate
+            expr: rate(automation_failures_total[10m]) > 0.05
+            for: 5m
+            labels:
+              severity: warning
+              category: automation
+            annotations:
+              summary: "High Snapchat automation failure rate"
+              description: "Failure rate is {{ $value | humanizePercentage }}"
+              
+          - alert: AndroidEmulatorBoot
+            expr: android_emulator_boot_time_seconds > 180
+            for: 1m
+            labels:
+              severity: warning
+              category: performance
+            annotations:
+              summary: "Slow Android emulator boot time"
+              description: "Boot time is {{ $value }}s, expected < 180s"
+
+  grafana-dashboard-terraform.json: |
+    {
+      "dashboard": {
+        "title": "Terraform Infrastructure Overview",
+        "tags": ["terraform", "infrastructure", "fly.io"],
+        "timezone": "UTC",
+        "panels": [
+          {
+            "title": "Infrastructure Health",
+            "type": "stat",
+            "targets": [
+              {
+                "expr": "up{job=~\"fly-.*\"}",
+                "legendFormat": "{{ instance }}"
+              }
+            ],
+            "fieldConfig": {
+              "defaults": {
+                "unit": "short",
+                "thresholds": {
+                  "steps": [
+                    {"color": "red", "value": 0},
+                    {"color": "green", "value": 1}
+                  ]
+                }
+              }
+            }
+          },
+          {
+            "title": "Request Rate",
+            "type": "graph",
+            "targets": [
+              {
+                "expr": "rate(http_requests_total[5m])",
+                "legendFormat": "{{ method }} {{ status }}"
+              }
+            ]
+          },
+          {
+            "title": "Android Farm Status",
+            "type": "table",
+            "targets": [
+              {
+                "expr": "android_devices_available",
+                "legendFormat": "Available Devices"
+              },
+              {
+                "expr": "android_emulator_count",
+                "legendFormat": "Running Emulators"
+              }
+            ]
+          },
+          {
+            "title": "Resource Usage",
+            "type": "graph",
+            "targets": [
+              {
+                "expr": "container_memory_usage_bytes / container_spec_memory_limit_bytes",
+                "legendFormat": "Memory Usage %"
+              },
+              {
+                "expr": "rate(container_cpu_usage_seconds_total[5m])",
+                "legendFormat": "CPU Usage %"
+              }
+            ]
+          },
+          {
+            "title": "Terraform State",
+            "type": "stat",
+            "targets": [
+              {
+                "expr": "terraform_resource_count",
+                "legendFormat": "Managed Resources"
+              },
+              {
+                "expr": "terraform_resource_drift",
+                "legendFormat": "Drifted Resources"
+              }
+            ]
+          },
+          {
+            "title": "Deployment Timeline",
+            "type": "logs",
+            "targets": [
+              {
+                "expr": "{job=\"deployment-logs\"} |= \"terraform\""
+              }
+            ]
+          }
+        ],
+        "time": {
+          "from": "now-1h",
+          "to": "now"
+        },
+        "refresh": "30s"
+      }
+    }
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: sli-slo-config
+data:
+  sli-definitions.yml: |
+    # Service Level Indicators (SLIs) for Terraform Infrastructure
+    slis:
+      availability:
+        description: "Percentage of successful health checks"
+        query: "rate(http_requests_total{status=~\"2..|3..\"}[5m]) / rate(http_requests_total[5m])"
+        target: 0.999  # 99.9%
+        
+      latency:
+        description: "95th percentile response time"
+        query: "histogram_quantile(0.95, rate(http_request_duration_seconds_bucket[5m]))"
+        target: 0.2  # 200ms
+        
+      error_rate:
+        description: "Percentage of requests returning 5xx errors"
+        query: "rate(http_requests_total{status=~\"5..\"}[5m]) / rate(http_requests_total[5m])"
+        target: 0.001  # 0.1%
+        
+      android_automation_success:
+        description: "Successful Android automation rate"
+        query: "rate(automation_success_total[10m]) / rate(automation_attempts_total[10m])"
+        target: 0.95  # 95%
+        
+      infrastructure_drift:
+        description: "Infrastructure drift from desired state"
+        query: "terraform_resource_drift / terraform_resource_count"
+        target: 0.05  # 5%
+
+  slo-rules.yml: |
+    groups:
+      - name: slo.rules
+        interval: 30s
+        rules:
+          # Availability SLO
+          - record: sli:availability_5m
+            expr: rate(http_requests_total{status=~"2..|3.."}[5m]) / rate(http_requests_total[5m])
+            
+          - record: sli:availability_30m
+            expr: rate(http_requests_total{status=~"2..|3.."}[30m]) / rate(http_requests_total[30m])
+            
+          - alert: SLOAvailabilityWarning
+            expr: sli:availability_5m < 0.999
+            for: 2m
+            labels:
+              severity: warning
+              slo: availability
+            annotations:
+              summary: "Availability SLO warning"
+              description: "Availability is {{ $value | humanizePercentage }}, below 99.9% target"
+              
+          # Latency SLO  
+          - record: sli:latency_95p_5m
+            expr: histogram_quantile(0.95, rate(http_request_duration_seconds_bucket[5m]))
+            
+          - alert: SLOLatencyWarning
+            expr: sli:latency_95p_5m > 0.2
+            for: 5m
+            labels:
+              severity: warning
+              slo: latency
+            annotations:
+              summary: "Latency SLO warning"
+              description: "95th percentile latency is {{ $value }}s, above 200ms target"
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: alertmanager-config
+data:
+  alertmanager.yml: |
+    global:
+      smtp_smarthost: 'localhost:587'
+      smtp_from: 'alerts@company.com'
+      
+    route:
+      group_by: ['alertname', 'environment']
+      group_wait: 10s
+      group_interval: 10s
+      repeat_interval: 1h
+      receiver: 'infrastructure-team'
+      routes:
+        - match:
+            severity: critical
+          receiver: 'critical-alerts'
+        - match:
+            category: automation
+          receiver: 'automation-team'
+        - match:
+            slo: availability
+          receiver: 'sre-team'
+          
+    receivers:
+      - name: 'infrastructure-team'
+        slack_configs:
+          - api_url: '${SLACK_WEBHOOK_URL}'
+            channel: '#infrastructure'
+            title: 'Infrastructure Alert'
+            text: '{{ range .Alerts }}{{ .Annotations.summary }}{{ end }}'
+            
+      - name: 'critical-alerts'
+        slack_configs:
+          - api_url: '${SLACK_WEBHOOK_URL}'
+            channel: '#critical'
+            title: 'CRITICAL: {{ .GroupLabels.alertname }}'
+            text: '{{ range .Alerts }}{{ .Annotations.description }}{{ end }}'
+        email_configs:
+          - to: 'oncall@company.com'
+            subject: 'CRITICAL: {{ .GroupLabels.alertname }}'
+            body: |
+              {{ range .Alerts }}
+              Alert: {{ .Annotations.summary }}
+              Description: {{ .Annotations.description }}
+              Runbook: {{ .Annotations.runbook_url }}
+              {{ end }}
+              
+      - name: 'automation-team'
+        slack_configs:
+          - api_url: '${SLACK_WEBHOOK_URL}'
+            channel: '#automation'
+            title: 'Automation Alert'
+            text: '{{ range .Alerts }}{{ .Annotations.summary }}{{ end }}'
+            
+      - name: 'sre-team'
+        slack_configs:
+          - api_url: '${SLACK_WEBHOOK_URL}'
+            channel: '#sre'
+            title: 'SLO Alert: {{ .GroupLabels.slo }}'
+            text: '{{ range .Alerts }}{{ .Annotations.description }}{{ end }}'

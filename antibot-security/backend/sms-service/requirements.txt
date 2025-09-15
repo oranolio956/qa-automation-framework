@@ -1,0 +1,37 @@
+# Web Framework
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+pydantic==2.5.0
+python-multipart==0.0.6
+
+# Redis and Queue
+aioredis==2.0.1
+pika==1.3.2
+celery[redis]==5.3.4
+
+# HTTP Client
+httpx==0.25.2
+requests==2.31.0
+
+# SMS Providers
+twilio==8.10.3
+boto3==1.34.0
+botocore==1.34.0
+
+# Reliability and Monitoring
+tenacity==8.2.3
+prometheus-client==0.19.0
+psutil==5.9.6
+
+# Logging and Security
+structlog==23.2.0
+python-jose[cryptography]==3.3.0
+cryptography==41.0.7
+
+# Utilities
+python-dotenv==1.0.0
+pydantic-settings==2.1.0
+typing-extensions==4.8.0
+colorama==0.4.6
+python-dateutil==2.8.2
+hvac==1.1.1

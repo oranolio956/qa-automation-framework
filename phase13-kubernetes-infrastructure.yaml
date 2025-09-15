@@ -1,0 +1,724 @@
+# Phase 13: Kubernetes Infrastructure for Autonomous Engagement System
+# Production-ready Kubernetes deployment with monitoring, security, and scalability
+
+---
+# Namespace
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: telegram-engagement
+  labels:
+    name: telegram-engagement
+    environment: production
+
+---
+# ConfigMap for application configuration
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: telegram-bot-config
+  namespace: telegram-engagement
+data:
+  NODE_ENV: "production"
+  LOG_LEVEL: "info"
+  PORT: "3000"
+  METRICS_PORT: "9090"
+  HEALTH_CHECK_INTERVAL: "300000"
+  RATE_LIMIT_WINDOW: "60"
+  RATE_LIMIT_MAX_REQUESTS: "100"
+  REDIS_URL: "redis://redis-service:6379"
+  MONGODB_URL: "mongodb://mongodb-service:27017/telegram-engagement"
+  WEBAPP_URL: "https://engagement.example.com"
+  WEBHOOK_URL: "https://api.engagement.example.com"
+
+---
+# Secret for sensitive configuration
+apiVersion: v1
+kind: Secret
+metadata:
+  name: telegram-bot-secrets
+  namespace: telegram-engagement
+type: Opaque
+data:
+  # Base64 encoded values - replace with actual secrets
+  BOT_TOKEN: Ym90X3Rva2VuX2hlcmU=
+  OPENAI_API_KEY: b3BlbmFpX2FwaV9rZXlfaGVyZQ==
+  ENCRYPTION_KEY: ZW5jcnlwdGlvbl9rZXlfaGVyZQ==
+  HASH_SALT: aGFzaF9zYWx0X2hlcmU=
+  JWT_SECRET: and0X3NlY3JldF9oZXJl
+  DATABASE_PASSWORD: ZGF0YWJhc2VfcGFzc3dvcmRfaGVyZQ==
+
+---
+# Deployment for the main Telegram bot
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: telegram-engagement-bot
+  namespace: telegram-engagement
+  labels:
+    app: telegram-engagement-bot
+    version: v2.0.0
+spec:
+  replicas: 3
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 1
+  selector:
+    matchLabels:
+      app: telegram-engagement-bot
+  template:
+    metadata:
+      labels:
+        app: telegram-engagement-bot
+        version: v2.0.0
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "9090"
+        prometheus.io/path: "/metrics"
+    spec:
+      serviceAccountName: telegram-bot-sa
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1001
+        fsGroup: 2000
+      containers:
+      - name: telegram-bot
+        image: telegram-engagement-bot:v2.0.0
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 3000
+          name: http
+          protocol: TCP
+        - containerPort: 9090
+          name: metrics
+          protocol: TCP
+        env:
+        - name: NODE_ENV
+          valueFrom:
+            configMapKeyRef:
+              name: telegram-bot-config
+              key: NODE_ENV
+        - name: LOG_LEVEL
+          valueFrom:
+            configMapKeyRef:
+              name: telegram-bot-config
+              key: LOG_LEVEL
+        - name: PORT
+          valueFrom:
+            configMapKeyRef:
+              name: telegram-bot-config
+              key: PORT
+        - name: BOT_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: telegram-bot-secrets
+              key: BOT_TOKEN
+        - name: OPENAI_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: telegram-bot-secrets
+              key: OPENAI_API_KEY
+        - name: REDIS_URL
+          valueFrom:
+            configMapKeyRef:
+              name: telegram-bot-config
+              key: REDIS_URL
+        - name: MONGODB_URL
+          valueFrom:
+            configMapKeyRef:
+              name: telegram-bot-config
+              key: MONGODB_URL
+        - name: ENCRYPTION_KEY
+          valueFrom:
+            secretKeyRef:
+              name: telegram-bot-secrets
+              key: ENCRYPTION_KEY
+        - name: HASH_SALT
+          valueFrom:
+            secretKeyRef:
+              name: telegram-bot-secrets
+              key: HASH_SALT
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "200m"
+          limits:
+            memory: "1Gi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 3000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 3000
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 3
+        startupProbe:
+          httpGet:
+            path: /health
+            port: 3000
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 30
+        volumeMounts:
+        - name: logs
+          mountPath: /app/logs
+        - name: tmp
+          mountPath: /tmp
+      volumes:
+      - name: logs
+        emptyDir: {}
+      - name: tmp
+        emptyDir: {}
+      terminationGracePeriodSeconds: 30
+
+---
+# Service for the Telegram bot
+apiVersion: v1
+kind: Service
+metadata:
+  name: telegram-bot-service
+  namespace: telegram-engagement
+  labels:
+    app: telegram-engagement-bot
+  annotations:
+    service.beta.kubernetes.io/aws-load-balancer-type: "nlb"
+spec:
+  type: LoadBalancer
+  selector:
+    app: telegram-engagement-bot
+  ports:
+  - name: http
+    port: 80
+    targetPort: 3000
+    protocol: TCP
+  - name: https
+    port: 443
+    targetPort: 3000
+    protocol: TCP
+
+---
+# Service for metrics scraping
+apiVersion: v1
+kind: Service
+metadata:
+  name: telegram-bot-metrics
+  namespace: telegram-engagement
+  labels:
+    app: telegram-engagement-bot
+  annotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "9090"
+spec:
+  selector:
+    app: telegram-engagement-bot
+  ports:
+  - name: metrics
+    port: 9090
+    targetPort: 9090
+    protocol: TCP
+
+---
+# Redis deployment for caching and sessions
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis
+  namespace: telegram-engagement
+  labels:
+    app: redis
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: redis
+  template:
+    metadata:
+      labels:
+        app: redis
+    spec:
+      containers:
+      - name: redis
+        image: redis:7-alpine
+        ports:
+        - containerPort: 6379
+        command:
+        - redis-server
+        - --appendonly
+        - "yes"
+        - --requirepass
+        - $(REDIS_PASSWORD)
+        env:
+        - name: REDIS_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: telegram-bot-secrets
+              key: DATABASE_PASSWORD
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "100m"
+          limits:
+            memory: "512Mi"
+            cpu: "200m"
+        volumeMounts:
+        - name: redis-data
+          mountPath: /data
+      volumes:
+      - name: redis-data
+        persistentVolumeClaim:
+          claimName: redis-pvc
+
+---
+# Redis service
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis-service
+  namespace: telegram-engagement
+  labels:
+    app: redis
+spec:
+  selector:
+    app: redis
+  ports:
+  - port: 6379
+    targetPort: 6379
+
+---
+# Redis PVC
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: redis-pvc
+  namespace: telegram-engagement
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+  storageClassName: fast-ssd
+
+---
+# MongoDB deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mongodb
+  namespace: telegram-engagement
+  labels:
+    app: mongodb
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mongodb
+  template:
+    metadata:
+      labels:
+        app: mongodb
+    spec:
+      containers:
+      - name: mongodb
+        image: mongo:7
+        ports:
+        - containerPort: 27017
+        env:
+        - name: MONGO_INITDB_ROOT_USERNAME
+          value: admin
+        - name: MONGO_INITDB_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: telegram-bot-secrets
+              key: DATABASE_PASSWORD
+        - name: MONGO_INITDB_DATABASE
+          value: telegram-engagement
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "200m"
+          limits:
+            memory: "2Gi"
+            cpu: "1000m"
+        volumeMounts:
+        - name: mongodb-data
+          mountPath: /data/db
+      volumes:
+      - name: mongodb-data
+        persistentVolumeClaim:
+          claimName: mongodb-pvc
+
+---
+# MongoDB service
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongodb-service
+  namespace: telegram-engagement
+  labels:
+    app: mongodb
+spec:
+  selector:
+    app: mongodb
+  ports:
+  - port: 27017
+    targetPort: 27017
+
+---
+# MongoDB PVC
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mongodb-pvc
+  namespace: telegram-engagement
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 50Gi
+  storageClassName: fast-ssd
+
+---
+# ServiceAccount for the bot
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: telegram-bot-sa
+  namespace: telegram-engagement
+
+---
+# Role for the bot
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: telegram-engagement
+  name: telegram-bot-role
+rules:
+- apiGroups: [""]
+  resources: ["pods", "services", "configmaps", "secrets"]
+  verbs: ["get", "list", "watch"]
+- apiGroups: ["apps"]
+  resources: ["deployments", "replicasets"]
+  verbs: ["get", "list", "watch"]
+- apiGroups: ["metrics.k8s.io"]
+  resources: ["pods", "nodes"]
+  verbs: ["get", "list"]
+
+---
+# RoleBinding for the bot
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: telegram-bot-rolebinding
+  namespace: telegram-engagement
+subjects:
+- kind: ServiceAccount
+  name: telegram-bot-sa
+  namespace: telegram-engagement
+roleRef:
+  kind: Role
+  name: telegram-bot-role
+  apiGroup: rbac.authorization.k8s.io
+
+---
+# HorizontalPodAutoscaler
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: telegram-bot-hpa
+  namespace: telegram-engagement
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: telegram-engagement-bot
+  minReplicas: 2
+  maxReplicas: 10
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 80
+  behavior:
+    scaleUp:
+      stabilizationWindowSeconds: 300
+      policies:
+      - type: Percent
+        value: 50
+        periodSeconds: 60
+    scaleDown:
+      stabilizationWindowSeconds: 600
+      policies:
+      - type: Percent
+        value: 25
+        periodSeconds: 60
+
+---
+# NetworkPolicy for enhanced security
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: telegram-bot-netpol
+  namespace: telegram-engagement
+spec:
+  podSelector:
+    matchLabels:
+      app: telegram-engagement-bot
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress:
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          name: ingress-nginx
+    - namespaceSelector:
+        matchLabels:
+          name: monitoring
+    ports:
+    - protocol: TCP
+      port: 3000
+    - protocol: TCP
+      port: 9090
+  egress:
+  - to: []
+    ports:
+    - protocol: TCP
+      port: 443  # HTTPS
+    - protocol: TCP
+      port: 80   # HTTP
+    - protocol: UDP
+      port: 53   # DNS
+  - to:
+    - podSelector:
+        matchLabels:
+          app: redis
+    ports:
+    - protocol: TCP
+      port: 6379
+  - to:
+    - podSelector:
+        matchLabels:
+          app: mongodb
+    ports:
+    - protocol: TCP
+      port: 27017
+
+---
+# PodDisruptionBudget
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: telegram-bot-pdb
+  namespace: telegram-engagement
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: telegram-engagement-bot
+
+---
+# Ingress for external access
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: telegram-bot-ingress
+  namespace: telegram-engagement
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/rate-limit: "100"
+    nginx.ingress.kubernetes.io/rate-limit-window: "1m"
+    nginx.ingress.kubernetes.io/enable-cors: "true"
+    nginx.ingress.kubernetes.io/cors-allow-methods: "GET, POST, OPTIONS"
+    nginx.ingress.kubernetes.io/cors-allow-headers: "DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range,Authorization"
+spec:
+  tls:
+  - hosts:
+    - api.engagement.example.com
+    secretName: telegram-bot-tls
+  rules:
+  - host: api.engagement.example.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: telegram-bot-service
+            port:
+              number: 80
+
+---
+# ServiceMonitor for Prometheus monitoring
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: telegram-bot-monitor
+  namespace: telegram-engagement
+  labels:
+    app: telegram-engagement-bot
+spec:
+  selector:
+    matchLabels:
+      app: telegram-engagement-bot
+  endpoints:
+  - port: metrics
+    interval: 30s
+    path: /metrics
+    honorLabels: true
+
+---
+# PrometheusRule for alerting
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: telegram-bot-alerts
+  namespace: telegram-engagement
+spec:
+  groups:
+  - name: telegram-bot.rules
+    rules:
+    - alert: TelegramBotDown
+      expr: up{job="telegram-bot-metrics"} == 0
+      for: 5m
+      labels:
+        severity: critical
+      annotations:
+        summary: "Telegram bot is down"
+        description: "Telegram engagement bot has been down for more than 5 minutes."
+    
+    - alert: TelegramBotHighErrorRate
+      expr: rate(telegram_messages_total{status="error"}[5m]) > 0.1
+      for: 2m
+      labels:
+        severity: warning
+      annotations:
+        summary: "High error rate in Telegram bot"
+        description: "Error rate is {{ $value }} errors per second."
+    
+    - alert: TelegramBotHighResponseTime
+      expr: histogram_quantile(0.95, rate(http_request_duration_ms_bucket[5m])) > 1000
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        summary: "High response time"
+        description: "95th percentile response time is {{ $value }}ms."
+    
+    - alert: TelegramBotHighMemoryUsage
+      expr: (container_memory_working_set_bytes{pod=~"telegram-engagement-bot-.*"} / container_spec_memory_limit_bytes{pod=~"telegram-engagement-bot-.*"}) * 100 > 85
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        summary: "High memory usage"
+        description: "Memory usage is {{ $value }}%."
+    
+    - alert: TelegramBotHighCPUUsage
+      expr: (rate(container_cpu_usage_seconds_total{pod=~"telegram-engagement-bot-.*"}[5m]) * 100) > 80
+      for: 10m
+      labels:
+        severity: warning
+      annotations:
+        summary: "High CPU usage"
+        description: "CPU usage is {{ $value }}%."
+    
+    - alert: RedisDown
+      expr: up{job="redis"} == 0
+      for: 5m
+      labels:
+        severity: critical
+      annotations:
+        summary: "Redis is down"
+        description: "Redis cache server is down."
+    
+    - alert: MongoDBDown
+      expr: up{job="mongodb"} == 0
+      for: 5m
+      labels:
+        severity: critical
+      annotations:
+        summary: "MongoDB is down"
+        description: "MongoDB database server is down."
+
+---
+# CronJob for scheduled maintenance tasks
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: telegram-bot-maintenance
+  namespace: telegram-engagement
+spec:
+  schedule: "0 2 * * *"  # Daily at 2 AM
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          serviceAccountName: telegram-bot-sa
+          containers:
+          - name: maintenance
+            image: telegram-engagement-bot:v2.0.0
+            command:
+            - node
+            - maintenance.js
+            env:
+            - name: NODE_ENV
+              value: "production"
+            - name: REDIS_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: telegram-bot-config
+                  key: REDIS_URL
+            - name: MONGODB_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: telegram-bot-config
+                  key: MONGODB_URL
+            resources:
+              requests:
+                memory: "128Mi"
+                cpu: "50m"
+              limits:
+                memory: "256Mi"
+                cpu: "100m"
+          restartPolicy: OnFailure
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 1
+
+---
+# StorageClass for fast SSD storage
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: fast-ssd
+provisioner: kubernetes.io/aws-ebs
+parameters:
+  type: gp3
+  fsType: ext4
+  encrypted: "true"
+allowVolumeExpansion: true
+volumeBindingMode: WaitForFirstConsumer

@@ -1,0 +1,300 @@
+{
+  "test_results": {
+    "local_connection_tests": [
+      {
+        "host": "localhost",
+        "port": 8000,
+        "successful_connections": 20,
+        "total_attempts": 20,
+        "success_rate": 100.0,
+        "connection_times": {
+          "mean_ms": 0.2223491668701172,
+          "median_ms": 0.16951560974121094,
+          "min_ms": 0.1621246337890625,
+          "max_ms": 1.1320114135742188,
+          "p95_ms": 1.1320114135742188
+        }
+      },
+      {
+        "host": "localhost",
+        "port": 8888,
+        "successful_connections": 20,
+        "total_attempts": 20,
+        "success_rate": 100.0,
+        "connection_times": {
+          "mean_ms": 0.17380714416503906,
+          "median_ms": 0.17201900482177734,
+          "min_ms": 0.1609325408935547,
+          "max_ms": 0.20194053649902344,
+          "p95_ms": 0.20194053649902344
+        }
+      },
+      {
+        "host": "localhost",
+        "port": 5000,
+        "successful_connections": 20,
+        "total_attempts": 20,
+        "success_rate": 100.0,
+        "connection_times": {
+          "mean_ms": 0.12238025665283203,
+          "median_ms": 0.10836124420166016,
+          "min_ms": 0.09703636169433594,
+          "max_ms": 0.20003318786621094,
+          "p95_ms": 0.20003318786621094
+        }
+      },
+      {
+        "host": "localhost",
+        "port": 6379,
+        "successful_connections": 20,
+        "total_attempts": 20,
+        "success_rate": 100.0,
+        "connection_times": {
+          "mean_ms": 0.10807514190673828,
+          "median_ms": 0.10764598846435547,
+          "min_ms": 0.08082389831542969,
+          "max_ms": 0.14901161193847656,
+          "p95_ms": 0.14901161193847656
+        }
+      }
+    ],
+    "url_performance": {
+      "http://localhost:8888/health": {
+        "successful_requests": 20,
+        "total_requests": 20,
+        "success_rate": 100.0,
+        "response_times": {
+          "mean_ms": 2.269279956817627,
+          "median_ms": 2.1578073501586914,
+          "min_ms": 1.7507076263427734,
+          "max_ms": 5.151033401489258,
+          "p95_ms": 5.151033401489258
+        },
+        "status_codes": {
+          "200": 20
+        }
+      },
+      "http://localhost:5000/health": {
+        "successful_requests": 20,
+        "total_requests": 20,
+        "success_rate": 100.0,
+        "response_times": {
+          "mean_ms": 1.3405084609985352,
+          "median_ms": 1.3256072998046875,
+          "min_ms": 1.27410888671875,
+          "max_ms": 1.5828609466552734,
+          "p95_ms": 1.5828609466552734
+        },
+        "status_codes": {
+          "200": 20
+        }
+      }
+    },
+    "concurrent_connection_test": [
+      {
+        "concurrent_connections": 1,
+        "total_time_seconds": 0.003659963607788086,
+        "successful_requests": 1,
+        "failed_requests": 0,
+        "success_rate": 100.0,
+        "requests_per_second": 273.2267604716305,
+        "response_times": {
+          "mean_ms": 2.5739669799804688,
+          "max_ms": 2.5739669799804688,
+          "min_ms": 2.5739669799804688
+        }
+      },
+      {
+        "concurrent_connections": 5,
+        "total_time_seconds": 0.00849008560180664,
+        "successful_requests": 5,
+        "failed_requests": 0,
+        "success_rate": 100.0,
+        "requests_per_second": 588.9222128615557,
+        "response_times": {
+          "mean_ms": 7.54547119140625,
+          "max_ms": 7.948875427246094,
+          "min_ms": 7.331132888793945
+        }
+      },
+      {
+        "concurrent_connections": 10,
+        "total_time_seconds": 0.015685081481933594,
+        "successful_requests": 10,
+        "failed_requests": 0,
+        "success_rate": 100.0,
+        "requests_per_second": 637.5484890861555,
+        "response_times": {
+          "mean_ms": 13.338136672973633,
+          "max_ms": 13.840913772583008,
+          "min_ms": 11.811971664428711
+        }
+      },
+      {
+        "concurrent_connections": 15,
+        "total_time_seconds": 0.02050495147705078,
+        "successful_requests": 15,
+        "failed_requests": 0,
+        "success_rate": 100.0,
+        "requests_per_second": 731.5306264824892,
+        "response_times": {
+          "mean_ms": 15.322144826253256,
+          "max_ms": 18.312931060791016,
+          "min_ms": 9.76705551147461
+        }
+      }
+    ],
+    "external_service_latency": [
+      {
+        "host": "google.com",
+        "port": 80,
+        "ping_latency": {
+          "samples": 4,
+          "mean_ms": 19.554,
+          "min_ms": 13.263,
+          "max_ms": 33.796
+        },
+        "tcp_connection": {
+          "host": "google.com",
+          "port": 80,
+          "successful_connections": 5,
+          "total_attempts": 5,
+          "success_rate": 100.0,
+          "connection_times": {
+            "mean_ms": 17.426204681396484,
+            "median_ms": 17.606019973754883,
+            "min_ms": 14.394044876098633,
+            "max_ms": 22.31287956237793,
+            "p95_ms": 22.31287956237793
+          }
+        }
+      },
+      {
+        "host": "github.com",
+        "port": 443,
+        "ping_latency": {
+          "samples": 5,
+          "mean_ms": 59.5182,
+          "min_ms": 58.335,
+          "max_ms": 60.687
+        },
+        "tcp_connection": {
+          "host": "github.com",
+          "port": 443,
+          "successful_connections": 5,
+          "total_attempts": 5,
+          "success_rate": 100.0,
+          "connection_times": {
+            "mean_ms": 58.12215805053711,
+            "median_ms": 58.13193321228027,
+            "min_ms": 57.64269828796387,
+            "max_ms": 58.756113052368164,
+            "p95_ms": 58.756113052368164
+          }
+        }
+      },
+      {
+        "host": "api.github.com",
+        "port": 443,
+        "ping_latency": {
+          "samples": 5,
+          "mean_ms": 62.9282,
+          "min_ms": 59.944,
+          "max_ms": 64.786
+        },
+        "tcp_connection": {
+          "host": "api.github.com",
+          "port": 443,
+          "successful_connections": 5,
+          "total_attempts": 5,
+          "success_rate": 100.0,
+          "connection_times": {
+            "mean_ms": 59.04197692871094,
+            "median_ms": 58.29310417175293,
+            "min_ms": 57.86895751953125,
+            "max_ms": 61.798810958862305,
+            "p95_ms": 61.798810958862305
+          }
+        }
+      },
+      {
+        "host": "httpbin.org",
+        "port": 80,
+        "ping_latency": {
+          "samples": 0,
+          "mean_ms": null,
+          "min_ms": null,
+          "max_ms": null
+        },
+        "tcp_connection": {
+          "host": "httpbin.org",
+          "port": 80,
+          "successful_connections": 5,
+          "total_attempts": 5,
+          "success_rate": 100.0,
+          "connection_times": {
+            "mean_ms": 58.39815139770508,
+            "median_ms": 58.049917221069336,
+            "min_ms": 57.373046875,
+            "max_ms": 59.9980354309082,
+            "p95_ms": 59.9980354309082
+          }
+        }
+      },
+      {
+        "host": "jsonplaceholder.typicode.com",
+        "port": 80,
+        "ping_latency": {
+          "samples": 5,
+          "mean_ms": 17.71,
+          "min_ms": 15.668,
+          "max_ms": 19.02
+        },
+        "tcp_connection": {
+          "host": "jsonplaceholder.typicode.com",
+          "port": 80,
+          "successful_connections": 5,
+          "total_attempts": 5,
+          "success_rate": 100.0,
+          "connection_times": {
+            "mean_ms": 17.479944229125977,
+            "median_ms": 17.630338668823242,
+            "min_ms": 16.79205894470215,
+            "max_ms": 18.029212951660156,
+            "p95_ms": 18.029212951660156
+          }
+        }
+      }
+    ],
+    "proxy_performance": {
+      "test_url": "http://httpbin.org/ip",
+      "direct_requests": {
+        "successful_requests": 10,
+        "mean_response_time_ms": 204.90024089813232,
+        "min_response_time_ms": 116.70923233032227,
+        "max_response_time_ms": 736.0949516296387
+      },
+      "proxy_requests": {
+        "successful_requests": 0,
+        "mean_response_time_ms": null,
+        "min_response_time_ms": null,
+        "max_response_time_ms": null
+      }
+    }
+  },
+  "analysis": {
+    "network_health_score": 100,
+    "performance_issues": [],
+    "recommendations": [
+      "Network performance is excellent - maintain current configuration"
+    ],
+    "summary": {
+      "local_connections": {
+        "successful_services": 4,
+        "total_services_tested": 4,
+        "success_rate": 100.0
+      }
+    }
+  },
+  "timestamp": "2025-09-13T13:13:32.302490"
+}

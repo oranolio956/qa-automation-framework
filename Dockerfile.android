@@ -1,0 +1,120 @@
+# Android Emulator Farm for Fly.io - Snapchat Account Creation
+# Based on Ubuntu with Android SDK and emulator support
+FROM ubuntu:22.04
+
+# Avoid interactive prompts during installation
+ENV DEBIAN_FRONTEND=noninteractive
+ENV TZ=UTC
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    # Base system tools
+    curl wget unzip git python3 python3-pip \
+    # Android development tools  
+    openjdk-11-jdk android-tools-adb android-tools-fastboot \
+    # Emulator dependencies
+    qemu-kvm libvirt-daemon-system libvirt-clients bridge-utils \
+    # UI and display (for emulator)
+    xvfb x11vnc fluxbox \
+    # Additional tools
+    supervisor redis-server \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+# Set JAVA_HOME
+ENV JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
+
+# Download and install Android SDK Command Line Tools
+RUN mkdir -p /opt/android-sdk/cmdline-tools && \
+    cd /opt/android-sdk/cmdline-tools && \
+    wget -q https://dl.google.com/android/repository/commandlinetools-linux-8512546_latest.zip && \
+    unzip commandlinetools-linux-8512546_latest.zip && \
+    rm commandlinetools-linux-8512546_latest.zip && \
+    mv cmdline-tools latest
+
+# Set Android environment variables
+ENV ANDROID_HOME=/opt/android-sdk
+ENV ANDROID_SDK_ROOT=/opt/android-sdk
+ENV PATH=$PATH:$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$ANDROID_HOME/emulator
+
+# Accept licenses and install SDK components
+RUN yes | sdkmanager --licenses
+RUN sdkmanager "platform-tools" "platforms;android-30" "build-tools;30.0.3" \
+    "system-images;android-30;google_apis;x86_64" "emulator"
+
+# Create Android Virtual Device (AVD)
+RUN echo "no" | avdmanager create avd \
+    --name "snapchat_device" \
+    --package "system-images;android-30;google_apis;x86_64" \
+    --device "Nexus_6P"
+
+# Copy application files
+COPY . /app
+
+# Install Python dependencies
+RUN pip3 install --no-cache-dir -r automation/requirements.txt
+
+# Create directories for Android automation
+RUN mkdir -p /app/device_farm /app/logs /app/.android
+
+# Create startup script
+RUN cat > /app/start_android_farm.sh << 'EOF'
+#!/bin/bash
+set -e
+
+# Start Xvfb (virtual display)
+export DISPLAY=:99
+Xvfb :99 -screen 0 1024x768x24 -ac &
+
+# Start VNC server for remote access
+x11vnc -display :99 -nopw -forever -shared -bg
+
+# Start Redis server
+redis-server --daemonize yes
+
+# Start Android emulator
+echo "Starting Android emulator..."
+cd $ANDROID_HOME/emulator
+./emulator -avd snapchat_device -no-window -no-audio -no-boot-anim -accel auto -netfast &
+
+# Wait for emulator to boot
+echo "Waiting for emulator to boot..."
+adb wait-for-device
+sleep 30
+
+# Enable developer options and USB debugging
+adb shell settings put global development_settings_enabled 1
+adb shell settings put global adb_enabled 1
+adb shell settings put global stay_on_while_plugged_in 3
+
+# Ensure ADB over TCP is enabled on port 5555
+adb tcpip 5555
+adb shell setprop service.adb.tcp.port 5555
+
+echo "Android emulator ready!"
+echo "ADB devices:"
+adb devices
+
+# Start the Snapchat automation service
+cd /app
+python3 -m automation.android.automation_orchestrator_fixed &
+
+# Start health server for Fly.io checks
+uvicorn automation.android.health_server:app --host 0.0.0.0 --port 5000 &
+
+# Keep container running
+tail -f /dev/null
+EOF
+
+RUN chmod +x /app/start_android_farm.sh
+
+# Expose ports
+EXPOSE 5000 5554 5555 5900
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --retries=3 \
+    CMD adb devices | grep -q "device" || exit 1
+
+# Start the Android device farm
+CMD ["/app/start_android_farm.sh"]

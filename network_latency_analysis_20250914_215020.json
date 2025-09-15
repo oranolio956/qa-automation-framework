@@ -1,0 +1,398 @@
+{
+  "analysis_start": "2025-09-14T21:48:48.882153",
+  "ping_tests": {
+    "snapchat_api": {
+      "target": "accounts.snapchat.com",
+      "protocol": "ICMP",
+      "avg_latency_ms": 16.155401865641277,
+      "min_latency_ms": 11.605024337768555,
+      "max_latency_ms": 18.55301856994629,
+      "std_deviation": 1.7279763228130025,
+      "packet_loss_percent": 0.0,
+      "success_rate": 100.0,
+      "total_tests": 15,
+      "failed_tests": 0
+    },
+    "google_recaptcha": {
+      "target": "www.google.com",
+      "protocol": "ICMP",
+      "avg_latency_ms": 16.528765360514324,
+      "min_latency_ms": 14.358043670654297,
+      "max_latency_ms": 17.667055130004883,
+      "std_deviation": 0.7758562776030231,
+      "packet_loss_percent": 0.0,
+      "success_rate": 100.0,
+      "total_tests": 15,
+      "failed_tests": 0
+    },
+    "sms_service": {
+      "target": "api.sms-activate.org",
+      "protocol": "ICMP",
+      "avg_latency_ms": 16.63351058959961,
+      "min_latency_ms": 12.481927871704102,
+      "max_latency_ms": 23.603200912475586,
+      "std_deviation": 2.4457897222336378,
+      "packet_loss_percent": 0.0,
+      "success_rate": 100.0,
+      "total_tests": 15,
+      "failed_tests": 0
+    },
+    "email_service": {
+      "target": "api.mailgun.net",
+      "protocol": "ICMP",
+      "avg_latency_ms": 24.904457728068035,
+      "min_latency_ms": 12.33983039855957,
+      "max_latency_ms": 144.14095878601074,
+      "std_deviation": 33.01211650070286,
+      "packet_loss_percent": 0.0,
+      "success_rate": 100.0,
+      "total_tests": 15,
+      "failed_tests": 0
+    },
+    "proxy_service": {
+      "target": "brightdata.com",
+      "protocol": "ICMP",
+      "avg_latency_ms": 15.164836247762045,
+      "min_latency_ms": 11.7340087890625,
+      "max_latency_ms": 17.5931453704834,
+      "std_deviation": 2.2465125837380446,
+      "packet_loss_percent": 0.0,
+      "success_rate": 100.0,
+      "total_tests": 15,
+      "failed_tests": 0
+    },
+    "cloudflare": {
+      "target": "cloudflare.com",
+      "protocol": "ICMP",
+      "avg_latency_ms": 16.754436492919922,
+      "min_latency_ms": 13.048887252807617,
+      "max_latency_ms": 20.90001106262207,
+      "std_deviation": 1.7513279636723866,
+      "packet_loss_percent": 0.0,
+      "success_rate": 100.0,
+      "total_tests": 15,
+      "failed_tests": 0
+    },
+    "google_dns": {
+      "target": "8.8.8.8",
+      "protocol": "ICMP",
+      "avg_latency_ms": 18.79281657082694,
+      "min_latency_ms": 13.725042343139648,
+      "max_latency_ms": 29.799938201904297,
+      "std_deviation": 4.286985838857762,
+      "packet_loss_percent": 6.666666666666667,
+      "success_rate": 93.33333333333333,
+      "total_tests": 15,
+      "failed_tests": 1
+    }
+  },
+  "tcp_tests": {
+    "farm_port_5555": {
+      "target": "android-device-farm-prod.fly.dev:5555",
+      "protocol": "TCP",
+      "avg_latency_ms": 0,
+      "min_latency_ms": 0,
+      "max_latency_ms": 0,
+      "std_deviation": 0,
+      "packet_loss_percent": 0,
+      "success_rate": 0,
+      "total_tests": 8,
+      "failed_tests": 8
+    },
+    "farm_port_5556": {
+      "target": "android-device-farm-prod.fly.dev:5556",
+      "protocol": "TCP",
+      "avg_latency_ms": 0,
+      "min_latency_ms": 0,
+      "max_latency_ms": 0,
+      "std_deviation": 0,
+      "packet_loss_percent": 0,
+      "success_rate": 0,
+      "total_tests": 8,
+      "failed_tests": 8
+    },
+    "farm_port_5557": {
+      "target": "android-device-farm-prod.fly.dev:5557",
+      "protocol": "TCP",
+      "avg_latency_ms": 0,
+      "min_latency_ms": 0,
+      "max_latency_ms": 0,
+      "std_deviation": 0,
+      "packet_loss_percent": 0,
+      "success_rate": 0,
+      "total_tests": 8,
+      "failed_tests": 8
+    },
+    "farm_port_5558": {
+      "target": "android-device-farm-prod.fly.dev:5558",
+      "protocol": "TCP",
+      "avg_latency_ms": 0,
+      "min_latency_ms": 0,
+      "max_latency_ms": 0,
+      "std_deviation": 0,
+      "packet_loss_percent": 0,
+      "success_rate": 0,
+      "total_tests": 8,
+      "failed_tests": 8
+    },
+    "farm_port_5559": {
+      "target": "android-device-farm-prod.fly.dev:5559",
+      "protocol": "TCP",
+      "avg_latency_ms": 0,
+      "min_latency_ms": 0,
+      "max_latency_ms": 0,
+      "std_deviation": 0,
+      "packet_loss_percent": 0,
+      "success_rate": 0,
+      "total_tests": 8,
+      "failed_tests": 8
+    }
+  },
+  "http_tests": {
+    "snapchat_api": {
+      "target": "https://accounts.snapchat.com",
+      "protocol": "HTTP",
+      "avg_latency_ms": 361.06786727905273,
+      "min_latency_ms": 301.87392234802246,
+      "max_latency_ms": 591.0537242889404,
+      "std_deviation": 90.10175987239386,
+      "packet_loss_percent": 0,
+      "success_rate": 100.0,
+      "total_tests": 10,
+      "failed_tests": 0
+    },
+    "google_recaptcha": {
+      "target": "https://www.google.com/recaptcha",
+      "protocol": "HTTP",
+      "avg_latency_ms": 601.253342628479,
+      "min_latency_ms": 427.25491523742676,
+      "max_latency_ms": 854.1240692138672,
+      "std_deviation": 145.36506931254434,
+      "packet_loss_percent": 0,
+      "success_rate": 100.0,
+      "total_tests": 10,
+      "failed_tests": 0
+    },
+    "sms_service": {
+      "target": "https://api.sms-activate.org",
+      "protocol": "HTTP",
+      "avg_latency_ms": 0,
+      "min_latency_ms": 0,
+      "max_latency_ms": 0,
+      "std_deviation": 0,
+      "packet_loss_percent": 0,
+      "success_rate": 0,
+      "total_tests": 10,
+      "failed_tests": 10
+    },
+    "email_service": {
+      "target": "https://api.mailgun.net",
+      "protocol": "HTTP",
+      "avg_latency_ms": 74.95770454406738,
+      "min_latency_ms": 49.3311882019043,
+      "max_latency_ms": 263.80228996276855,
+      "std_deviation": 66.41011430522428,
+      "packet_loss_percent": 0,
+      "success_rate": 100.0,
+      "total_tests": 10,
+      "failed_tests": 0
+    },
+    "proxy_service": {
+      "target": "https://brightdata.com",
+      "protocol": "HTTP",
+      "avg_latency_ms": 160.68799495697021,
+      "min_latency_ms": 113.65199089050293,
+      "max_latency_ms": 407.98187255859375,
+      "std_deviation": 88.21614506009861,
+      "packet_loss_percent": 0,
+      "success_rate": 100.0,
+      "total_tests": 10,
+      "failed_tests": 0
+    },
+    "cloudflare": {
+      "target": "https://cloudflare.com",
+      "protocol": "HTTP",
+      "avg_latency_ms": 923.9937782287598,
+      "min_latency_ms": 588.677167892456,
+      "max_latency_ms": 1355.4120063781738,
+      "std_deviation": 309.00936884874034,
+      "packet_loss_percent": 0,
+      "success_rate": 100.0,
+      "total_tests": 10,
+      "failed_tests": 0
+    }
+  },
+  "android_farm_tests": {
+    "port_5555": {
+      "farm_host": "android-device-farm-prod.fly.dev",
+      "port": 5555,
+      "tcp_connect_ms": 0,
+      "adb_connect_ms": 0,
+      "uiautomator_init_ms": 0,
+      "device_info_retrieval_ms": 0,
+      "total_setup_ms": 1.2691020965576172,
+      "connection_stable": false,
+      "error_message": "Connection test failed: [Errno 8] nodename nor servname provided, or not known"
+    },
+    "port_5556": {
+      "farm_host": "android-device-farm-prod.fly.dev",
+      "port": 5556,
+      "tcp_connect_ms": 0,
+      "adb_connect_ms": 0,
+      "uiautomator_init_ms": 0,
+      "device_info_retrieval_ms": 0,
+      "total_setup_ms": 0.5171298980712891,
+      "connection_stable": false,
+      "error_message": "Connection test failed: [Errno 8] nodename nor servname provided, or not known"
+    },
+    "port_5557": {
+      "farm_host": "android-device-farm-prod.fly.dev",
+      "port": 5557,
+      "tcp_connect_ms": 0,
+      "adb_connect_ms": 0,
+      "uiautomator_init_ms": 0,
+      "device_info_retrieval_ms": 0,
+      "total_setup_ms": 0.47588348388671875,
+      "connection_stable": false,
+      "error_message": "Connection test failed: [Errno 8] nodename nor servname provided, or not known"
+    }
+  },
+  "concurrent_farm_tests": [
+    {
+      "farm_host": "android-device-farm-prod.fly.dev",
+      "port": 5555,
+      "tcp_connect_ms": 0,
+      "adb_connect_ms": 0,
+      "uiautomator_init_ms": 0,
+      "device_info_retrieval_ms": 0,
+      "total_setup_ms": 1.1410713195800781,
+      "connection_stable": false,
+      "error_message": "Connection test failed: [Errno 8] nodename nor servname provided, or not known"
+    },
+    {
+      "farm_host": "android-device-farm-prod.fly.dev",
+      "port": 5557,
+      "tcp_connect_ms": 0,
+      "adb_connect_ms": 0,
+      "uiautomator_init_ms": 0,
+      "device_info_retrieval_ms": 0,
+      "total_setup_ms": 0.9717941284179688,
+      "connection_stable": false,
+      "error_message": "Connection test failed: [Errno 8] nodename nor servname provided, or not known"
+    },
+    {
+      "farm_host": "android-device-farm-prod.fly.dev",
+      "port": 5556,
+      "tcp_connect_ms": 0,
+      "adb_connect_ms": 0,
+      "uiautomator_init_ms": 0,
+      "device_info_retrieval_ms": 0,
+      "total_setup_ms": 1.1348724365234375,
+      "connection_stable": false,
+      "error_message": "Connection test failed: [Errno 8] nodename nor servname provided, or not known"
+    }
+  ],
+  "network_paths": {
+    "android-device-farm-prod.fly.dev": {
+      "target": "android-device-farm-prod.fly.dev",
+      "error": "traceroute: unknown host android-device-farm-prod.fly.dev\n",
+      "success": false
+    },
+    "snapchat.com": {
+      "target": "snapchat.com",
+      "hops": [
+        "1  10.0.0.1 (10.0.0.1)  3.437 ms  3.289 ms  2.947 ms",
+        "2  10.112.140.194 (10.112.140.194)  12.839 ms",
+        "10.112.140.195 (10.112.140.195)  14.915 ms",
+        "10.112.140.194 (10.112.140.194)  14.032 ms",
+        "3  po-320-346-rur402.arvada.co.denver.comcast.net (96.216.98.173)  13.061 ms",
+        "po-320-345-rur401.arvada.co.denver.comcast.net (24.124.156.89)  14.342 ms",
+        "po-320-346-rur402.arvada.co.denver.comcast.net (96.216.98.173)  12.463 ms",
+        "4  po-400-xar01.arvada.co.denver.comcast.net (24.124.155.213)  12.591 ms",
+        "po-2-rur401.arvada.co.denver.comcast.net (68.86.128.93)  15.155 ms",
+        "po-400-xar01.arvada.co.denver.comcast.net (24.124.155.213)  15.225 ms",
+        "5  * be-308-arsc1.denver.co.denver.comcast.net (96.216.147.73)  13.495 ms",
+        "po-400-xar01.arvada.co.denver.comcast.net (24.124.155.213)  14.597 ms",
+        "6  be-36041-cs04.1601milehigh.co.ibone.comcast.net (96.110.43.253)  14.017 ms",
+        "be-308-arsc1.denver.co.denver.comcast.net (96.216.147.73)  21.999 ms",
+        "be-36021-cs02.1601milehigh.co.ibone.comcast.net (96.110.43.245)  21.090 ms",
+        "7  be-36011-cs01.1601milehigh.co.ibone.comcast.net (96.110.43.241)  22.559 ms",
+        "be-3211-pe11.910fifteenth.co.ibone.comcast.net (96.110.33.118)  18.594 ms",
+        "be-36021-cs02.1601milehigh.co.ibone.comcast.net (96.110.43.245)  22.178 ms",
+        "8  * be-3111-pe11.910fifteenth.co.ibone.comcast.net (96.110.33.114)  16.771 ms *",
+        "9  * 216.239.40.59 (216.239.40.59)  17.648 ms *",
+        "10  172.253.75.177 (172.253.75.177)  19.686 ms",
+        "216.239.40.59 (216.239.40.59)  17.261 ms",
+        "142.251.48.5 (142.251.48.5)  17.162 ms",
+        "11  142.251.48.5 (142.251.48.5)  12.945 ms",
+        "130.46.149.34.bc.googleusercontent.com (34.149.46.130)  17.616 ms",
+        "172.253.75.177 (172.253.75.177)  17.185 ms"
+      ],
+      "hop_count": 26,
+      "success": true
+    },
+    "google.com": {
+      "target": "google.com",
+      "hops": [
+        "1  10.0.0.1 (10.0.0.1)  3.408 ms  2.831 ms  3.177 ms",
+        "2  10.112.140.195 (10.112.140.195)  13.695 ms",
+        "10.112.140.194 (10.112.140.194)  12.361 ms",
+        "10.112.140.195 (10.112.140.195)  13.106 ms",
+        "3  po-320-345-rur401.arvada.co.denver.comcast.net (24.124.156.89)  13.849 ms",
+        "po-320-346-rur402.arvada.co.denver.comcast.net (96.216.98.173)  12.942 ms",
+        "po-320-345-rur401.arvada.co.denver.comcast.net (24.124.156.89)  12.950 ms",
+        "4  po-2-rur401.arvada.co.denver.comcast.net (68.86.128.93)  15.735 ms",
+        "po-400-xar01.arvada.co.denver.comcast.net (24.124.155.213)  15.253 ms",
+        "po-2-rur401.arvada.co.denver.comcast.net (68.86.128.93)  12.284 ms",
+        "5  be-308-arsc1.denver.co.denver.comcast.net (96.216.147.73)  14.895 ms",
+        "po-400-xar01.arvada.co.denver.comcast.net (24.124.155.213)  15.587 ms",
+        "be-308-arsc1.denver.co.denver.comcast.net (96.216.147.73)  15.221 ms",
+        "6  be-308-arsc1.denver.co.denver.comcast.net (96.216.147.73)  35.976 ms",
+        "be-36041-cs04.1601milehigh.co.ibone.comcast.net (96.110.43.253)  16.609 ms",
+        "be-308-arsc1.denver.co.denver.comcast.net (96.216.147.73)  17.853 ms",
+        "7  be-3411-pe11.910fifteenth.co.ibone.comcast.net (96.110.33.126)  17.262 ms *",
+        "be-3111-pe11.910fifteenth.co.ibone.comcast.net (96.110.33.114)  18.946 ms",
+        "8  be-3311-pe11.910fifteenth.co.ibone.comcast.net (96.110.33.122)  17.360 ms *",
+        "be-3211-pe11.910fifteenth.co.ibone.comcast.net (96.110.33.118)  19.959 ms",
+        "9  * * *",
+        "10  * 142.251.51.154 (142.251.51.154)  19.570 ms *",
+        "11  den16s08-in-f14.1e100.net (142.250.72.46)  16.694 ms",
+        "142.251.48.4 (142.251.48.4)  16.446 ms",
+        "den16s08-in-f14.1e100.net (142.250.72.46)  13.562 ms"
+      ],
+      "hop_count": 25,
+      "success": true
+    }
+  },
+  "performance_summary": {
+    "overall_status": "POOR",
+    "critical_issues": [
+      "Low Android farm connectivity success rate"
+    ],
+    "performance_metrics": {
+      "average_ping_latency_ms": 17.847746407904594,
+      "max_ping_latency_ms": 24.904457728068035,
+      "farm_connectivity_success_rate": 0.0
+    },
+    "bottleneck_identification": {}
+  },
+  "optimization_recommendations": [
+    {
+      "priority": "HIGH",
+      "category": "Infrastructure",
+      "issue": "Low Android farm connectivity: 0.0%",
+      "recommendation": "Investigate fly.io deployment status and implement connection retry logic",
+      "estimated_improvement": "Increase success rate to 90%+",
+      "implementation": "Deploy redundant farm instances and add circuit breakers"
+    },
+    {
+      "priority": "MEDIUM",
+      "category": "Concurrency",
+      "issue": "Poor concurrent connection performance",
+      "recommendation": "Implement connection rate limiting and queue management",
+      "estimated_improvement": "More stable concurrent operations",
+      "implementation": "Add connection pooling with backoff strategies"
+    }
+  ],
+  "analysis_end": "2025-09-14T21:50:20.689586"
+}

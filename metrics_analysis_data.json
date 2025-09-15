@@ -1,0 +1,482 @@
+{
+  "statistical_results": {
+    "response_times": {
+      "current_mean": 180.57996167466976,
+      "proposed_mean": 49.987423111781446,
+      "improvement_percent": -72.3183997558721,
+      "t_statistic": 135.96805151436453,
+      "p_value": 0.0,
+      "effect_size": -6.08371873930121,
+      "significance": "Significant",
+      "confidence_interval": [
+        178.75701355809892,
+        182.4029097912406
+      ]
+    },
+    "success_rates": {
+      "current_mean": 83.65418118624578,
+      "proposed_mean": 98.46887416039378,
+      "improvement_percent": 17.709447111991814,
+      "t_statistic": -92.30524173503467,
+      "p_value": 0.0,
+      "effect_size": 4.130081461230852,
+      "significance": "Significant",
+      "confidence_interval": [
+        83.34469759714213,
+        83.96366477534943
+      ]
+    },
+    "error_rates": {
+      "current_mean": 4.507001057467229,
+      "proposed_mean": 0.5029411319814399,
+      "improvement_percent": 88.84089163573273,
+      "t_statistic": 105.83884132952049,
+      "p_value": 0.0,
+      "effect_size": -4.735625282342935,
+      "significance": "Significant",
+      "confidence_interval": [
+        4.433767521959166,
+        4.580234592975292
+      ]
+    },
+    "uptime": {
+      "current_mean": 95.46256156442647,
+      "proposed_mean": 99.90448029178027,
+      "improvement_percent": 4.653047911726121,
+      "t_statistic": -68.29714146035589,
+      "p_value": 0.0,
+      "effect_size": 3.0558693363284433,
+      "significance": "Significant",
+      "confidence_interval": [
+        95.33508479247023,
+        95.5900383363827
+      ]
+    },
+    "detection_events": {
+      "current_mean": 14.998,
+      "proposed_mean": 1.967,
+      "improvement_percent": 86.8849179890652,
+      "t_statistic": 100.33118970164809,
+      "p_value": 0.0,
+      "effect_size": -4.489192366339204,
+      "significance": "Significant",
+      "confidence_interval": [
+        14.759636080197199,
+        15.2363639198028
+      ]
+    },
+    "false_positives": {
+      "current_mean": 8.438641722325295,
+      "proposed_mean": 1.5179018186826279,
+      "improvement_percent": -82.01248650399671,
+      "t_statistic": 103.66213100047045,
+      "p_value": 0.0,
+      "effect_size": -4.638231127823678,
+      "significance": "Significant",
+      "confidence_interval": [
+        8.311296977067814,
+        8.565986467582777
+      ]
+    },
+    "threat_blocks": {
+      "current_mean": 5.006,
+      "proposed_mean": 25.009,
+      "improvement_percent": 399.58050339592484,
+      "t_statistic": -113.60595198045918,
+      "p_value": 0.0,
+      "effect_size": 5.083154838669257,
+      "significance": "Significant",
+      "confidence_interval": [
+        4.863257290448141,
+        5.148742709551859
+      ]
+    },
+    "vulnerability_score": {
+      "current_mean": 6.494860359941906,
+      "proposed_mean": 1.819412303316804,
+      "improvement_percent": 71.98689113412937,
+      "t_statistic": 96.17692955463076,
+      "p_value": 0.0,
+      "effect_size": -4.303315242832206,
+      "significance": "Significant",
+      "confidence_interval": [
+        6.404556764409534,
+        6.585163955474277
+      ]
+    },
+    "cpu_usage": {
+      "current_mean": 75.69439497584375,
+      "proposed_mean": 45.134885741265,
+      "improvement_percent": 40.372222070512834,
+      "t_statistic": 55.63393584051016,
+      "p_value": 0.0,
+      "effect_size": -2.489270194316462,
+      "significance": "Significant",
+      "confidence_interval": [
+        74.73706109420607,
+        76.65172885748143
+      ]
+    },
+    "memory_usage": {
+      "current_mean": 68.2544614125154,
+      "proposed_mean": 34.69194646230301,
+      "improvement_percent": 49.17263173079297,
+      "t_statistic": 77.10393364392405,
+      "p_value": 0.0,
+      "effect_size": -3.4499181297293307,
+      "significance": "Significant",
+      "confidence_interval": [
+        67.48519578558546,
+        69.02372703944533
+      ]
+    },
+    "disk_io": {
+      "current_mean": 44.90246199671243,
+      "proposed_mean": 25.15094222453924,
+      "improvement_percent": -43.98760979658379,
+      "t_statistic": 56.15821421609761,
+      "p_value": 0.0,
+      "effect_size": -2.512728368076014,
+      "significance": "Significant",
+      "confidence_interval": [
+        44.280873988274315,
+        45.52405000515055
+      ]
+    },
+    "network_latency": {
+      "current_mean": 25.27508240420717,
+      "proposed_mean": 7.914691355828117,
+      "improvement_percent": 68.68579405893183,
+      "t_statistic": 66.37533445366321,
+      "p_value": 0.0,
+      "effect_size": -2.969880509028808,
+      "significance": "Significant",
+      "confidence_interval": [
+        24.77702256787474,
+        25.773142240539595
+      ]
+    },
+    "operational_cost": {
+      "current_mean": 12124.157225817957,
+      "proposed_mean": 7977.60384768386,
+      "improvement_percent": 34.20075557337841,
+      "t_statistic": 59.187885461411774,
+      "p_value": 0.0,
+      "effect_size": -2.648287181516042,
+      "significance": "Significant",
+      "confidence_interval": [
+        12000.284388218053,
+        12248.03006341786
+      ]
+    },
+    "maintenance_hours": {
+      "current_mean": 39.91573239815667,
+      "proposed_mean": 15.027935892803365,
+      "improvement_percent": 62.35084516826412,
+      "t_statistic": 92.19993571810525,
+      "p_value": 0.0,
+      "effect_size": -4.125369676503343,
+      "significance": "Significant",
+      "confidence_interval": [
+        39.421561252191744,
+        40.4099035441216
+      ]
+    },
+    "incident_count": {
+      "current_mean": 2.948,
+      "proposed_mean": 0.514,
+      "improvement_percent": 82.56445047489824,
+      "t_statistic": 41.76427900768198,
+      "p_value": 1.4182266559002383e-274,
+      "effect_size": -1.8686899165102482,
+      "significance": "Significant",
+      "confidence_interval": [
+        2.842540180757636,
+        3.053459819242364
+      ]
+    },
+    "customer_satisfaction": {
+      "current_mean": 7.153985302391546,
+      "proposed_mean": 9.203331754696839,
+      "improvement_percent": 28.64622117157838,
+      "t_statistic": -57.965757641866084,
+      "p_value": 0.0,
+      "effect_size": 2.5936046157604684,
+      "significance": "Significant",
+      "confidence_interval": [
+        7.091520162585039,
+        7.216450442198053
+      ]
+    }
+  },
+  "performance_projections": {
+    "response_times": {
+      "years": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "current": [
+        185.99736052490985,
+        191.41475937514997,
+        196.83215822539006,
+        202.24955707563015,
+        207.6669559258702
+      ],
+      "proposed": [
+        49.48754888066363,
+        48.987674649545816,
+        48.487800418428,
+        47.98792618731019,
+        47.48805195619237
+      ]
+    },
+    "success_rates": {
+      "years": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "current": [
+        84.49072299810824,
+        85.3272648099707,
+        86.16380662183316,
+        87.0003484336956,
+        87.83689024555807
+      ],
+      "proposed": [
+        100.43825164360166,
+        102.40762912680954,
+        104.37700661001742,
+        106.3463840932253,
+        108.31576157643318
+      ]
+    },
+    "uptime": {
+      "years": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "current": [
+        96.41718718007073,
+        97.371812795715,
+        98.32643841135926,
+        99.28106402700352,
+        100.2356896426478
+      ],
+      "proposed": [
+        101.90256989761588,
+        103.9006595034515,
+        105.8987491092871,
+        107.8968387151227,
+        109.89492832095831
+      ]
+    },
+    "operational_cost": {
+      "years": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "current": [
+        12730.365087108856,
+        13336.572948399753,
+        13942.780809690648,
+        14548.988670981547,
+        15155.196532272446
+      ],
+      "proposed": [
+        8137.155924637537,
+        8296.708001591214,
+        8456.260078544892,
+        8615.81215549857,
+        8775.364232452246
+      ]
+    },
+    "customer_satisfaction": {
+      "years": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "current": [
+        7.225525155415462,
+        7.297065008439377,
+        7.368604861463293,
+        7.440144714487208,
+        7.511684567511124
+      ],
+      "proposed": [
+        9.387398389790775,
+        9.571465024884713,
+        9.755531659978649,
+        9.939598295072587,
+        10.123664930166523
+      ]
+    }
+  },
+  "roi_analysis": {
+    "total_implementation_cost": 250000,
+    "annual_operational_cost": 81000,
+    "annual_benefits": 750000,
+    "years": [
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "cumulative_costs": [
+      250000,
+      333430.0,
+      419362.9,
+      507873.787,
+      599040.00061
+    ],
+    "cumulative_benefits": [
+      750000.0,
+      1575000.0,
+      2482500.0,
+      3480750.0000000005,
+      4578825.000000001
+    ],
+    "net_benefits": [
+      500000.0,
+      1241570.0,
+      2063137.1,
+      2972876.2130000005,
+      3979784.999390001
+    ],
+    "roi_percentages": [
+      200.0,
+      372.3630147257295,
+      491.9693897576538,
+      585.3572854312326,
+      664.3604759844754
+    ],
+    "risk_adjusted_roi": [
+      169.0,
+      314.6467474432414,
+      415.7141343452175,
+      494.62690618939155,
+      561.3846022068817
+    ],
+    "payback_period_years": 1,
+    "npv_5_year": 3979784.999390001,
+    "break_even_month": 12
+  },
+  "risk_assessment": {
+    "risks": {
+      "technical_risks": {
+        "ML Model Performance": {
+          "probability": 0.15,
+          "impact": "High",
+          "score": 7.5
+        },
+        "Integration Complexity": {
+          "probability": 0.25,
+          "impact": "Medium",
+          "score": 5.0
+        },
+        "Scalability Issues": {
+          "probability": 0.1,
+          "impact": "High",
+          "score": 6.0
+        },
+        "Data Quality Problems": {
+          "probability": 0.2,
+          "impact": "Medium",
+          "score": 4.0
+        },
+        "Security Vulnerabilities": {
+          "probability": 0.05,
+          "impact": "Critical",
+          "score": 8.5
+        }
+      },
+      "operational_risks": {
+        "Team Capability Gap": {
+          "probability": 0.3,
+          "impact": "Medium",
+          "score": 4.5
+        },
+        "Timeline Delays": {
+          "probability": 0.35,
+          "impact": "Medium",
+          "score": 4.2
+        },
+        "Budget Overruns": {
+          "probability": 0.25,
+          "impact": "High",
+          "score": 6.3
+        },
+        "Change Management": {
+          "probability": 0.4,
+          "impact": "Low",
+          "score": 2.4
+        },
+        "Vendor Dependencies": {
+          "probability": 0.15,
+          "impact": "Medium",
+          "score": 3.8
+        }
+      },
+      "business_risks": {
+        "Market Changes": {
+          "probability": 0.2,
+          "impact": "Medium",
+          "score": 4.0
+        },
+        "Competitive Response": {
+          "probability": 0.25,
+          "impact": "Medium",
+          "score": 3.8
+        },
+        "Regulatory Changes": {
+          "probability": 0.1,
+          "impact": "High",
+          "score": 6.0
+        },
+        "Customer Adoption": {
+          "probability": 0.15,
+          "impact": "High",
+          "score": 6.8
+        },
+        "ROI Shortfall": {
+          "probability": 0.2,
+          "impact": "High",
+          "score": 6.4
+        }
+      }
+    },
+    "summary": {
+      "technical_risks": {
+        "total_score": 31.0,
+        "average_probability": 0.15,
+        "risk_level": "High"
+      },
+      "operational_risks": {
+        "total_score": 21.2,
+        "average_probability": 0.2899999999999999,
+        "risk_level": "Medium"
+      },
+      "business_risks": {
+        "total_score": 27.0,
+        "average_probability": 0.18000000000000002,
+        "risk_level": "Medium"
+      }
+    }
+  },
+  "generated_at": "2025-09-14T22:04:27.934544"
+}

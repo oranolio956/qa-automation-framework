@@ -1,0 +1,197 @@
+# Prometheus Alert Rules for Security Monitoring
+groups:
+  - name: security_alerts
+    interval: 30s
+    rules:
+      # High Anomaly Detection
+      - alert: HighAnomalyScore
+        expr: anomaly_confidence > 0.8
+        for: 1m
+        labels:
+          severity: critical
+          category: security
+          service: "{{ $labels.service }}"
+        annotations:
+          summary: "High anomaly score detected in {{ $labels.service }}"
+          description: "Anomaly confidence score of {{ $value }} detected in {{ $labels.service }}. Potential security threat."
+          runbook_url: "https://docs.company.com/runbooks/security/high-anomaly"
+
+      # Suspicious Behavior Patterns
+      - alert: SuspiciousBehaviorPattern
+        expr: behavior_risk_score > 0.7
+        for: 2m
+        labels:
+          severity: warning
+          category: security
+          service: "{{ $labels.service }}"
+        annotations:
+          summary: "Suspicious behavior pattern detected"
+          description: "Behavior risk score of {{ $value }} indicates potential bot activity or account compromise."
+
+      # Failed Authentication Spike
+      - alert: AuthenticationFailureSpike
+        expr: rate(auth_failures_total[5m]) > 10
+        for: 1m
+        labels:
+          severity: warning
+          category: security
+          service: auth-service
+        annotations:
+          summary: "High rate of authentication failures"
+          description: "{{ $value }} authentication failures per second detected. Possible credential stuffing attack."
+
+      # TLS Fingerprint Anomalies
+      - alert: TLSFingerprintAnomaly
+        expr: tls_fingerprint_uniqueness_ratio < 0.3
+        for: 5m
+        labels:
+          severity: warning
+          category: security
+          service: tls-service
+        annotations:
+          summary: "TLS fingerprint patterns show low diversity"
+          description: "TLS fingerprint uniqueness ratio of {{ $value }} suggests potential bot traffic or evasion attempts."
+
+      # Biometric Verification Failures
+      - alert: BiometricVerificationFailures
+        expr: rate(biometric_verification_failures_total[5m]) > 5
+        for: 2m
+        labels:
+          severity: warning
+          category: security
+          service: biometric-service
+        annotations:
+          summary: "High rate of biometric verification failures"
+          description: "{{ $value }} biometric verification failures per second. Potential bot detection evasion."
+
+      # Service Security Health
+      - alert: SecurityServiceDown
+        expr: up{job=~".*-service"} == 0
+        for: 30s
+        labels:
+          severity: critical
+          category: availability
+          service: "{{ $labels.job }}"
+        annotations:
+          summary: "Security service {{ $labels.job }} is down"
+          description: "Security service {{ $labels.job }} has been down for more than 30 seconds."
+
+      # Threat Intelligence Alerts
+      - alert: CriticalThreatDetected
+        expr: threat_confidence_score > 0.9
+        for: 0s  # Immediate alert
+        labels:
+          severity: critical
+          category: threat_intelligence
+          attack_vector: "{{ $labels.attack_vector }}"
+        annotations:
+          summary: "Critical threat detected: {{ $labels.attack_vector }}"
+          description: "High confidence ({{ $value }}) threat detected. Attack vector: {{ $labels.attack_vector }}"
+
+      # Rate Limiting Alerts
+      - alert: RateLimitExceeded
+        expr: rate(rate_limit_exceeded_total[1m]) > 1
+        for: 1m
+        labels:
+          severity: warning
+          category: security
+          service: "{{ $labels.service }}"
+        annotations:
+          summary: "Rate limits being exceeded"
+          description: "{{ $value }} rate limit violations per second in {{ $labels.service }}"
+
+  - name: advanced_security_patterns
+    interval: 60s
+    rules:
+      # Coordinated Attack Detection
+      - alert: CoordinatedAttackPattern
+        expr: |
+          (
+            rate(auth_failures_total[5m]) > 5 and
+            rate(biometric_verification_failures_total[5m]) > 2 and
+            tls_fingerprint_uniqueness_ratio < 0.5
+          )
+        for: 2m
+        labels:
+          severity: critical
+          category: coordinated_attack
+        annotations:
+          summary: "Coordinated attack pattern detected"
+          description: "Multiple security systems showing suspicious patterns simultaneously. Possible sophisticated attack in progress."
+
+      # Data Exfiltration Indicators
+      - alert: DataExfiltrationIndicators
+        expr: |
+          (
+            rate(api_requests_total[10m]) > 100 and
+            avg_over_time(response_size_bytes[10m]) > 10000
+          )
+        for: 5m
+        labels:
+          severity: warning
+          category: data_protection
+        annotations:
+          summary: "Potential data exfiltration detected"
+          description: "High API request rate with large response sizes detected. Potential data exfiltration attempt."
+
+      # Service Mesh Security
+      - alert: ServiceMeshSecurityViolation
+        expr: istio_request_total{response_code!~"2.."} / ignoring(response_code) group_left istio_request_total > 0.1
+        for: 3m
+        labels:
+          severity: warning
+          category: service_mesh
+        annotations:
+          summary: "High error rate in service mesh"
+          description: "{{ $value | humanizePercentage }} error rate detected in service mesh communications."
+
+      # Circuit Breaker Activation
+      - alert: CircuitBreakerActivated
+        expr: circuit_breaker_state == 1
+        for: 0s
+        labels:
+          severity: warning
+          category: resilience
+          service: "{{ $labels.service }}"
+        annotations:
+          summary: "Circuit breaker activated for {{ $labels.service }}"
+          description: "Circuit breaker has been activated, indicating service degradation or failures."
+
+  - name: ml_model_health
+    interval: 300s  # 5 minutes
+    rules:
+      # ML Model Performance Degradation
+      - alert: MLModelPerformanceDegradation
+        expr: model_accuracy < 0.85
+        for: 10m
+        labels:
+          severity: warning
+          category: ml_ops
+          model: "{{ $labels.model_name }}"
+        annotations:
+          summary: "ML model performance degradation"
+          description: "Model {{ $labels.model_name }} accuracy has dropped to {{ $value }}, below the 0.85 threshold."
+
+      # Model Prediction Latency
+      - alert: MLModelLatencyHigh
+        expr: model_prediction_duration_seconds > 0.5
+        for: 5m
+        labels:
+          severity: warning
+          category: performance
+          model: "{{ $labels.model_name }}"
+        annotations:
+          summary: "High ML model prediction latency"
+          description: "Model {{ $labels.model_name }} prediction latency is {{ $value }}s, above acceptable threshold."
+
+      # Model Training Required
+      - alert: ModelRetrainingRequired
+        expr: time() - model_last_training_timestamp > 604800  # 7 days
+        for: 0s
+        labels:
+          severity: info
+          category: ml_ops
+          model: "{{ $labels.model_name }}"
+        annotations:
+          summary: "Model retraining required"
+          description: "Model {{ $labels.model_name }} hasn't been retrained for over 7 days."

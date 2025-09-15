@@ -1,0 +1,65 @@
+# Grafana Datasource Configuration for Anti-Bot Security
+
+apiVersion: 1
+
+datasources:
+  - name: Prometheus
+    type: prometheus
+    uid: prometheus
+    access: proxy
+    url: http://prometheus:9090
+    isDefault: true
+    editable: true
+    jsonData:
+      httpMethod: POST
+      queryTimeout: 60s
+      timeInterval: 15s
+      manageAlerts: true
+      alertmanagerUid: alertmanager
+      exemplarTraceIdDestinations:
+        - name: traceID
+          datasourceUid: jaeger
+    version: 1
+
+  - name: Elasticsearch
+    type: elasticsearch
+    uid: elasticsearch
+    access: proxy
+    url: http://elasticsearch:9200
+    database: "logstash-*"
+    jsonData:
+      interval: Daily
+      timeField: "@timestamp"
+      esVersion: "8.11.0"
+      maxConcurrentShardRequests: 5
+      logLevelField: "level"
+      logMessageField: "message"
+    version: 1
+
+  - name: Jaeger
+    type: jaeger
+    uid: jaeger
+    access: proxy
+    url: http://jaeger:16686
+    jsonData:
+      tracesToLogs:
+        datasourceUid: elasticsearch
+        filterBySpanID: true
+        filterByTraceID: true
+        mapTagNamesEnabled: true
+        tags:
+          - key: service.name
+            value: service
+          - key: service.instance.id
+            value: instance
+    version: 1
+
+  - name: MongoDB
+    type: mongodb-datasource
+    uid: mongodb
+    access: proxy
+    url: mongodb://antibot:antibotpass@mongodb:27017/antibot_security
+    jsonData:
+      authSource: admin
+      ssl: false
+    version: 1

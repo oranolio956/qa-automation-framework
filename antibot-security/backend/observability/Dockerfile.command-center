@@ -1,0 +1,70 @@
+# Multi-stage Dockerfile for Unified Observability Command Center
+FROM python:3.11-slim as builder
+
+# Set build arguments
+ARG BUILD_DATE
+ARG VCS_REF
+ARG VERSION
+
+# Add metadata
+LABEL maintainer="Security Team <security@company.com>"
+LABEL org.label-schema.build-date=$BUILD_DATE
+LABEL org.label-schema.vcs-ref=$VCS_REF
+LABEL org.label-schema.version=$VERSION
+LABEL org.label-schema.name="Unified Observability Command Center"
+LABEL org.label-schema.description="AI-Driven Security Monitoring and Threat Intelligence Platform"
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    gcc \
+    g++ \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Set working directory
+WORKDIR /build
+
+# Copy requirements and install Python dependencies
+COPY requirements.txt .
+RUN pip install --no-cache-dir --user -r requirements.txt
+
+# Production stage
+FROM python:3.11-slim as production
+
+# Install runtime dependencies
+RUN apt-get update && apt-get install -y \
+    curl \
+    && rm -rf /var/lib/apt/lists/* \
+    && groupadd -r appuser && useradd -r -g appuser appuser
+
+# Copy installed packages from builder
+COPY --from=builder /root/.local /home/appuser/.local
+
+# Set working directory
+WORKDIR /app
+
+# Copy application code
+COPY unified_command_center.py .
+COPY opentelemetry_config.py .
+COPY telemetry_integration.py .
+
+# Create necessary directories
+RUN mkdir -p logs && chown -R appuser:appuser /app
+
+# Switch to non-root user
+USER appuser
+
+# Set environment variables
+ENV PATH=/home/appuser/.local/bin:$PATH
+ENV PYTHONPATH=/app
+ENV PYTHONUNBUFFERED=1
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost:8080/api/health || exit 1
+
+# Expose port
+EXPOSE 8080
+
+# Start command
+CMD ["python", "-m", "uvicorn", "unified_command_center:app", "--host", "0.0.0.0", "--port", "8080", "--workers", "1"]

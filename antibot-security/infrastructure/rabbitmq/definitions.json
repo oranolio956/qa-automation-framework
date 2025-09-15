@@ -1,0 +1,283 @@
+{
+  "rabbit_version": "3.12.0",
+  "rabbitmq_version": "3.12.0",
+  "product_name": "RabbitMQ",
+  "product_version": "3.12.0",
+  "users": [
+    {
+      "name": "antibot",
+      "password_hash": "gS4mdKxSfUHwHwX8nFdOmO2A6qjCOV3VXOgOTJKmOGPUEh1V",
+      "hashing_algorithm": "rabbit_password_hashing_sha256",
+      "tags": "administrator"
+    }
+  ],
+  "vhosts": [
+    {
+      "name": "antibot_vhost"
+    }
+  ],
+  "permissions": [
+    {
+      "user": "antibot",
+      "vhost": "antibot_vhost",
+      "configure": ".*",
+      "write": ".*",
+      "read": ".*"
+    }
+  ],
+  "topic_permissions": [],
+  "parameters": [],
+  "global_parameters": [
+    {
+      "name": "cluster_name",
+      "value": "antibot-cluster"
+    }
+  ],
+  "policies": [
+    {
+      "vhost": "antibot_vhost",
+      "name": "ha-policy",
+      "pattern": "^(sms|risk|data|audit).*",
+      "apply-to": "queues",
+      "definition": {
+        "ha-mode": "exactly",
+        "ha-params": 2,
+        "ha-sync-mode": "automatic",
+        "ha-sync-batch-size": 1000
+      },
+      "priority": 100
+    },
+    {
+      "vhost": "antibot_vhost", 
+      "name": "dlx-policy",
+      "pattern": "^(sms|risk|data)_queue$",
+      "apply-to": "queues",
+      "definition": {
+        "dead-letter-exchange": "dlx",
+        "dead-letter-routing-key": "failed",
+        "message-ttl": 3600000
+      },
+      "priority": 50
+    },
+    {
+      "vhost": "antibot_vhost",
+      "name": "priority-queue-policy", 
+      "pattern": "^priority_.*",
+      "apply-to": "queues",
+      "definition": {
+        "max-priority": 10,
+        "ha-mode": "exactly",
+        "ha-params": 2
+      },
+      "priority": 75
+    }
+  ],
+  "queues": [
+    {
+      "name": "sms_queue",
+      "vhost": "antibot_vhost",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {
+        "x-message-ttl": 3600000,
+        "x-max-priority": 10,
+        "x-dead-letter-exchange": "dlx",
+        "x-dead-letter-routing-key": "sms.failed"
+      }
+    },
+    {
+      "name": "sms_queue_p1",
+      "vhost": "antibot_vhost", 
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {
+        "x-message-ttl": 300000,
+        "x-max-priority": 10
+      }
+    },
+    {
+      "name": "sms_queue_p2",
+      "vhost": "antibot_vhost",
+      "durable": true, 
+      "auto_delete": false,
+      "arguments": {
+        "x-message-ttl": 600000,
+        "x-max-priority": 10
+      }
+    },
+    {
+      "name": "sms_queue_p3",
+      "vhost": "antibot_vhost",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {
+        "x-message-ttl": 900000,
+        "x-max-priority": 10
+      }
+    },
+    {
+      "name": "sms_dlq",
+      "vhost": "antibot_vhost",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {
+        "x-message-ttl": 86400000
+      }
+    },
+    {
+      "name": "risk_assessment_queue",
+      "vhost": "antibot_vhost",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {
+        "x-message-ttl": 300000,
+        "x-max-priority": 5,
+        "x-dead-letter-exchange": "dlx",
+        "x-dead-letter-routing-key": "risk.failed"
+      }
+    },
+    {
+      "name": "data_processing_queue",
+      "vhost": "antibot_vhost",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {
+        "x-message-ttl": 600000,
+        "x-dead-letter-exchange": "dlx",
+        "x-dead-letter-routing-key": "data.failed"
+      }
+    },
+    {
+      "name": "pattern_recognition_queue",
+      "vhost": "antibot_vhost",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {
+        "x-message-ttl": 1800000,
+        "x-dead-letter-exchange": "dlx", 
+        "x-dead-letter-routing-key": "pattern.failed"
+      }
+    },
+    {
+      "name": "audit_log_queue",
+      "vhost": "antibot_vhost",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {
+        "x-message-ttl": 86400000
+      }
+    }
+  ],
+  "exchanges": [
+    {
+      "name": "antibot_exchange",
+      "vhost": "antibot_vhost",
+      "type": "topic",
+      "durable": true,
+      "auto_delete": false,
+      "internal": false,
+      "arguments": {}
+    },
+    {
+      "name": "dlx",
+      "vhost": "antibot_vhost",
+      "type": "direct",
+      "durable": true,
+      "auto_delete": false,
+      "internal": false,
+      "arguments": {}
+    },
+    {
+      "name": "priority_exchange",
+      "vhost": "antibot_vhost",
+      "type": "direct",
+      "durable": true,
+      "auto_delete": false,
+      "internal": false,
+      "arguments": {}
+    },
+    {
+      "name": "retry_exchange",
+      "vhost": "antibot_vhost",
+      "type": "direct", 
+      "durable": true,
+      "auto_delete": false,
+      "internal": false,
+      "arguments": {}
+    }
+  ],
+  "bindings": [
+    {
+      "source": "antibot_exchange",
+      "vhost": "antibot_vhost",
+      "destination": "sms_queue",
+      "destination_type": "queue",
+      "routing_key": "sms.*",
+      "arguments": {}
+    },
+    {
+      "source": "antibot_exchange", 
+      "vhost": "antibot_vhost",
+      "destination": "risk_assessment_queue",
+      "destination_type": "queue", 
+      "routing_key": "risk.*",
+      "arguments": {}
+    },
+    {
+      "source": "antibot_exchange",
+      "vhost": "antibot_vhost",
+      "destination": "data_processing_queue",
+      "destination_type": "queue",
+      "routing_key": "data.*", 
+      "arguments": {}
+    },
+    {
+      "source": "antibot_exchange",
+      "vhost": "antibot_vhost",
+      "destination": "pattern_recognition_queue",
+      "destination_type": "queue",
+      "routing_key": "pattern.*",
+      "arguments": {}
+    },
+    {
+      "source": "antibot_exchange",
+      "vhost": "antibot_vhost",
+      "destination": "audit_log_queue", 
+      "destination_type": "queue",
+      "routing_key": "audit.*",
+      "arguments": {}
+    },
+    {
+      "source": "priority_exchange",
+      "vhost": "antibot_vhost",
+      "destination": "sms_queue_p1",
+      "destination_type": "queue",
+      "routing_key": "p1",
+      "arguments": {}
+    },
+    {
+      "source": "priority_exchange",
+      "vhost": "antibot_vhost", 
+      "destination": "sms_queue_p2",
+      "destination_type": "queue",
+      "routing_key": "p2", 
+      "arguments": {}
+    },
+    {
+      "source": "priority_exchange",
+      "vhost": "antibot_vhost",
+      "destination": "sms_queue_p3",
+      "destination_type": "queue",
+      "routing_key": "p3",
+      "arguments": {}
+    },
+    {
+      "source": "dlx",
+      "vhost": "antibot_vhost",
+      "destination": "sms_dlq",
+      "destination_type": "queue",
+      "routing_key": "sms.failed",
+      "arguments": {}
+    }
+  ]
+}

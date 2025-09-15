@@ -1,0 +1,633 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: antibot-security
+  labels:
+    name: antibot-security
+    
+---
+# ConfigMap for application configuration
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: antibot-config
+  namespace: antibot-security
+data:
+  REDIS_URL: "redis://redis-master:6379"
+  RABBITMQ_URL: "amqp://antibot:antibotmq@rabbitmq-1:5672/antibot_vhost"
+  POSTGRES_URL: "postgresql://antibot:antibotdb@postgres-primary:5432/antibot_security"
+  MONGODB_URL: "mongodb://antibot:antibotpass@mongodb:27017/antibot_security"
+  LOG_LEVEL: "INFO"
+  CIRCUIT_BREAKER_THRESHOLD: "10"
+  CIRCUIT_BREAKER_TIMEOUT: "30"
+  BATCH_SIZE: "1000"
+  PROCESSING_INTERVAL: "5"
+  
+---
+# Secret for sensitive configuration
+apiVersion: v1
+kind: Secret
+metadata:
+  name: antibot-secrets
+  namespace: antibot-security
+type: Opaque
+stringData:
+  TWILIO_ACCOUNT_SID: "your-twilio-sid"
+  TWILIO_AUTH_TOKEN: "your-twilio-token"
+  TWILIO_PHONE_NUMBER: "your-twilio-number"
+  AWS_SNS_ACCESS_KEY: "your-aws-access-key"
+  AWS_SNS_SECRET_KEY: "your-aws-secret-key"
+  JWT_SECRET: "your-jwt-secret"
+  
+---
+# Redis Master Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis-master
+  namespace: antibot-security
+  labels:
+    app: redis
+    role: master
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: redis
+      role: master
+  template:
+    metadata:
+      labels:
+        app: redis
+        role: master
+    spec:
+      containers:
+      - name: redis
+        image: redis:7.2-alpine
+        command:
+        - redis-server
+        - --appendonly
+        - "yes"
+        - --replica-read-only
+        - "no"
+        - --maxmemory
+        - "1gb"
+        - --maxmemory-policy
+        - "allkeys-lru"
+        ports:
+        - containerPort: 6379
+          name: redis
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "250m"
+          limits:
+            memory: "1Gi"
+            cpu: "500m"
+        livenessProbe:
+          exec:
+            command:
+            - redis-cli
+            - ping
+          initialDelaySeconds: 30
+          timeoutSeconds: 5
+          periodSeconds: 10
+        readinessProbe:
+          exec:
+            command:
+            - redis-cli
+            - ping
+          initialDelaySeconds: 5
+          timeoutSeconds: 1
+          periodSeconds: 5
+        volumeMounts:
+        - name: redis-data
+          mountPath: /data
+      volumes:
+      - name: redis-data
+        persistentVolumeClaim:
+          claimName: redis-pvc
+          
+---
+# Redis Master Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis-master
+  namespace: antibot-security
+  labels:
+    app: redis
+    role: master
+spec:
+  ports:
+  - port: 6379
+    targetPort: 6379
+    name: redis
+  selector:
+    app: redis
+    role: master
+    
+---
+# SMS Service Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sms-service
+  namespace: antibot-security
+  labels:
+    app: sms-service
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: sms-service
+  template:
+    metadata:
+      labels:
+        app: sms-service
+    spec:
+      containers:
+      - name: sms-service
+        image: antibot/sms-service:latest
+        ports:
+        - containerPort: 8002
+          name: http
+        env:
+        - name: REDIS_URL
+          valueFrom:
+            configMapKeyRef:
+              name: antibot-config
+              key: REDIS_URL
+        - name: RABBITMQ_URL
+          valueFrom:
+            configMapKeyRef:
+              name: antibot-config
+              key: RABBITMQ_URL
+        - name: TWILIO_ACCOUNT_SID
+          valueFrom:
+            secretKeyRef:
+              name: antibot-secrets
+              key: TWILIO_ACCOUNT_SID
+        - name: TWILIO_AUTH_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: antibot-secrets
+              key: TWILIO_AUTH_TOKEN
+        - name: TWILIO_PHONE_NUMBER
+          valueFrom:
+            secretKeyRef:
+              name: antibot-secrets
+              key: TWILIO_PHONE_NUMBER
+        - name: AWS_SNS_ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              name: antibot-secrets
+              key: AWS_SNS_ACCESS_KEY
+        - name: AWS_SNS_SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: antibot-secrets
+              key: AWS_SNS_SECRET_KEY
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "200m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8002
+          initialDelaySeconds: 30
+          timeoutSeconds: 5
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8002
+          initialDelaySeconds: 5
+          timeoutSeconds: 1
+          periodSeconds: 5
+        
+---
+# SMS Service HPA
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: sms-service-hpa
+  namespace: antibot-security
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: sms-service
+  minReplicas: 3
+  maxReplicas: 20
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 80
+  behavior:
+    scaleUp:
+      stabilizationWindowSeconds: 60
+      policies:
+      - type: Percent
+        value: 100
+        periodSeconds: 60
+    scaleDown:
+      stabilizationWindowSeconds: 300
+      policies:
+      - type: Percent
+        value: 10
+        periodSeconds: 60
+        
+---
+# SMS Service Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: sms-service
+  namespace: antibot-security
+  labels:
+    app: sms-service
+spec:
+  ports:
+  - port: 8002
+    targetPort: 8002
+    name: http
+  selector:
+    app: sms-service
+    
+---
+# Risk Engine Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: risk-engine
+  namespace: antibot-security
+  labels:
+    app: risk-engine
+spec:
+  replicas: 4
+  selector:
+    matchLabels:
+      app: risk-engine
+  template:
+    metadata:
+      labels:
+        app: risk-engine
+    spec:
+      containers:
+      - name: risk-engine
+        image: antibot/risk-engine:latest
+        ports:
+        - containerPort: 8001
+          name: http
+        env:
+        - name: REDIS_URL
+          valueFrom:
+            configMapKeyRef:
+              name: antibot-config
+              key: REDIS_URL
+        - name: MONGODB_URL
+          valueFrom:
+            configMapKeyRef:
+              name: antibot-config
+              key: MONGODB_URL
+        resources:
+          requests:
+            memory: "1Gi"
+            cpu: "500m"
+          limits:
+            memory: "2Gi"
+            cpu: "1000m"
+        livenessProbe:
+          httpGet:
+            path: /api/v1/health
+            port: 8001
+          initialDelaySeconds: 60
+          timeoutSeconds: 10
+          periodSeconds: 15
+        readinessProbe:
+          httpGet:
+            path: /api/v1/health
+            port: 8001
+          initialDelaySeconds: 10
+          timeoutSeconds: 5
+          periodSeconds: 10
+          
+---
+# Risk Engine HPA
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: risk-engine-hpa
+  namespace: antibot-security
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: risk-engine
+  minReplicas: 4
+  maxReplicas: 50
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 60
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 70
+  behavior:
+    scaleUp:
+      stabilizationWindowSeconds: 30
+      policies:
+      - type: Percent
+        value: 200
+        periodSeconds: 30
+    scaleDown:
+      stabilizationWindowSeconds: 300
+      policies:
+      - type: Percent
+        value: 25
+        periodSeconds: 60
+
+---
+# Risk Engine Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: risk-engine
+  namespace: antibot-security
+  labels:
+    app: risk-engine
+spec:
+  ports:
+  - port: 8001
+    targetPort: 8001
+    name: http
+  selector:
+    app: risk-engine
+    
+---
+# Data Processor Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: data-processor
+  namespace: antibot-security
+  labels:
+    app: data-processor
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: data-processor
+  template:
+    metadata:
+      labels:
+        app: data-processor
+    spec:
+      containers:
+      - name: data-processor
+        image: antibot/data-processor:latest
+        ports:
+        - containerPort: 8004
+          name: http
+        envFrom:
+        - configMapRef:
+            name: antibot-config
+        resources:
+          requests:
+            memory: "1Gi"
+            cpu: "500m"
+          limits:
+            memory: "2Gi"
+            cpu: "1000m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8004
+          initialDelaySeconds: 60
+          timeoutSeconds: 10
+          periodSeconds: 30
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8004
+          initialDelaySeconds: 15
+          timeoutSeconds: 5
+          periodSeconds: 15
+          
+---
+# Data Processor HPA
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: data-processor-hpa
+  namespace: antibot-security
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: data-processor
+  minReplicas: 2
+  maxReplicas: 10
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 80
+        
+---
+# Data Processor Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: data-processor
+  namespace: antibot-security
+  labels:
+    app: data-processor
+spec:
+  ports:
+  - port: 8004
+    targetPort: 8004
+    name: http
+  selector:
+    app: data-processor
+    
+---
+# Load Balancer Service (exposes services externally)
+apiVersion: v1
+kind: Service
+metadata:
+  name: antibot-loadbalancer
+  namespace: antibot-security
+  labels:
+    app: antibot-loadbalancer
+  annotations:
+    service.beta.kubernetes.io/aws-load-balancer-type: "nlb"
+    service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled: "true"
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 80
+    targetPort: 8000
+    name: http
+    protocol: TCP
+  - port: 443
+    targetPort: 8443
+    name: https
+    protocol: TCP
+  selector:
+    app: kong
+    
+---
+# Network Policy for security
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: antibot-network-policy
+  namespace: antibot-security
+spec:
+  podSelector: {}
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress:
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          name: antibot-security
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          name: kube-system
+  egress:
+  - to:
+    - namespaceSelector:
+        matchLabels:
+          name: antibot-security
+  - to:
+    - namespaceSelector:
+        matchLabels:
+          name: kube-system
+  - to: []
+    ports:
+    - protocol: TCP
+      port: 443
+    - protocol: TCP
+      port: 80
+    - protocol: UDP
+      port: 53
+      
+---
+# Pod Disruption Budget for SMS Service
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: sms-service-pdb
+  namespace: antibot-security
+spec:
+  minAvailable: 2
+  selector:
+    matchLabels:
+      app: sms-service
+      
+---
+# Pod Disruption Budget for Risk Engine
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: risk-engine-pdb
+  namespace: antibot-security
+spec:
+  minAvailable: 3
+  selector:
+    matchLabels:
+      app: risk-engine
+      
+---
+# ServiceMonitor for Prometheus monitoring
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: antibot-services
+  namespace: antibot-security
+  labels:
+    app: antibot
+spec:
+  selector:
+    matchLabels:
+      monitoring: enabled
+  endpoints:
+  - port: http
+    path: /metrics
+    interval: 30s
+    scrapeTimeout: 10s
+    
+---
+# Persistent Volume Claims
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: redis-pvc
+  namespace: antibot-security
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 50Gi
+  storageClassName: gp3
+  
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: postgres-pvc
+  namespace: antibot-security
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 100Gi
+  storageClassName: gp3
+  
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mongodb-pvc
+  namespace: antibot-security
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 200Gi
+  storageClassName: gp3

@@ -1,0 +1,720 @@
+# Docker Compose for Anti-Bot Security Framework
+# Production-ready fault-tolerant architecture
+
+version: '3.8'
+
+networks:
+  antibot-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
+
+volumes:
+  redis-data:
+    driver: local
+  postgres-data:
+    driver: local
+  mongodb-data:
+    driver: local
+  kong-data:
+    driver: local
+  prometheus-data:
+    driver: local
+  grafana-data:
+    driver: local
+
+services:
+  # API Gateway (Kong)
+  kong-database:
+    image: postgres:14-alpine
+    environment:
+      POSTGRES_USER: kong
+      POSTGRES_PASSWORD: kongpass
+      POSTGRES_DB: kong
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - antibot-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U kong"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  kong-migration:
+    image: kong:3.4.2-alpine
+    environment:
+      KONG_DATABASE: postgres
+      KONG_PG_HOST: kong-database
+      KONG_PG_USER: kong
+      KONG_PG_PASSWORD: kongpass
+      KONG_PG_DATABASE: kong
+    command: kong migrations bootstrap
+    networks:
+      - antibot-network
+    depends_on:
+      kong-database:
+        condition: service_healthy
+    restart: "no"
+
+  kong:
+    image: kong:3.4.2-alpine
+    environment:
+      KONG_DATABASE: postgres
+      KONG_PG_HOST: kong-database
+      KONG_PG_USER: kong
+      KONG_PG_PASSWORD: kongpass
+      KONG_PG_DATABASE: kong
+      KONG_PROXY_ACCESS_LOG: /dev/stdout
+      KONG_ADMIN_ACCESS_LOG: /dev/stdout
+      KONG_PROXY_ERROR_LOG: /dev/stderr
+      KONG_ADMIN_ERROR_LOG: /dev/stderr
+      KONG_ADMIN_LISTEN: 0.0.0.0:8001
+      KONG_ADMIN_GUI_URL: http://localhost:8002
+      KONG_PLUGINS: bundled,rate-limiting-advanced,bot-detection
+      KONG_LOG_LEVEL: info
+    ports:
+      - "8000:8000"  # Proxy
+      - "8443:8443"  # Proxy SSL
+      - "8001:8001"  # Admin API
+      - "8444:8444"  # Admin API SSL
+      - "8002:8002"  # Admin GUI
+    volumes:
+      - ./kong-gateway/kong.yml:/kong/declarative/kong.yml
+      - kong-data:/kong/data
+    networks:
+      - antibot-network
+    depends_on:
+      kong-database:
+        condition: service_healthy
+      kong-migration:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD", "kong", "health"]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+      start_period: 60s
+    restart: unless-stopped
+
+  # Redis Cluster for Caching and Rate Limiting
+  redis-master:
+    image: redis:7.2-alpine
+    command: redis-server --appendonly yes --replica-read-only no --maxmemory 512mb --maxmemory-policy allkeys-lru
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    networks:
+      - antibot-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    restart: unless-stopped
+
+  redis-replica:
+    image: redis:7.2-alpine
+    command: redis-server --appendonly yes --replicaof redis-master 6379 --replica-read-only yes
+    networks:
+      - antibot-network
+    depends_on:
+      redis-master:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    restart: unless-stopped
+
+  # MongoDB for Historical Data Storage
+  mongodb:
+    image: mongo:7.0
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: antibot
+      MONGO_INITDB_ROOT_PASSWORD: antibotpass
+      MONGO_INITDB_DATABASE: antibot_security
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb-data:/data/db
+      - ./mongodb/init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
+    networks:
+      - antibot-network
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 40s
+    restart: unless-stopped
+
+  # Risk Scoring Engine (Primary)
+  risk-engine-1:
+    build:
+      context: ./backend/risk-engine
+      dockerfile: Dockerfile
+    environment:
+      - REDIS_URL=redis://redis-master:6379
+      - MONGODB_URL=mongodb://antibot:antibotpass@mongodb:27017/antibot_security
+      - SERVICE_NAME=risk-engine-1
+      - LOG_LEVEL=INFO
+      - PYTHONUNBUFFERED=1
+    ports:
+      - "8001:8001"
+    volumes:
+      - ./backend/risk-engine:/app
+      - ./backend/risk-engine/models:/app/models
+    networks:
+      - antibot-network
+    depends_on:
+      redis-master:
+        condition: service_healthy
+      mongodb:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8001/api/v1/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 2G
+        reservations:
+          cpus: '1.0'
+          memory: 1G
+
+  # Risk Scoring Engine (Replica)
+  risk-engine-2:
+    build:
+      context: ./backend/risk-engine
+      dockerfile: Dockerfile
+    environment:
+      - REDIS_URL=redis://redis-master:6379
+      - MONGODB_URL=mongodb://antibot:antibotpass@mongodb:27017/antibot_security
+      - SERVICE_NAME=risk-engine-2
+      - LOG_LEVEL=INFO
+      - PYTHONUNBUFFERED=1
+    volumes:
+      - ./backend/risk-engine:/app
+      - ./backend/risk-engine/models:/app/models
+    networks:
+      - antibot-network
+    depends_on:
+      redis-master:
+        condition: service_healthy
+      mongodb:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8001/api/v1/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 2G
+
+  # SMS Verification Service - Primary
+  sms-service-1:
+    build:
+      context: ./backend/sms-service
+      dockerfile: Dockerfile
+    environment:
+      - REDIS_URL=redis://redis-master:6379
+      - TWILIO_ACCOUNT_SID=${TWILIO_ACCOUNT_SID}
+      - TWILIO_AUTH_TOKEN=${TWILIO_AUTH_TOKEN}
+      - TWILIO_PHONE_NUMBER=${TWILIO_PHONE_NUMBER}
+      - AWS_SNS_ACCESS_KEY=${AWS_SNS_ACCESS_KEY}
+      - AWS_SNS_SECRET_KEY=${AWS_SNS_SECRET_KEY}
+      - AWS_SNS_REGION=${AWS_SNS_REGION}
+      - SERVICE_NAME=sms-service-1
+      - SMS_PROVIDER_FAILOVER=true
+      - RATE_LIMIT_PER_PHONE=5
+      - RATE_LIMIT_WINDOW=300
+      - CIRCUIT_BREAKER_THRESHOLD=10
+      - CIRCUIT_BREAKER_TIMEOUT=30
+    ports:
+      - "8002:8002"
+    networks:
+      - antibot-network
+    depends_on:
+      redis-master:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8002/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 512M
+        reservations:
+          cpus: '0.5'
+          memory: 256M
+
+  # SMS Verification Service - Replica for High Availability
+  sms-service-2:
+    build:
+      context: ./backend/sms-service
+      dockerfile: Dockerfile
+    environment:
+      - REDIS_URL=redis://redis-master:6379
+      - TWILIO_ACCOUNT_SID=${TWILIO_ACCOUNT_SID}
+      - TWILIO_AUTH_TOKEN=${TWILIO_AUTH_TOKEN}
+      - TWILIO_PHONE_NUMBER=${TWILIO_PHONE_NUMBER}
+      - AWS_SNS_ACCESS_KEY=${AWS_SNS_ACCESS_KEY}
+      - AWS_SNS_SECRET_KEY=${AWS_SNS_SECRET_KEY}
+      - AWS_SNS_REGION=${AWS_SNS_REGION}
+      - SERVICE_NAME=sms-service-2
+      - SMS_PROVIDER_FAILOVER=true
+      - RATE_LIMIT_PER_PHONE=5
+      - RATE_LIMIT_WINDOW=300
+      - CIRCUIT_BREAKER_THRESHOLD=10
+      - CIRCUIT_BREAKER_TIMEOUT=30
+    networks:
+      - antibot-network
+    depends_on:
+      redis-master:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8002/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 512M
+
+  # Pattern Recognition Service
+  pattern-recognition:
+    build:
+      context: ./backend/pattern-recognition
+      dockerfile: Dockerfile
+    environment:
+      - REDIS_URL=redis://redis-master:6379
+      - MONGODB_URL=mongodb://antibot:antibotpass@mongodb:27017/antibot_security
+    ports:
+      - "8003:8003"
+    networks:
+      - antibot-network
+    depends_on:
+      redis-master:
+        condition: service_healthy
+      mongodb:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8003/api/v1/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+
+  # Web Application Firewall (OWASP ModSecurity)
+  waf:
+    image: owasp/modsecurity-crs:3.3-apache
+    environment:
+      PARANOIA: 2
+      ANOMALY_INBOUND: 5
+      ANOMALY_OUTBOUND: 4
+      PROXY: 1
+      BACKEND: http://kong:8000
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./waf/custom-rules:/etc/modsecurity.d/custom-rules:ro
+      - ./waf/ssl:/etc/ssl/certs:ro
+    networks:
+      - antibot-network
+    depends_on:
+      kong:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # Message Queue Cluster (RabbitMQ) - Primary Node
+  rabbitmq-1:
+    image: rabbitmq:3.12-management-alpine
+    hostname: rabbitmq-1
+    environment:
+      RABBITMQ_DEFAULT_USER: antibot
+      RABBITMQ_DEFAULT_PASS: antibotmq
+      RABBITMQ_ERLANG_COOKIE: antibot_cluster_cookie
+      RABBITMQ_DEFAULT_VHOST: antibot_vhost
+      RABBITMQ_VM_MEMORY_HIGH_WATERMARK: 0.6
+    ports:
+      - "5672:5672"
+      - "15672:15672"  # Management UI
+    volumes:
+      - ./rabbitmq/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf:ro
+      - ./rabbitmq/definitions.json:/etc/rabbitmq/definitions.json:ro
+      - ./rabbitmq/enabled_plugins:/etc/rabbitmq/enabled_plugins:ro
+    networks:
+      - antibot-network
+    healthcheck:
+      test: rabbitmq-diagnostics -q ping
+      interval: 30s
+      timeout: 30s
+      retries: 3
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+        reservations:
+          memory: 512M
+
+  # RabbitMQ Cluster - Secondary Node
+  rabbitmq-2:
+    image: rabbitmq:3.12-management-alpine
+    hostname: rabbitmq-2
+    environment:
+      RABBITMQ_DEFAULT_USER: antibot
+      RABBITMQ_DEFAULT_PASS: antibotmq
+      RABBITMQ_ERLANG_COOKIE: antibot_cluster_cookie
+      RABBITMQ_DEFAULT_VHOST: antibot_vhost
+      RABBITMQ_VM_MEMORY_HIGH_WATERMARK: 0.6
+    volumes:
+      - ./rabbitmq/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf:ro
+      - ./rabbitmq/definitions.json:/etc/rabbitmq/definitions.json:ro
+      - ./rabbitmq/enabled_plugins:/etc/rabbitmq/enabled_plugins:ro
+    networks:
+      - antibot-network
+    depends_on:
+      rabbitmq-1:
+        condition: service_healthy
+    healthcheck:
+      test: rabbitmq-diagnostics -q ping
+      interval: 30s
+      timeout: 30s
+      retries: 3
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+        reservations:
+          memory: 512M
+
+  # Monitoring Stack
+  prometheus:
+    image: prom/prometheus:v2.47.2
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--storage.tsdb.retention.time=200h'
+      - '--web.enable-lifecycle'
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
+    networks:
+      - antibot-network
+    restart: unless-stopped
+
+  grafana:
+    image: grafana/grafana:10.2.0
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: grafana123
+      GF_USERS_ALLOW_SIGN_UP: false
+    ports:
+      - "3001:3000"
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./monitoring/grafana/dashboards:/var/lib/grafana/dashboards:ro
+    networks:
+      - antibot-network
+    depends_on:
+      - prometheus
+    restart: unless-stopped
+
+  # Log Aggregation (ELK Stack)
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.11.0
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - "ES_JAVA_OPTS=-Xms1g -Xmx1g"
+    ports:
+      - "9200:9200"
+    volumes:
+      - ./elk/elasticsearch/data:/usr/share/elasticsearch/data
+    networks:
+      - antibot-network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:9200/_cluster/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    restart: unless-stopped
+
+  logstash:
+    image: docker.elastic.co/logstash/logstash:8.11.0
+    volumes:
+      - ./elk/logstash/config/logstash.yml:/usr/share/logstash/config/logstash.yml:ro
+      - ./elk/logstash/pipeline:/usr/share/logstash/pipeline:ro
+    ports:
+      - "5044:5044"
+      - "5000:5000/tcp"
+      - "5000:5000/udp"
+      - "9600:9600"
+    networks:
+      - antibot-network
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+    restart: unless-stopped
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.11.0
+    environment:
+      ELASTICSEARCH_HOSTS: http://elasticsearch:9200
+    ports:
+      - "5601:5601"
+    networks:
+      - antibot-network
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # Load Testing Tool (for performance validation)
+  locust:
+    image: locustio/locust:2.17.0
+    command: -f /mnt/locust/locustfile.py --master --host=http://kong:8000
+    ports:
+      - "8089:8089"
+    volumes:
+      - ./testing/load-testing:/mnt/locust
+    networks:
+      - antibot-network
+    depends_on:
+      kong:
+        condition: service_healthy
+    profiles:
+      - testing
+
+  locust-worker:
+    image: locustio/locust:2.17.0
+    command: -f /mnt/locust/locustfile.py --worker --master-host locust
+    volumes:
+      - ./testing/load-testing:/mnt/locust
+    networks:
+      - antibot-network
+    depends_on:
+      - locust
+    profiles:
+      - testing
+    deploy:
+      replicas: 4
+
+  # PostgreSQL Primary Database for Transactional Data
+  postgres-primary:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: antibot
+      POSTGRES_PASSWORD: antibotdb
+      POSTGRES_DB: antibot_security
+      POSTGRES_INITDB_ARGS: "--encoding=UTF8 --locale=C"
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./postgres/init-scripts:/docker-entrypoint-initdb.d:ro
+      - ./postgres/postgresql.conf:/etc/postgresql/postgresql.conf:ro
+    networks:
+      - antibot-network
+    command: postgres -c config_file=/etc/postgresql/postgresql.conf
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U antibot"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+        reservations:
+          memory: 1G
+
+  # PostgreSQL Read Replica for Scaling
+  postgres-replica:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: antibot
+      POSTGRES_PASSWORD: antibotdb
+      POSTGRES_DB: antibot_security
+      PGUSER: antibot
+    volumes:
+      - ./postgres/replica-setup.sh:/docker-entrypoint-initdb.d/replica-setup.sh:ro
+    networks:
+      - antibot-network
+    depends_on:
+      postgres-primary:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U antibot"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+        reservations:
+          memory: 512M
+
+  # HAProxy Load Balancer for SMS Services
+  haproxy:
+    image: haproxy:2.8-alpine
+    ports:
+      - "8100:8100"  # SMS service load balancer
+      - "8101:8101"  # Risk engine load balancer
+      - "8999:8999"  # HAProxy stats
+    volumes:
+      - ./haproxy/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro
+    networks:
+      - antibot-network
+    depends_on:
+      - sms-service-1
+      - sms-service-2
+      - risk-engine-1
+      - risk-engine-2
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8999/stats"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+
+  # Data Processing Pipeline Service
+  data-processor:
+    build:
+      context: ./backend/data-processor
+      dockerfile: Dockerfile
+    environment:
+      - REDIS_URL=redis://redis-master:6379
+      - MONGODB_URL=mongodb://antibot:antibotpass@mongodb:27017/antibot_security
+      - POSTGRES_URL=postgresql://antibot:antibotdb@postgres-primary:5432/antibot_security
+      - RABBITMQ_URL=amqp://antibot:antibotmq@rabbitmq-1:5672/antibot_vhost
+      - BATCH_SIZE=1000
+      - PROCESSING_INTERVAL=5
+    ports:
+      - "8004:8004"
+    networks:
+      - antibot-network
+    depends_on:
+      redis-master:
+        condition: service_healthy
+      mongodb:
+        condition: service_healthy
+      postgres-primary:
+        condition: service_healthy
+      rabbitmq-1:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8004/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 2G
+        reservations:
+          cpus: '1.0'
+          memory: 1G
+
+  # Serverless Function Simulator for SMS Processing
+  serverless-sms:
+    build:
+      context: ./backend/serverless-functions
+      dockerfile: Dockerfile.sms
+    environment:
+      - REDIS_URL=redis://redis-master:6379
+      - RABBITMQ_URL=amqp://antibot:antibotmq@rabbitmq-1:5672/antibot_vhost
+      - TWILIO_ACCOUNT_SID=${TWILIO_ACCOUNT_SID}
+      - TWILIO_AUTH_TOKEN=${TWILIO_AUTH_TOKEN}
+      - AWS_SNS_ACCESS_KEY=${AWS_SNS_ACCESS_KEY}
+      - AWS_SNS_SECRET_KEY=${AWS_SNS_SECRET_KEY}
+      - FUNCTION_TIMEOUT=30
+      - MAX_RETRIES=3
+    networks:
+      - antibot-network
+    depends_on:
+      redis-master:
+        condition: service_healthy
+      rabbitmq-1:
+        condition: service_healthy
+    restart: unless-stopped
+    deploy:
+      replicas: 3
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+
+  # Connection Pool Manager
+  connection-pool:
+    image: pgbouncer/pgbouncer:1.20.1
+    environment:
+      DATABASES_HOST: postgres-primary
+      DATABASES_PORT: 5432
+      DATABASES_USER: antibot
+      DATABASES_PASSWORD: antibotdb
+      DATABASES_DBNAME: antibot_security
+      POOL_MODE: transaction
+      SERVER_RESET_QUERY: DISCARD ALL
+      MAX_CLIENT_CONN: 1000
+      DEFAULT_POOL_SIZE: 100
+      MAX_DB_CONNECTIONS: 100
+    ports:
+      - "6432:5432"
+    volumes:
+      - ./pgbouncer/pgbouncer.ini:/etc/pgbouncer/pgbouncer.ini:ro
+    networks:
+      - antibot-network
+    depends_on:
+      postgres-primary:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # Circuit Breaker Dashboard
+  hystrix-dashboard:
+    image: mlabouardy/hystrix-dashboard:latest
+    ports:
+      - "8080:8080"
+    networks:
+      - antibot-network
+    restart: unless-stopped

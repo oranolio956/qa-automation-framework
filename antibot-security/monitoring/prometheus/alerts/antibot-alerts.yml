@@ -1,0 +1,258 @@
+# Anti-Bot Security Alert Rules
+# Comprehensive alerting for bot detection and system health
+
+groups:
+  - name: antibot.security
+    interval: 10s
+    rules:
+      # High-Risk Bot Activity Detected
+      - alert: HighRiskBotActivity
+        expr: increase(risk_engine_high_risk_sessions_total[5m]) > 10
+        for: 1m
+        labels:
+          severity: critical
+          team: security
+          component: risk-engine
+        annotations:
+          summary: "High volume of high-risk bot sessions detected"
+          description: "{{ $value }} high-risk bot sessions detected in the last 5 minutes. This may indicate a coordinated attack."
+          runbook_url: "https://runbook.example.com/alerts/high-risk-bot-activity"
+
+      # Anomalous Request Pattern
+      - alert: AnomalousRequestPattern
+        expr: rate(kong_requests_total[1m]) > 1000 and rate(kong_requests_total[1m]) > (avg_over_time(rate(kong_requests_total[1m])[1h:1m]) * 5)
+        for: 2m
+        labels:
+          severity: warning
+          team: security
+          component: api-gateway
+        annotations:
+          summary: "Anomalous request pattern detected"
+          description: "Request rate of {{ $value }} req/sec is 5x higher than the hourly average. Possible bot attack in progress."
+
+      # Risk Engine Service Down
+      - alert: RiskEngineDown
+        expr: up{job="risk-engine"} == 0
+        for: 30s
+        labels:
+          severity: critical
+          team: platform
+          component: risk-engine
+        annotations:
+          summary: "Risk Engine instance is down"
+          description: "Risk Engine instance {{ $labels.instance }} has been down for more than 30 seconds."
+
+      # High Response Time
+      - alert: HighResponseTime
+        expr: histogram_quantile(0.95, rate(risk_engine_request_duration_seconds_bucket[5m])) > 0.1
+        for: 2m
+        labels:
+          severity: warning
+          team: performance
+          component: risk-engine
+        annotations:
+          summary: "High response time detected"
+          description: "95th percentile response time is {{ $value }}s, exceeding SLA of 100ms."
+
+      # SMS Rate Limit Exceeded
+      - alert: SMSRateLimitExceeded
+        expr: increase(sms_service_rate_limited_total[5m]) > 50
+        for: 1m
+        labels:
+          severity: warning
+          team: security
+          component: sms-service
+        annotations:
+          summary: "SMS service rate limit frequently exceeded"
+          description: "SMS rate limit exceeded {{ $value }} times in the last 5 minutes."
+
+      # Redis Memory Usage Critical
+      - alert: RedisMemoryUsageCritical
+        expr: (redis_memory_used_bytes / redis_memory_max_bytes) * 100 > 90
+        for: 2m
+        labels:
+          severity: critical
+          team: infrastructure
+          component: redis
+        annotations:
+          summary: "Redis memory usage critical"
+          description: "Redis memory usage is {{ $value }}%, approaching maximum capacity."
+
+      # Model Accuracy Degradation
+      - alert: ModelAccuracyDegraded
+        expr: risk_engine_model_accuracy < 0.85
+        for: 5m
+        labels:
+          severity: warning
+          team: ml-ops
+          component: risk-engine
+        annotations:
+          summary: "ML model accuracy has degraded"
+          description: "Model accuracy is {{ $value }}, below acceptable threshold of 0.85."
+
+      # Circuit Breaker Open
+      - alert: CircuitBreakerOpen
+        expr: circuit_breaker_state > 0
+        for: 1m
+        labels:
+          severity: warning
+          team: reliability
+          component: circuit-breaker
+        annotations:
+          summary: "Circuit breaker is open"
+          description: "Circuit breaker for {{ $labels.service }} is open, blocking requests."
+
+      # Disk Space Low
+      - alert: DiskSpaceLow
+        expr: (node_filesystem_avail_bytes{mountpoint="/"} / node_filesystem_size_bytes{mountpoint="/"}) * 100 < 10
+        for: 2m
+        labels:
+          severity: warning
+          team: infrastructure
+          component: system
+        annotations:
+          summary: "Disk space running low"
+          description: "Available disk space is {{ $value }}% on {{ $labels.instance }}."
+
+      # MongoDB Connection Issues
+      - alert: MongoDBConnectionIssues
+        expr: increase(mongodb_connections_failed_total[5m]) > 10
+        for: 1m
+        labels:
+          severity: warning
+          team: database
+          component: mongodb
+        annotations:
+          summary: "MongoDB experiencing connection issues"
+          description: "{{ $value }} failed MongoDB connections in the last 5 minutes."
+
+  - name: antibot.patterns
+    interval: 15s
+    rules:
+      # Coordinated Attack Pattern
+      - alert: CoordinatedAttackPattern
+        expr: |
+          (
+            increase(kong_requests_total{status=~"4..|5.."}[2m]) > 100
+          ) and (
+            count by (source_ip) (
+              increase(kong_requests_total[2m]) > 50
+            ) > 10
+          )
+        for: 1m
+        labels:
+          severity: critical
+          team: security
+          component: pattern-detection
+        annotations:
+          summary: "Coordinated attack pattern detected"
+          description: "Multiple IPs generating high error rates simultaneously. Possible coordinated bot attack."
+
+      # Credential Stuffing Attack
+      - alert: CredentialStuffingAttack
+        expr: increase(kong_requests_total{path="/login",status="401"}[5m]) > 500
+        for: 2m
+        labels:
+          severity: warning
+          team: security
+          component: authentication
+        annotations:
+          summary: "Possible credential stuffing attack"
+          description: "{{ $value }} failed login attempts in the last 5 minutes."
+
+      # Scraping Bot Detected
+      - alert: ScrapingBotDetected
+        expr: |
+          (
+            rate(kong_requests_total[5m]) > 10
+          ) and (
+            avg_over_time(risk_engine_mouse_events[5m]) < 5
+          ) and (
+            avg_over_time(risk_engine_keyboard_events[5m]) < 2
+          )
+        for: 3m
+        labels:
+          severity: warning
+          team: security
+          component: behavioral-analysis
+        annotations:
+          summary: "Scraping bot behavior detected"
+          description: "High request rate with minimal human interaction detected from {{ $labels.source_ip }}."
+
+  - name: antibot.performance
+    interval: 30s
+    rules:
+      # API Gateway Overloaded
+      - alert: APIGatewayOverloaded
+        expr: rate(kong_requests_total[1m]) > 5000
+        for: 2m
+        labels:
+          severity: warning
+          team: platform
+          component: api-gateway
+        annotations:
+          summary: "API Gateway experiencing high load"
+          description: "Request rate of {{ $value }} req/sec may overload the system."
+
+      # Queue Depth High
+      - alert: QueueDepthHigh
+        expr: rabbitmq_queue_messages > 10000
+        for: 2m
+        labels:
+          severity: warning
+          team: messaging
+          component: rabbitmq
+        annotations:
+          summary: "Message queue depth is high"
+          description: "Queue {{ $labels.queue }} has {{ $value }} messages pending."
+
+      # ML Model Inference Slow
+      - alert: MLModelInferenceSlow
+        expr: histogram_quantile(0.99, rate(risk_engine_model_inference_duration_seconds_bucket[5m])) > 0.05
+        for: 3m
+        labels:
+          severity: warning
+          team: ml-ops
+          component: ml-inference
+        annotations:
+          summary: "ML model inference is slow"
+          description: "99th percentile model inference time is {{ $value }}s, impacting response times."
+
+  - name: antibot.business
+    interval: 60s
+    rules:
+      # False Positive Rate High
+      - alert: FalsePositiveRateHigh
+        expr: (risk_engine_false_positives_total / risk_engine_total_assessments_total) > 0.05
+        for: 5m
+        labels:
+          severity: warning
+          team: product
+          component: risk-assessment
+        annotations:
+          summary: "False positive rate is high"
+          description: "False positive rate is {{ $value | humanizePercentage }}, impacting user experience."
+
+      # Bot Detection Rate Low
+      - alert: BotDetectionRateLow
+        expr: (risk_engine_bots_detected_total / risk_engine_total_sessions_total) < 0.01
+        for: 10m
+        labels:
+          severity: info
+          team: security
+          component: detection
+        annotations:
+          summary: "Bot detection rate unusually low"
+          description: "Only {{ $value | humanizePercentage }} of sessions flagged as bots. May indicate detection issues."
+
+      # Revenue Impact from Bot Activity
+      - alert: RevenueImpactFromBots
+        expr: increase(business_metrics_blocked_transactions_total[1h]) > 1000
+        for: 5m
+        labels:
+          severity: warning
+          team: business
+          component: impact-analysis
+        annotations:
+          summary: "Significant revenue impact from bot blocking"
+          description: "{{ $value }} transactions blocked in the last hour due to bot activity."

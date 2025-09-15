@@ -1,0 +1,410 @@
+# Kong API Gateway Configuration for Anti-Bot Security
+# Production-ready setup with plugins for security and performance
+
+_format_version: "3.0"
+_transform: true
+
+services:
+  # Risk Engine Service
+  - name: risk-engine-service
+    url: http://risk-engine:8001
+    tags:
+      - antibot
+      - risk-engine
+    retries: 3
+    connect_timeout: 30000
+    write_timeout: 30000
+    read_timeout: 30000
+    
+    routes:
+      - name: behavioral-data-route
+        paths:
+          - /api/v1/behavioral-data
+        methods:
+          - POST
+        strip_path: false
+        preserve_host: false
+        tags:
+          - behavioral-analysis
+        
+        plugins:
+          # Rate Limiting - Aggressive for bot detection
+          - name: rate-limiting-advanced
+            config:
+              limit:
+                - 50  # 50 requests per minute for behavioral data
+              window_size:
+                - 60
+              identifier: consumer
+              sync_rate: -1
+              strategy: redis
+              redis:
+                host: redis
+                port: 6379
+                database: 1
+              hide_client_headers: false
+              fault_tolerant: true
+          
+          # Request Size Limiting
+          - name: request-size-limiting
+            config:
+              allowed_payload_size: 1000000  # 1MB max payload
+              size_unit: bytes
+              require_content_length: true
+          
+          # Request Transformation - Add security headers
+          - name: request-transformer
+            config:
+              add:
+                headers:
+                  - "X-Request-ID:$(uuid)"
+                  - "X-Forwarded-For:$(remote_addr)"
+                  - "X-Real-IP:$(remote_addr)"
+              remove:
+                headers:
+                  - "X-Sensitive-Header"
+          
+          # Response Transformation - Security headers
+          - name: response-transformer
+            config:
+              add:
+                headers:
+                  - "X-Content-Type-Options:nosniff"
+                  - "X-Frame-Options:DENY"
+                  - "X-XSS-Protection:1; mode=block"
+                  - "Strict-Transport-Security:max-age=31536000; includeSubDomains"
+                  - "Content-Security-Policy:default-src 'self'"
+          
+          # Circuit Breaker for fault tolerance
+          - name: proxy-cache
+            config:
+              strategy: memory
+              memory:
+                dictionary_name: kong_cache
+              content_type:
+                - application/json
+              cache_ttl: 300  # 5 minutes
+              request_method:
+                - GET
+                - HEAD
+              response_code:
+                - 200
+                - 301
+                - 404
+          
+          # CORS for browser security
+          - name: cors
+            config:
+              origins:
+                - "https://*.yourdomain.com"
+                - "http://localhost:3000"  # Development
+              methods:
+                - GET
+                - POST
+                - OPTIONS
+              headers:
+                - Accept
+                - Accept-Version
+                - Content-Length
+                - Content-MD5
+                - Content-Type
+                - Date
+                - X-Auth-Token
+                - X-Session-ID
+              exposed_headers:
+                - X-Request-ID
+                - X-Response-Time
+              credentials: true
+              max_age: 3600
+              preflight_continue: false
+      
+      # Health Check Route
+      - name: health-check-route
+        paths:
+          - /api/v1/health
+        methods:
+          - GET
+        strip_path: false
+        
+        plugins:
+          # Lighter rate limiting for health checks
+          - name: rate-limiting
+            config:
+              minute: 100
+              policy: redis
+              redis_host: redis
+              redis_port: 6379
+              redis_database: 1
+              fault_tolerant: true
+
+  # SMS Verification Service
+  - name: sms-service
+    url: http://sms-service:8002
+    tags:
+      - antibot
+      - sms-verification
+    retries: 3
+    
+    routes:
+      - name: sms-verification-route
+        paths:
+          - /api/v1/sms
+        methods:
+          - POST
+        strip_path: false
+        
+        plugins:
+          # Strict rate limiting for SMS to prevent abuse
+          - name: rate-limiting-advanced
+            config:
+              limit:
+                - 5   # 5 SMS requests per minute
+                - 20  # 20 SMS requests per hour
+              window_size:
+                - 60
+                - 3600
+              identifier: consumer
+              strategy: redis
+              redis:
+                host: redis
+                port: 6379
+                database: 2
+              fault_tolerant: true
+          
+          # Request validation for SMS
+          - name: request-validator
+            config:
+              version: draft4
+              body_schema: |
+                {
+                  "type": "object",
+                  "properties": {
+                    "phoneNumber": {
+                      "type": "string",
+                      "pattern": "^\\+[1-9]\\d{1,14}$"
+                    },
+                    "sessionId": {
+                      "type": "string",
+                      "minLength": 10
+                    }
+                  },
+                  "required": ["phoneNumber", "sessionId"]
+                }
+
+  # Pattern Recognition Service
+  - name: pattern-service
+    url: http://pattern-recognition:8003
+    tags:
+      - antibot
+      - pattern-recognition
+    retries: 2
+    
+    routes:
+      - name: pattern-analysis-route
+        paths:
+          - /api/v1/patterns
+        methods:
+          - POST
+          - GET
+        strip_path: false
+        
+        plugins:
+          # Moderate rate limiting for pattern analysis
+          - name: rate-limiting
+            config:
+              minute: 200
+              policy: redis
+              redis_host: redis
+              redis_port: 6379
+              redis_database: 3
+
+# Global Plugins
+plugins:
+  # IP Restriction - Block known bot IPs
+  - name: ip-restriction
+    config:
+      deny:
+        - "192.168.1.100"  # Example bot IP
+      status: 403
+      message: "Access denied"
+  
+  # Bot Detection Plugin (custom)
+  - name: bot-detection
+    config:
+      user_agent_patterns:
+        - "curl"
+        - "wget"
+        - "python-requests"
+        - "Go-http-client"
+        - "HTTPie"
+      block_patterns: true
+      challenge_threshold: 0.7
+      block_threshold: 0.9
+  
+  # Prometheus Metrics
+  - name: prometheus
+    config:
+      per_consumer: true
+      status_code_metrics: true
+      latency_metrics: true
+      bandwidth_metrics: true
+      upstream_health_metrics: true
+
+# Consumers for API Key Management
+consumers:
+  # Web Application Consumer
+  - username: web-app
+    custom_id: web-app-001
+    tags:
+      - web-application
+    
+    keyauth_credentials:
+      - key: web-app-api-key-2024
+    
+    acls:
+      - group: web-apps
+    
+    plugins:
+      # Enhanced rate limiting for web apps
+      - name: rate-limiting-advanced
+        config:
+          limit:
+            - 1000  # 1000 requests per minute
+            - 10000 # 10000 requests per hour
+          window_size:
+            - 60
+            - 3600
+          identifier: consumer
+          strategy: redis
+          redis:
+            host: redis
+            port: 6379
+            database: 0
+
+  # Mobile App Consumer
+  - username: mobile-app
+    custom_id: mobile-app-001
+    tags:
+      - mobile-application
+    
+    keyauth_credentials:
+      - key: mobile-app-api-key-2024
+    
+    acls:
+      - group: mobile-apps
+    
+    plugins:
+      # Mobile-specific rate limiting
+      - name: rate-limiting-advanced
+        config:
+          limit:
+            - 500   # 500 requests per minute
+            - 5000  # 5000 requests per hour
+          window_size:
+            - 60
+            - 3600
+          identifier: consumer
+
+  # Admin Dashboard Consumer
+  - username: admin-dashboard
+    custom_id: admin-dashboard-001
+    tags:
+      - admin
+    
+    keyauth_credentials:
+      - key: admin-dashboard-api-key-2024
+    
+    acls:
+      - group: admins
+    
+    plugins:
+      # Higher limits for admin operations
+      - name: rate-limiting-advanced
+        config:
+          limit:
+            - 2000  # 2000 requests per minute
+            - 20000 # 20000 requests per hour
+          window_size:
+            - 60
+            - 3600
+
+# ACL Groups
+acls:
+  - group: web-apps
+  - group: mobile-apps  
+  - group: admins
+
+# Upstreams for Load Balancing
+upstreams:
+  # Risk Engine Upstream
+  - name: risk-engine-upstream
+    algorithm: round-robin
+    hash_on: none
+    hash_fallback: none
+    healthchecks:
+      active:
+        type: http
+        http_path: /api/v1/health
+        healthy:
+          interval: 30
+          successes: 2
+        unhealthy:
+          interval: 30
+          http_failures: 3
+          timeouts: 3
+      passive:
+        type: http
+        healthy:
+          successes: 2
+        unhealthy:
+          http_failures: 3
+          timeouts: 3
+    
+    targets:
+      - target: risk-engine-1:8001
+        weight: 100
+        tags:
+          - primary
+      - target: risk-engine-2:8001
+        weight: 100
+        tags:
+          - secondary
+
+  # SMS Service Upstream
+  - name: sms-service-upstream
+    algorithm: least-connections
+    healthchecks:
+      active:
+        type: http
+        http_path: /health
+        healthy:
+          interval: 60
+          successes: 1
+        unhealthy:
+          interval: 30
+          http_failures: 2
+    
+    targets:
+      - target: sms-service-1:8002
+        weight: 100
+      - target: sms-service-2:8002
+        weight: 100
+
+# Certificates for HTTPS
+certificates:
+  - cert: |
+      -----BEGIN CERTIFICATE-----
+      # Your SSL certificate here
+      -----END CERTIFICATE-----
+    key: |
+      -----BEGIN PRIVATE KEY-----
+      # Your private key here
+      -----END PRIVATE KEY-----
+    tags:
+      - api-gateway
+
+# SNIs (Server Name Indication)
+snis:
+  - name: api.yourdomain.com
+    certificate:
+      id: "your-cert-id"

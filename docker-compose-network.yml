@@ -1,0 +1,109 @@
+version: '3.8'
+
+services:
+  # Squid HTTP/HTTPS Proxy for development testing
+  squid-proxy:
+    image: sameersbn/squid:latest
+    container_name: android-test-proxy
+    ports:
+      - "3128:3128"
+    volumes:
+      - ./network-testing/config/squid.conf:/etc/squid/squid.conf:ro
+      - ./network-testing/logs:/var/log/squid
+    environment:
+      - SQUID_USERNAME=testuser
+      - SQUID_PASSWORD=testpass
+    restart: unless-stopped
+    networks:
+      - android-network
+
+  # Mock API server for testing
+  mock-api:
+    build:
+      context: .
+      dockerfile_inline: |
+        FROM python:3.9-slim
+        WORKDIR /app
+        RUN pip install flask requests
+        COPY network-testing/scripts/mock_server.py .
+        EXPOSE 8081
+        CMD ["python", "mock_server.py"]
+    container_name: android-mock-api
+    ports:
+      - "8081:8081"
+    restart: unless-stopped
+    networks:
+      - android-network
+
+  # Network monitoring and analysis
+  wireshark:
+    image: lscr.io/linuxserver/wireshark:latest
+    container_name: android-wireshark
+    cap_add:
+      - NET_ADMIN
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+    volumes:
+      - ./network-testing/captures:/captures
+    ports:
+      - "3000:3000"
+    restart: unless-stopped
+    networks:
+      - android-network
+
+  # HTTP/HTTPS request inspector
+  httpbin:
+    image: kennethreitz/httpbin
+    container_name: android-httpbin
+    ports:
+      - "8082:80"
+    restart: unless-stopped
+    networks:
+      - android-network
+
+  # JSON API placeholder for testing
+  jsonserver:
+    image: typicode/json-server
+    container_name: android-json-server
+    ports:
+      - "8083:80"
+    volumes:
+      - ./network-testing/mocks/db.json:/data/db.json
+    command: json-server --host 0.0.0.0 --port 80 /data/db.json
+    restart: unless-stopped
+    networks:
+      - android-network
+
+  # Network latency simulator
+  toxiproxy:
+    image: ghcr.io/shopify/toxiproxy:latest
+    container_name: android-toxiproxy
+    ports:
+      - "8474:8474"  # API port
+      - "8475:8475"  # Proxy port
+    restart: unless-stopped
+    networks:
+      - android-network
+
+  # Redis for caching tests
+  redis:
+    image: redis:7-alpine
+    container_name: android-redis
+    ports:
+      - "6379:6379"
+    restart: unless-stopped
+    networks:
+      - android-network
+
+networks:
+  android-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
+
+volumes:
+  network-logs:
+  network-captures:

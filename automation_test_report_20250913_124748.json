@@ -1,0 +1,76 @@
+{
+  "test_execution": {
+    "start_time": "2025-09-13T12:47:47.434412",
+    "end_time": "2025-09-13T12:47:48.955768",
+    "duration_seconds": 1.521356,
+    "duration_formatted": "0:00:01.521356"
+  },
+  "test_summary": {
+    "total_tests": 7,
+    "passed": 3,
+    "failed": 4,
+    "not_tested": 0,
+    "success_rate": 0.42857142857142855
+  },
+  "test_results": {
+    "sms_verification": {
+      "status": "failed",
+      "details": {
+        "error": "TWILIO_ACCOUNT_SID and TWILIO_AUTH_TOKEN must be set"
+      }
+    },
+    "anti_detection": {
+      "status": "failed",
+      "details": {
+        "error": "numpy.dtype size changed, may indicate binary incompatibility. Expected 96 from C header, got 88 from PyObject"
+      }
+    },
+    "redis_queue": {
+      "status": "passed",
+      "details": {
+        "connection": "success",
+        "basic_operations": "success",
+        "queue_operations": "3 items processed",
+        "pub_sub": "0 subscribers",
+        "performance": "35 clients, 1.89M memory"
+      }
+    },
+    "risk_scoring": {
+      "status": "passed",
+      "details": {
+        "api_availability": "unavailable",
+        "feature_extraction": "6 features extracted",
+        "risk_calculation": "0.000 score (Low risk)",
+        "api_integration": "skipped"
+      }
+    },
+    "health_monitoring": {
+      "status": "failed",
+      "details": {
+        "error": "(pid=47745)"
+      }
+    },
+    "device_fingerprinting": {
+      "status": "failed",
+      "details": {
+        "error": "numpy.dtype size changed, may indicate binary incompatibility. Expected 96 from C header, got 88 from PyObject"
+      }
+    },
+    "proxy_system": {
+      "status": "passed",
+      "details": {
+        "imports": "success",
+        "session_creation": "success",
+        "basic_connectivity": "success",
+        "configuration": "invalid",
+        "verification_logic": "failed"
+      }
+    }
+  },
+  "system_info": {
+    "python_version": "3.9.6 (default, Apr 30 2025, 02:07:17) \n[Clang 17.0.0 (clang-1700.0.13.5)]",
+    "platform": "darwin",
+    "working_directory": "/Users/daltonmetzler/Desktop/Tinder",
+    "test_script": "/Users/daltonmetzler/Desktop/Tinder/test_automation_system.py"
+  }
+}

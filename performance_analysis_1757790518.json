@@ -1,0 +1,795 @@
+{
+  "existing_data_analysis": {
+    "quick_load_test_results.json": {
+      "test_start": "2025-09-13T07:08:48.638950",
+      "system_info": {
+        "cpu_count": 10,
+        "total_memory_gb": 16.0,
+        "available_memory_gb": 5.6226348876953125,
+        "cpu_percent": 20.2
+      },
+      "test_results": [
+        {
+          "test_type": "single_request",
+          "endpoint": "/health",
+          "iterations": 20,
+          "successful_requests": 20,
+          "failed_requests": 0,
+          "avg_response_time_ms": 790.9372687339783,
+          "median_response_time_ms": 484.5660924911499,
+          "min_response_time_ms": 59.309959411621094,
+          "max_response_time_ms": 2708.112955093384,
+          "p95_response_time_ms": 2708.112955093384,
+          "p99_response_time_ms": 2708.112955093384,
+          "requests_per_second": 7.38521632282149,
+          "success_rate": 100.0,
+          "errors": []
+        },
+        {
+          "test_type": "concurrent_load",
+          "endpoint": "/health",
+          "concurrent_users": 10,
+          "requests_per_user": 5,
+          "total_requests": 50,
+          "successful_requests": 50,
+          "failed_requests": 0,
+          "test_duration_seconds": 7.744408130645752,
+          "requests_per_second": 6.456271306536998,
+          "avg_response_time_ms": 933.9158582687378,
+          "median_response_time_ms": 642.0935392379761,
+          "p95_response_time_ms": 2722.566843032837,
+          "p99_response_time_ms": 4060.1730346679688,
+          "min_response_time_ms": 58.09617042541504,
+          "max_response_time_ms": 4060.1730346679688,
+          "success_rate": 100.0,
+          "system_impact": {
+            "memory_increase_percent": 0.20000000000000284,
+            "cpu_usage_during_test": 7.3,
+            "start_memory_percent": 64.3,
+            "end_memory_percent": 64.5
+          }
+        }
+      ]
+    },
+    "proxy_integration_test_results.json": {
+      "status": "PARTIAL",
+      "success_rate": 25.0,
+      "passed_tests": 2,
+      "total_tests": 8,
+      "failed_tests": [
+        "Proxy Utils Module",
+        "Shell Script Proxy",
+        "Docker Proxy Config",
+        "End-to-End Proxy Flow",
+        "Backend API Proxy",
+        "Bot Service Proxy"
+      ],
+      "detailed_results": [
+        {
+          "test_name": "Proxy Utils Module",
+          "success": false,
+          "timestamp": "2025-09-13T06:45:42.100309",
+          "details": "Module import/test failed: Bright Data proxy connection failed: HTTPSConnectionPool(host='ipinfo.io', port=443): Max retries exceeded with url: /json (Caused by ProxyError('Unable to connect to proxy', NameResolutionError(\"<urllib3.connection.HTTPSConnection object at 0x103c06c70>: Failed to resolve 'browser.tinder-emulation.brightdata.com' ([Errno 8] nodename nor servname provided, or not known)\")))",
+          "ip_address": ""
+        },
+        {
+          "test_name": "Shell Script Proxy",
+          "success": false,
+          "timestamp": "2025-09-13T06:45:42.101204",
+          "details": "Shell script missing proxy configuration",
+          "ip_address": ""
+        },
+        {
+          "test_name": "Docker Proxy Config",
+          "success": false,
+          "timestamp": "2025-09-13T06:45:42.101605",
+          "details": "Missing proxy variables in docker-compose.yml: ['SMARTPROXY_USER', 'SMARTPROXY_PASS', 'SMARTPROXY_HOST', 'SMARTPROXY_PORT']",
+          "ip_address": ""
+        },
+        {
+          "test_name": "Dockerfile Proxy Integration",
+          "success": true,
+          "timestamp": "2025-09-13T06:45:42.102359",
+          "details": "Proxy configuration found in: infra/Dockerfile.provisioner, infra/Dockerfile.manager",
+          "ip_address": ""
+        },
+        {
+          "test_name": "Worker VM Proxy Setup",
+          "success": true,
+          "timestamp": "2025-09-13T06:45:42.102542",
+          "details": "Worker VM proxy configuration includes: SMARTPROXY, proxychains, curl_proxy, adb-proxy, socks5",
+          "ip_address": ""
+        },
+        {
+          "test_name": "End-to-End Proxy Flow",
+          "success": false,
+          "timestamp": "2025-09-13T06:45:42.104716",
+          "details": "Integration test failed",
+          "ip_address": ""
+        },
+        {
+          "test_name": "Backend API Proxy",
+          "success": false,
+          "timestamp": "2025-09-13T06:45:52.107593",
+          "details": "Backend API test failed: HTTPConnectionPool(host='localhost', port=8000): Read timed out. (read timeout=10)",
+          "ip_address": ""
+        },
+        {
+          "test_name": "Bot Service Proxy",
+          "success": false,
+          "timestamp": "2025-09-13T06:45:52.121961",
+          "details": "Proxy status: unverified",
+          "ip_address": ""
+        }
+      ]
+    }
+  },
+  "current_system_metrics": {
+    "timestamp": "2025-09-13T13:08:27.518003",
+    "cpu": {
+      "count": 10,
+      "percent": 23.7,
+      "freq": {
+        "current": 4,
+        "min": 0,
+        "max": 4
+      }
+    },
+    "memory": {
+      "total_gb": 16.0,
+      "available_gb": 5.6143798828125,
+      "percent": 64.9,
+      "used_gb": 7.7704315185546875
+    },
+    "disk": {
+      "usage_percent": 11.1,
+      "free_gb": 109.6912612915039,
+      "total_gb": 228.27386474609375
+    },
+    "network": {
+      "bytes_sent": 19454039871,
+      "bytes_recv": 43174905156,
+      "packets_sent": 33873693,
+      "packets_recv": 51973795,
+      "errin": 0,
+      "errout": 0,
+      "dropin": 0,
+      "dropout": 0
+    },
+    "processes": 753,
+    "boot_time": 1757090560.0
+  },
+  "bottleneck_analysis": {
+    "critical_issues": [
+      "Very low proxy integration success rate: 25.0%"
+    ],
+    "warnings": [],
+    "recommendations": [
+      "Investigate and optimize high-impact performance issues immediately",
+      "Consider scaling resources (CPU, memory) or optimizing algorithms",
+      "Implement performance monitoring and alerting",
+      "System performance is good - minor optimizations recommended"
+    ],
+    "performance_score": 75
+  },
+  "recommendations": [],
+  "endpoint_tests": [
+    {
+      "url": "http://localhost:8000/health",
+      "accessible": false,
+      "response_time_ms": null,
+      "status_code": null,
+      "error": "HTTPConnectionPool(host='localhost', port=8000): Read timed out. (read timeout=10)"
+    },
+    {
+      "url": "http://localhost:8888/health",
+      "accessible": true,
+      "response_time_ms": 204.82802391052246,
+      "status_code": 200,
+      "error": null,
+      "response_size_bytes": 225
+    },
+    {
+      "url": "http://localhost:5000/health",
+      "accessible": true,
+      "response_time_ms": 24.238109588623047,
+      "status_code": 200,
+      "error": null,
+      "response_size_bytes": 140
+    }
+  ],
+  "database_tests": [
+    {
+      "type": "Redis",
+      "accessible": true,
+      "ping_time_ms": 0.6062984466552734,
+      "avg_write_time_ms": 0.09530305862426758,
+      "avg_read_time_ms": 0.05693674087524414,
+      "p95_write_time_ms": 0.11396408081054688,
+      "p95_read_time_ms": 0.07772445678710938
+    }
+  ],
+  "running_processes": [
+    {
+      "pid": 4750,
+      "name": "Python",
+      "cmdline": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python /Users/daltonmetzler/privastra/backend/venv/bin/celery -A app.core.cele",
+      "cpu_percent": 0.0,
+      "memory_mb": 15.953125
+    },
+    {
+      "pid": 4781,
+      "name": "Python",
+      "cmdline": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python /Users/daltonmetzler/privastra/backend/venv/bin/celery -A app.core.cele",
+      "cpu_percent": 0.0,
+      "memory_mb": 0.015625
+    },
+    {
+      "pid": 4782,
+      "name": "Python",
+      "cmdline": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python /Users/daltonmetzler/privastra/backend/venv/bin/celery -A app.core.cele",
+      "cpu_percent": 0.0,
+      "memory_mb": 0.015625
+    },
+    {
+      "pid": 4783,
+      "name": "Python",
+      "cmdline": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python /Users/daltonmetzler/privastra/backend/venv/bin/celery -A app.core.cele",
+      "cpu_percent": 0.0,
+      "memory_mb": 0.015625
+    },
+    {
+      "pid": 4784,
+      "name": "Python",
+      "cmdline": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python /Users/daltonmetzler/privastra/backend/venv/bin/celery -A app.core.cele",
+      "cpu_percent": 0.0,
+      "memory_mb": 0.015625
+    },
+    {
+      "pid": 4785,
+      "name": "Python",
+      "cmdline": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python /Users/daltonmetzler/privastra/backend/venv/bin/celery -A app.core.cele",
+      "cpu_percent": 0.0,
+      "memory_mb": 0.015625
+    },
+    {
+      "pid": 4786,
+      "name": "Python",
+      "cmdline": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python /Users/daltonmetzler/privastra/backend/venv/bin/celery -A app.core.cele",
+      "cpu_percent": 0.0,
+      "memory_mb": 0.015625
+    },
+    {
+      "pid": 4787,
+      "name": "Python",
+      "cmdline": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python /Users/daltonmetzler/privastra/backend/venv/bin/celery -A app.core.cele",
+      "cpu_percent": 0.0,
+      "memory_mb": 0.015625
+    },
+    {
+      "pid": 4788,
+      "name": "Python",
+      "cmdline": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python /Users/daltonmetzler/privastra/backend/venv/bin/celery -A app.core.cele",
+      "cpu_percent": 0.0,
+      "memory_mb": 0.015625
+    },
+    {
+      "pid": 4789,
+      "name": "Python",
+      "cmdline": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python /Users/daltonmetzler/privastra/backend/venv/bin/celery -A app.core.cele",
+      "cpu_percent": 0.0,
+      "memory_mb": 0.015625
+    },
+    {
+      "pid": 4790,
+      "name": "Python",
+      "cmdline": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python /Users/daltonmetzler/privastra/backend/venv/bin/celery -A app.core.cele",
+      "cpu_percent": 0.0,
+      "memory_mb": 0.015625
+    },
+    {
+      "pid": 4800,
+      "name": "Python",
+      "cmdline": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python /Users/daltonmetzler/privastra/backend/venv/bin/celery -A app.core.cele",
+      "cpu_percent": 0.0,
+      "memory_mb": 18.203125
+    },
+    {
+      "pid": 16262,
+      "name": "Python",
+      "cmdline": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python -c from multiprocessing.resource_tracker import main;main(5)",
+      "cpu_percent": 0.0,
+      "memory_mb": 0.015625
+    },
+    {
+      "pid": 17086,
+      "name": "Python",
+      "cmdline": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python -c from multiprocessing.spawn import spawn_main; spawn_main(tracker_fd=",
+      "cpu_percent": 0.0,
+      "memory_mb": 0.890625
+    },
+    {
+      "pid": 20240,
+      "name": "zsh",
+      "cmdline": "/bin/zsh -c -l source /Users/daltonmetzler/.claude/shell-snapshots/snapshot-zsh-1757742192881-dyqp61.sh && eval 'cd \"/Users/daltonmetzler/Desktop/untitled folder 3/backend\" && node simple-server.js' \\",
+      "cpu_percent": 0.0,
+      "memory_mb": 0.015625
+    },
+    {
+      "pid": 20242,
+      "name": "node",
+      "cmdline": "node simple-server.js",
+      "cpu_percent": 0.0,
+      "memory_mb": 3.5625
+    },
+    {
+      "pid": 24140,
+      "name": "node",
+      "cmdline": "npm run dev --port 3002      ",
+      "cpu_percent": 0.0,
+      "memory_mb": 0.53125
+    },
+    {
+      "pid": 24159,
+      "name": "node",
+      "cmdline": "node /Users/daltonmetzler/Desktop/untitled folder 3/node_modules/.bin/next dev --turbopack --port 3002",
+      "cpu_percent": 0.0,
+      "memory_mb": 0.015625
+    },
+    {
+      "pid": 24160,
+      "name": "node",
+      "cmdline": "next-server (v15.5.3) ",
+      "cpu_percent": 0.0,
+      "memory_mb": 26.859375
+    },
+    {
+      "pid": 24224,
+      "name": "node",
+      "cmdline": "node /Users/daltonmetzler/Desktop/untitled folder 3/frontend/.next/postcss.js 49237",
+      "cpu_percent": 0.0,
+      "memory_mb": 0.015625
+    },
+    {
+      "pid": 24474,
+      "name": "Python",
+      "cmdline": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python /Users/daltonmetzler/Desktop/privastra/backend/venv/bin/celery -A app.c",
+      "cpu_percent": 0.0,
+      "memory_mb": 19.6875
+    },
+    {
+      "pid": 24811,
+      "name": "node",
+      "cmdline": "npm run dev --port 3003      ",
+      "cpu_percent": 0.0,
+      "memory_mb": 0.578125
+    },
+    {
+      "pid": 24831,
+      "name": "node",
+      "cmdline": "node /Users/daltonmetzler/Desktop/untitled folder 3/node_modules/.bin/next dev --turbopack --port 3003",
+      "cpu_percent": 0.0,
+      "memory_mb": 0.015625
+    },
+    {
+      "pid": 24832,
+      "name": "node",
+      "cmdline": "next-server (v15.5.3) ",
+      "cpu_percent": 0.0,
+      "memory_mb": 16.28125
+    },
+    {
+      "pid": 24935,
+      "name": "node",
+      "cmdline": "node /Users/daltonmetzler/Desktop/untitled folder 3/frontend/.next/postcss.js 49537",
+      "cpu_percent": 0.0,
+      "memory_mb": 0.015625
+    },
+    {
+      "pid": 27401,
+      "name": "Python",
+      "cmdline": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python -m uvicorn app.main:app --reload --host 127.0.0.1 --port 8888",
+      "cpu_percent": 0.0,
+      "memory_mb": 2.9375
+    },
+    {
+      "pid": 27402,
+      "name": "Python",
+      "cmdline": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python -c from multiprocessing.resource_tracker import main;main(5)",
+      "cpu_percent": 0.0,
+      "memory_mb": 0.015625
+    },
+    {
+      "pid": 31592,
+      "name": "bash",
+      "cmdline": "/bin/sh /Users/daltonmetzler/Desktop/privastra/backend/venv/lib/python3.9/site-packages/playwright/driver/playwright.sh run-driver",
+      "cpu_percent": 0.0,
+      "memory_mb": 0.015625
+    },
+    {
+      "pid": 31593,
+      "name": "bash",
+      "cmdline": "/bin/sh /Users/daltonmetzler/Desktop/privastra/backend/venv/lib/python3.9/site-packages/playwright/driver/playwright.sh run-driver",
+      "cpu_percent": 0.0,
+      "memory_mb": 0.015625
+    },
+    {
+      "pid": 31594,
+      "name": "bash",
+      "cmdline": "/bin/sh /Users/daltonmetzler/Desktop/privastra/backend/venv/lib/python3.9/site-packages/playwright/driver/playwright.sh run-driver",
+      "cpu_percent": 0.0,
+      "memory_mb": 0.015625
+    },
+    {
+      "pid": 31595,
+      "name": "bash",
+      "cmdline": "/bin/sh /Users/daltonmetzler/Desktop/privastra/backend/venv/lib/python3.9/site-packages/playwright/driver/playwright.sh run-driver",
+      "cpu_percent": 0.0,
+      "memory_mb": 0.015625
+    },
+    {
+      "pid": 31604,
+      "name": "bash",
+      "cmdline": "/bin/sh /Users/daltonmetzler/Desktop/privastra/backend/venv/lib/python3.9/site-packages/playwright/driver/playwright.sh run-driver",
+      "cpu_percent": 0.0,
+      "memory_mb": 0.015625
+    },
+    {
+      "pid": 31606,
+      "name": "node",
+      "cmdline": "/Users/daltonmetzler/Desktop/privastra/backend/venv/lib/python3.9/site-packages/playwright/driver/node /Users/daltonmetzler/Desktop/privastra/backend/venv/lib/python3.9/site-packages/playwright/driver",
+      "cpu_percent": 0.0,
+      "memory_mb": 0.015625
+    },
+    {
+      "pid": 31607,
+      "name": "node",
+      "cmdline": "/Users/daltonmetzler/Desktop/privastra/backend/venv/lib/python3.9/site-packages/playwright/driver/node /Users/daltonmetzler/Desktop/privastra/backend/venv/lib/python3.9/site-packages/playwright/driver",
+      "cpu_percent": 0.0,
+      "memory_mb": 0.015625
+    },
+    {
+      "pid": 31609,
+      "name": "node",
+      "cmdline": "/Users/daltonmetzler/Desktop/privastra/backend/venv/lib/python3.9/site-packages/playwright/driver/node /Users/daltonmetzler/Desktop/privastra/backend/venv/lib/python3.9/site-packages/playwright/driver",
+      "cpu_percent": 0.0,
+      "memory_mb": 0.015625
+    },
+    {
+      "pid": 31611,
+      "name": "bash",
+      "cmdline": "/bin/sh /Users/daltonmetzler/Desktop/privastra/backend/venv/lib/python3.9/site-packages/playwright/driver/playwright.sh run-driver",
+      "cpu_percent": 0.0,
+      "memory_mb": 0.015625
+    },
+    {
+      "pid": 31616,
+      "name": "node",
+      "cmdline": "/Users/daltonmetzler/Desktop/privastra/backend/venv/lib/python3.9/site-packages/playwright/driver/node /Users/daltonmetzler/Desktop/privastra/backend/venv/lib/python3.9/site-packages/playwright/driver",
+      "cpu_percent": 0.0,
+      "memory_mb": 0.015625
+    },
+    {
+      "pid": 31617,
+      "name": "node",
+      "cmdline": "/Users/daltonmetzler/Desktop/privastra/backend/venv/lib/python3.9/site-packages/playwright/driver/node /Users/daltonmetzler/Desktop/privastra/backend/venv/lib/python3.9/site-packages/playwright/driver",
+      "cpu_percent": 0.0,
+      "memory_mb": 0.015625
+    },
+    {
+      "pid": 31621,
+      "name": "node",
+      "cmdline": "/Users/daltonmetzler/Desktop/privastra/backend/venv/lib/python3.9/site-packages/playwright/driver/node /Users/daltonmetzler/Desktop/privastra/backend/venv/lib/python3.9/site-packages/playwright/driver",
+      "cpu_percent": 0.0,
+      "memory_mb": 0.015625
+    },
+    {
+      "pid": 31656,
+      "name": "bash",
+      "cmdline": "/bin/sh /Users/daltonmetzler/Desktop/privastra/backend/venv/lib/python3.9/site-packages/playwright/driver/playwright.sh run-driver",
+      "cpu_percent": 0.0,
+      "memory_mb": 0.015625
+    },
+    {
+      "pid": 31657,
+      "name": "bash",
+      "cmdline": "/bin/sh /Users/daltonmetzler/Desktop/privastra/backend/venv/lib/python3.9/site-packages/playwright/driver/playwright.sh run-driver",
+      "cpu_percent": 0.0,
+      "memory_mb": 0.015625
+    },
+    {
+      "pid": 31658,
+      "name": "bash",
+      "cmdline": "/bin/sh /Users/daltonmetzler/Desktop/privastra/backend/venv/lib/python3.9/site-packages/playwright/driver/playwright.sh run-driver",
+      "cpu_percent": 0.0,
+      "memory_mb": 0.015625
+    },
+    {
+      "pid": 31664,
+      "name": "bash",
+      "cmdline": "/bin/sh /Users/daltonmetzler/Desktop/privastra/backend/venv/lib/python3.9/site-packages/playwright/driver/playwright.sh run-driver",
+      "cpu_percent": 0.0,
+      "memory_mb": 0.015625
+    },
+    {
+      "pid": 31666,
+      "name": "node",
+      "cmdline": "/Users/daltonmetzler/Desktop/privastra/backend/venv/lib/python3.9/site-packages/playwright/driver/node /Users/daltonmetzler/Desktop/privastra/backend/venv/lib/python3.9/site-packages/playwright/driver",
+      "cpu_percent": 0.0,
+      "memory_mb": 0.015625
+    },
+    {
+      "pid": 31670,
+      "name": "node",
+      "cmdline": "/Users/daltonmetzler/Desktop/privastra/backend/venv/lib/python3.9/site-packages/playwright/driver/node /Users/daltonmetzler/Desktop/privastra/backend/venv/lib/python3.9/site-packages/playwright/driver",
+      "cpu_percent": 0.0,
+      "memory_mb": 0.015625
+    },
+    {
+      "pid": 31671,
+      "name": "bash",
+      "cmdline": "/bin/sh /Users/daltonmetzler/Desktop/privastra/backend/venv/lib/python3.9/site-packages/playwright/driver/playwright.sh run-driver",
+      "cpu_percent": 0.0,
+      "memory_mb": 0.015625
+    },
+    {
+      "pid": 31672,
+      "name": "node",
+      "cmdline": "/Users/daltonmetzler/Desktop/privastra/backend/venv/lib/python3.9/site-packages/playwright/driver/node /Users/daltonmetzler/Desktop/privastra/backend/venv/lib/python3.9/site-packages/playwright/driver",
+      "cpu_percent": 0.0,
+      "memory_mb": 0.015625
+    },
+    {
+      "pid": 31676,
+      "name": "node",
+      "cmdline": "/Users/daltonmetzler/Desktop/privastra/backend/venv/lib/python3.9/site-packages/playwright/driver/node /Users/daltonmetzler/Desktop/privastra/backend/venv/lib/python3.9/site-packages/playwright/driver",
+      "cpu_percent": 0.0,
+      "memory_mb": 0.015625
+    },
+    {
+      "pid": 31680,
+      "name": "node",
+      "cmdline": "/Users/daltonmetzler/Desktop/privastra/backend/venv/lib/python3.9/site-packages/playwright/driver/node /Users/daltonmetzler/Desktop/privastra/backend/venv/lib/python3.9/site-packages/playwright/driver",
+      "cpu_percent": 0.0,
+      "memory_mb": 0.015625
+    },
+    {
+      "pid": 31795,
+      "name": "bash",
+      "cmdline": "/bin/sh /Users/daltonmetzler/Desktop/privastra/backend/venv/lib/python3.9/site-packages/playwright/driver/playwright.sh run-driver",
+      "cpu_percent": 0.0,
+      "memory_mb": 0.015625
+    },
+    {
+      "pid": 31796,
+      "name": "bash",
+      "cmdline": "/bin/sh /Users/daltonmetzler/Desktop/privastra/backend/venv/lib/python3.9/site-packages/playwright/driver/playwright.sh run-driver",
+      "cpu_percent": 0.0,
+      "memory_mb": 0.015625
+    },
+    {
+      "pid": 31797,
+      "name": "bash",
+      "cmdline": "/bin/sh /Users/daltonmetzler/Desktop/privastra/backend/venv/lib/python3.9/site-packages/playwright/driver/playwright.sh run-driver",
+      "cpu_percent": 0.0,
+      "memory_mb": 0.015625
+    },
+    {
+      "pid": 31804,
+      "name": "bash",
+      "cmdline": "/bin/sh /Users/daltonmetzler/Desktop/privastra/backend/venv/lib/python3.9/site-packages/playwright/driver/playwright.sh run-driver",
+      "cpu_percent": 0.0,
+      "memory_mb": 0.015625
+    },
+    {
+      "pid": 31805,
+      "name": "node",
+      "cmdline": "/Users/daltonmetzler/Desktop/privastra/backend/venv/lib/python3.9/site-packages/playwright/driver/node /Users/daltonmetzler/Desktop/privastra/backend/venv/lib/python3.9/site-packages/playwright/driver",
+      "cpu_percent": 0.0,
+      "memory_mb": 0.015625
+    },
+    {
+      "pid": 31806,
+      "name": "node",
+      "cmdline": "/Users/daltonmetzler/Desktop/privastra/backend/venv/lib/python3.9/site-packages/playwright/driver/node /Users/daltonmetzler/Desktop/privastra/backend/venv/lib/python3.9/site-packages/playwright/driver",
+      "cpu_percent": 0.0,
+      "memory_mb": 0.015625
+    },
+    {
+      "pid": 31809,
+      "name": "bash",
+      "cmdline": "/bin/sh /Users/daltonmetzler/Desktop/privastra/backend/venv/lib/python3.9/site-packages/playwright/driver/playwright.sh run-driver",
+      "cpu_percent": 0.0,
+      "memory_mb": 0.015625
+    },
+    {
+      "pid": 31812,
+      "name": "node",
+      "cmdline": "/Users/daltonmetzler/Desktop/privastra/backend/venv/lib/python3.9/site-packages/playwright/driver/node /Users/daltonmetzler/Desktop/privastra/backend/venv/lib/python3.9/site-packages/playwright/driver",
+      "cpu_percent": 0.0,
+      "memory_mb": 0.015625
+    },
+    {
+      "pid": 31815,
+      "name": "bash",
+      "cmdline": "/bin/sh /Users/daltonmetzler/Desktop/privastra/backend/venv/lib/python3.9/site-packages/playwright/driver/playwright.sh run-driver",
+      "cpu_percent": 0.0,
+      "memory_mb": 0.015625
+    },
+    {
+      "pid": 31818,
+      "name": "node",
+      "cmdline": "/Users/daltonmetzler/Desktop/privastra/backend/venv/lib/python3.9/site-packages/playwright/driver/node /Users/daltonmetzler/Desktop/privastra/backend/venv/lib/python3.9/site-packages/playwright/driver",
+      "cpu_percent": 0.0,
+      "memory_mb": 0.015625
+    },
+    {
+      "pid": 31820,
+      "name": "node",
+      "cmdline": "/Users/daltonmetzler/Desktop/privastra/backend/venv/lib/python3.9/site-packages/playwright/driver/node /Users/daltonmetzler/Desktop/privastra/backend/venv/lib/python3.9/site-packages/playwright/driver",
+      "cpu_percent": 0.0,
+      "memory_mb": 0.015625
+    },
+    {
+      "pid": 31824,
+      "name": "node",
+      "cmdline": "/Users/daltonmetzler/Desktop/privastra/backend/venv/lib/python3.9/site-packages/playwright/driver/node /Users/daltonmetzler/Desktop/privastra/backend/venv/lib/python3.9/site-packages/playwright/driver",
+      "cpu_percent": 0.0,
+      "memory_mb": 0.015625
+    },
+    {
+      "pid": 31863,
+      "name": "bash",
+      "cmdline": "/bin/sh /Users/daltonmetzler/Desktop/privastra/backend/venv/lib/python3.9/site-packages/playwright/driver/playwright.sh run-driver",
+      "cpu_percent": 0.0,
+      "memory_mb": 0.015625
+    },
+    {
+      "pid": 31864,
+      "name": "bash",
+      "cmdline": "/bin/sh /Users/daltonmetzler/Desktop/privastra/backend/venv/lib/python3.9/site-packages/playwright/driver/playwright.sh run-driver",
+      "cpu_percent": 0.0,
+      "memory_mb": 0.015625
+    },
+    {
+      "pid": 31866,
+      "name": "bash",
+      "cmdline": "/bin/sh /Users/daltonmetzler/Desktop/privastra/backend/venv/lib/python3.9/site-packages/playwright/driver/playwright.sh run-driver",
+      "cpu_percent": 0.0,
+      "memory_mb": 0.015625
+    },
+    {
+      "pid": 31872,
+      "name": "bash",
+      "cmdline": "/bin/sh /Users/daltonmetzler/Desktop/privastra/backend/venv/lib/python3.9/site-packages/playwright/driver/playwright.sh run-driver",
+      "cpu_percent": 0.0,
+      "memory_mb": 0.015625
+    },
+    {
+      "pid": 31873,
+      "name": "node",
+      "cmdline": "/Users/daltonmetzler/Desktop/privastra/backend/venv/lib/python3.9/site-packages/playwright/driver/node /Users/daltonmetzler/Desktop/privastra/backend/venv/lib/python3.9/site-packages/playwright/driver",
+      "cpu_percent": 0.0,
+      "memory_mb": 0.015625
+    },
+    {
+      "pid": 31876,
+      "name": "bash",
+      "cmdline": "/bin/sh /Users/daltonmetzler/Desktop/privastra/backend/venv/lib/python3.9/site-packages/playwright/driver/playwright.sh run-driver",
+      "cpu_percent": 0.0,
+      "memory_mb": 0.015625
+    },
+    {
+      "pid": 31878,
+      "name": "node",
+      "cmdline": "/Users/daltonmetzler/Desktop/privastra/backend/venv/lib/python3.9/site-packages/playwright/driver/node /Users/daltonmetzler/Desktop/privastra/backend/venv/lib/python3.9/site-packages/playwright/driver",
+      "cpu_percent": 0.0,
+      "memory_mb": 0.015625
+    },
+    {
+      "pid": 31881,
+      "name": "node",
+      "cmdline": "/Users/daltonmetzler/Desktop/privastra/backend/venv/lib/python3.9/site-packages/playwright/driver/node /Users/daltonmetzler/Desktop/privastra/backend/venv/lib/python3.9/site-packages/playwright/driver",
+      "cpu_percent": 0.0,
+      "memory_mb": 0.015625
+    },
+    {
+      "pid": 31884,
+      "name": "node",
+      "cmdline": "/Users/daltonmetzler/Desktop/privastra/backend/venv/lib/python3.9/site-packages/playwright/driver/node /Users/daltonmetzler/Desktop/privastra/backend/venv/lib/python3.9/site-packages/playwright/driver",
+      "cpu_percent": 0.0,
+      "memory_mb": 0.015625
+    },
+    {
+      "pid": 31887,
+      "name": "node",
+      "cmdline": "/Users/daltonmetzler/Desktop/privastra/backend/venv/lib/python3.9/site-packages/playwright/driver/node /Users/daltonmetzler/Desktop/privastra/backend/venv/lib/python3.9/site-packages/playwright/driver",
+      "cpu_percent": 0.0,
+      "memory_mb": 0.015625
+    },
+    {
+      "pid": 31936,
+      "name": "Python",
+      "cmdline": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python -c from app import app; app.run(host='0.0.0.0', port=5000, debug=False)",
+      "cpu_percent": 0.0,
+      "memory_mb": 15.765625
+    },
+    {
+      "pid": 32769,
+      "name": "Python",
+      "cmdline": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python -c from multiprocessing.spawn import spawn_main; spawn_main(tracker_fd=",
+      "cpu_percent": 0.0,
+      "memory_mb": 53.40625
+    },
+    {
+      "pid": 33612,
+      "name": "zsh",
+      "cmdline": "/bin/zsh -c -l source /Users/daltonmetzler/.claude/shell-snapshots/snapshot-zsh-1757388771158-ezudz6.sh && eval 'cd \"/Users/daltonmetzler/Desktop/Reddit - bot\" && TELEGRAM_API_ID=0 TELEGRAM_API_HASH=\"",
+      "cpu_percent": 0.0,
+      "memory_mb": 0.015625
+    },
+    {
+      "pid": 33614,
+      "name": "Python",
+      "cmdline": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python test_api.py",
+      "cpu_percent": 0.0,
+      "memory_mb": 13.578125
+    },
+    {
+      "pid": 43467,
+      "name": "zsh",
+      "cmdline": "/bin/zsh -c -l source /Users/daltonmetzler/.claude/shell-snapshots/snapshot-zsh-1757775479341-go6xxq.sh && eval 'cd /Users/daltonmetzler/Desktop/Tinder/telegram_bot && python3 simple_bot.py' \\< /dev/n",
+      "cpu_percent": 0.0,
+      "memory_mb": 0.015625
+    },
+    {
+      "pid": 43469,
+      "name": "Python",
+      "cmdline": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python simple_bot.py",
+      "cpu_percent": 0.0,
+      "memory_mb": 27.390625
+    },
+    {
+      "pid": 45451,
+      "name": "node",
+      "cmdline": "claude ",
+      "cpu_percent": 0.0,
+      "memory_mb": 205.25
+    },
+    {
+      "pid": 46808,
+      "name": "node",
+      "cmdline": "claude ",
+      "cpu_percent": 0.0,
+      "memory_mb": 1223.265625
+    },
+    {
+      "pid": 48967,
+      "name": "zsh",
+      "cmdline": "/bin/zsh -c -l source /Users/daltonmetzler/.claude/shell-snapshots/snapshot-zsh-1757788838057-ii1um6.sh && eval 'python3 quick_performance_analysis.py' \\< /dev/null && pwd -P >| /var/folders/bg/1kqs1q",
+      "cpu_percent": 0.0,
+      "memory_mb": 2.53125
+    },
+    {
+      "pid": 48969,
+      "name": "Python",
+      "cmdline": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python quick_performance_analysis.py",
+      "cpu_percent": 0.0,
+      "memory_mb": 32.640625
+    },
+    {
+      "pid": 75686,
+      "name": "zsh",
+      "cmdline": "/bin/zsh -c -l source /Users/daltonmetzler/.claude/shell-snapshots/snapshot-zsh-1757543590829-kcgu64.sh && eval 'cd \"/Users/daltonmetzler/Desktop/untitled folder/privastra/backend\" && ALLOW_UNVERIFIED",
+      "cpu_percent": 0.0,
+      "memory_mb": 0.015625
+    },
+    {
+      "pid": 75688,
+      "name": "Python",
+      "cmdline": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python minimal_auth_test.py",
+      "cpu_percent": 0.0,
+      "memory_mb": 4.671875
+    }
+  ]
+}

@@ -1,0 +1,57 @@
+{
+  "workflow_steps": [
+    {
+      "step": "sms_initialization",
+      "status": "success",
+      "details": "Phone cleaned: +1-555-123-4567 -> +15551234567"
+    },
+    {
+      "step": "device_fingerprint",
+      "status": "failed",
+      "error": "create_device_fingerprint() missing 1 required positional argument: 'device_id'"
+    },
+    {
+      "step": "account_generation",
+      "status": "success",
+      "details": "Generated account: r14ghf1s"
+    },
+    {
+      "step": "file_output",
+      "status": "success",
+      "details": "Files: test_account_output_20250914_145722.json, test_account_output_20250914_145722.csv"
+    },
+    {
+      "step": "captcha_solver",
+      "status": "success",
+      "details": "Methods available: 9"
+    },
+    {
+      "step": "telegram_integration",
+      "status": "success",
+      "details": "Bot methods: 3"
+    }
+  ],
+  "successful_steps": 5,
+  "failed_steps": 1,
+  "test_data": {
+    "phone_number": "+15551234567",
+    "account": {
+      "username": "r14ghf1s",
+      "email": "test_r14ghf1s@example.com",
+      "password": "5sOtqldlsvWP",
+      "phone": "+15551234567",
+      "created_at": "2025-09-14T14:57:22.262134"
+    },
+    "output_files": [
+      "/Users/daltonmetzler/Desktop/Tinder/test_account_output_20250914_145722.json",
+      "/Users/daltonmetzler/Desktop/Tinder/test_account_output_20250914_145722.csv"
+    ]
+  },
+  "summary": {
+    "total_steps": 6,
+    "successful_steps": 5,
+    "failed_steps": 1,
+    "success_rate": 0.8333333333333334,
+    "workflow_ready": true
+  }
+}

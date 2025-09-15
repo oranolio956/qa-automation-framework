@@ -1,0 +1,268 @@
+{
+  "test_results": {
+    "test_metadata": {
+      "timestamp": "2025-09-13T13:11:18.650691",
+      "total_test_duration_minutes": 1.2217645009358724
+    },
+    "endpoint_load_tests": [
+      {
+        "url": "http://localhost:8888/health",
+        "test_config": {
+          "concurrent_users": 15,
+          "test_duration_seconds": 20,
+          "actual_duration_seconds": 20.109281063079834
+        },
+        "performance_metrics": {
+          "total_requests": 2627,
+          "requests_per_second": 130.63619687643185,
+          "success_rate": 100.0,
+          "error_count": 0
+        },
+        "response_times": {
+          "mean_ms": 14.047160364622211,
+          "median_ms": 12.388944625854492,
+          "p95_ms": 25.084447860717773,
+          "p99_ms": 28.415307998657227,
+          "min_ms": 1.8279552459716797,
+          "max_ms": 319.6148872375488,
+          "stddev_ms": 23.478302623809288
+        },
+        "status_codes": {
+          "200": 2627
+        },
+        "errors": []
+      },
+      {
+        "url": "http://localhost:5000/health",
+        "test_config": {
+          "concurrent_users": 15,
+          "test_duration_seconds": 20,
+          "actual_duration_seconds": 20.101246118545532
+        },
+        "performance_metrics": {
+          "total_requests": 2805,
+          "requests_per_second": 139.54358766902962,
+          "success_rate": 100.0,
+          "error_count": 0
+        },
+        "response_times": {
+          "mean_ms": 6.835484462200852,
+          "median_ms": 6.4182281494140625,
+          "p95_ms": 12.742805480957031,
+          "p99_ms": 18.889899253845215,
+          "min_ms": 0.8602142333984375,
+          "max_ms": 25.38299560546875,
+          "stddev_ms": 3.452784358743779
+        },
+        "status_codes": {
+          "200": 100,
+          "429": 2705
+        },
+        "errors": []
+      }
+    ],
+    "database_load_test": {
+      "database_type": "Redis",
+      "operations_tested": 2000,
+      "write_performance": {
+        "total_time_seconds": 0.07946324348449707,
+        "operations_per_second": 25168.869433201417,
+        "mean_time_ms": 0.03962373733520508,
+        "p95_time_ms": 0.07104873657226562,
+        "max_time_ms": 1.2478828430175781
+      },
+      "read_performance": {
+        "total_time_seconds": 0.05456399917602539,
+        "operations_per_second": 36654.204790743606,
+        "mean_time_ms": 0.027165889739990234,
+        "p95_time_ms": 0.031948089599609375,
+        "max_time_ms": 0.06890296936035156
+      },
+      "status": "success"
+    },
+    "system_resource_monitoring": {
+      "monitoring_duration_seconds": 25,
+      "sample_count": 23,
+      "cpu_usage": {
+        "mean_percent": 15.004347826086956,
+        "max_percent": 21.7,
+        "min_percent": 8.7,
+        "stddev_percent": 3.6358665668172705
+      },
+      "memory_usage": {
+        "mean_percent": 63.79565217391305,
+        "max_percent": 64.9,
+        "min_percent": 62.7,
+        "peak_used_gb": 7.7947845458984375
+      },
+      "samples": [
+        {
+          "timestamp": 20.015094995498657,
+          "cpu_percent": 10.5,
+          "memory_percent": 64.4,
+          "memory_used_gb": 7.729278564453125,
+          "disk_io": {
+            "read_count": 25652969,
+            "write_count": 14637887,
+            "read_bytes": 532059399168,
+            "write_bytes": 367310901248,
+            "read_time": 10010203,
+            "write_time": 756687
+          },
+          "network_io": {
+            "bytes_sent": 19473527194,
+            "bytes_recv": 43193026364,
+            "packets_sent": 34018788,
+            "packets_recv": 52117753,
+            "errin": 0,
+            "errout": 0,
+            "dropin": 0,
+            "dropout": 0
+          },
+          "active_processes": 731
+        },
+        {
+          "timestamp": 21.127642154693604,
+          "cpu_percent": 10.6,
+          "memory_percent": 64.4,
+          "memory_used_gb": 7.7290802001953125,
+          "disk_io": {
+            "read_count": 25652969,
+            "write_count": 14637891,
+            "read_bytes": 532059399168,
+            "write_bytes": 367310917632,
+            "read_time": 10010203,
+            "write_time": 756688
+          },
+          "network_io": {
+            "bytes_sent": 19473540700,
+            "bytes_recv": 43193042009,
+            "packets_sent": 34018842,
+            "packets_recv": 52117804,
+            "errin": 0,
+            "errout": 0,
+            "dropin": 0,
+            "dropout": 0
+          },
+          "active_processes": 731
+        },
+        {
+          "timestamp": 22.242663145065308,
+          "cpu_percent": 14.0,
+          "memory_percent": 64.3,
+          "memory_used_gb": 7.7228546142578125,
+          "disk_io": {
+            "read_count": 25652970,
+            "write_count": 14637897,
+            "read_bytes": 532059403264,
+            "write_bytes": 367310946304,
+            "read_time": 10010204,
+            "write_time": 756689
+          },
+          "network_io": {
+            "bytes_sent": 19473545843,
+            "bytes_recv": 43193048760,
+            "packets_sent": 34018871,
+            "packets_recv": 52117832,
+            "errin": 0,
+            "errout": 0,
+            "dropin": 0,
+            "dropout": 0
+          },
+          "active_processes": 731
+        },
+        {
+          "timestamp": 23.35219931602478,
+          "cpu_percent": 19.4,
+          "memory_percent": 64.4,
+          "memory_used_gb": 7.7289886474609375,
+          "disk_io": {
+            "read_count": 25652974,
+            "write_count": 14638011,
+            "read_bytes": 532059440128,
+            "write_bytes": 367311556608,
+            "read_time": 10010206,
+            "write_time": 756697
+          },
+          "network_io": {
+            "bytes_sent": 19473561027,
+            "bytes_recv": 43193066239,
+            "packets_sent": 34018926,
+            "packets_recv": 52117888,
+            "errin": 0,
+            "errout": 0,
+            "dropin": 0,
+            "dropout": 0
+          },
+          "active_processes": 731
+        },
+        {
+          "timestamp": 24.461809158325195,
+          "cpu_percent": 14.4,
+          "memory_percent": 64.4,
+          "memory_used_gb": 7.7270965576171875,
+          "disk_io": {
+            "read_count": 25652974,
+            "write_count": 14638070,
+            "read_bytes": 532059440128,
+            "write_bytes": 367311904768,
+            "read_time": 10010206,
+            "write_time": 756699
+          },
+          "network_io": {
+            "bytes_sent": 19473569727,
+            "bytes_recv": 43193074852,
+            "packets_sent": 34018966,
+            "packets_recv": 52117925,
+            "errin": 0,
+            "errout": 0,
+            "dropin": 0,
+            "dropout": 0
+          },
+          "active_processes": 731
+        }
+      ]
+    },
+    "memory_stress_test": {
+      "memory_stress_test": {
+        "target_memory_mb": 300,
+        "chunks_created": 6,
+        "initial_memory_percent": 64.3,
+        "peak_memory_percent": 65.6,
+        "final_memory_percent": 65.2,
+        "memory_increase_percent": 1.2999999999999972,
+        "memory_released_percent": 0.3999999999999915
+      }
+    }
+  },
+  "analysis": {
+    "performance_summary": {
+      "endpoints": {
+        "average_requests_per_second": 135.08989227273074,
+        "average_response_time_ms": 10.441322413411532,
+        "minimum_success_rate": 100.0,
+        "endpoints_tested": 2
+      },
+      "database": {
+        "write_operations_per_second": 25168.869433201417,
+        "read_operations_per_second": 36654.204790743606
+      },
+      "system_resources": {
+        "peak_cpu_percent": 21.7,
+        "average_cpu_percent": 15.004347826086956,
+        "peak_memory_percent": 64.9,
+        "average_memory_percent": 63.79565217391305
+      }
+    },
+    "bottlenecks_identified": [],
+    "recommendations": [
+      "System performance is good under current load levels"
+    ],
+    "scalability_assessment": {
+      "current_max_rps": 139.54358766902962,
+      "estimated_daily_capacity": 12056565,
+      "estimated_concurrent_users": 279,
+      "scaling_recommendation": "Good for small-medium scale"
+    }
+  }
+}

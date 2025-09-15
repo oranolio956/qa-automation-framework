@@ -1,0 +1,47 @@
+{
+  "Environment Variables": {
+    "status": "MISSING",
+    "details": "Missing: ['REDIS_URL', 'TWILIO_ACCOUNT_SID', 'TWILIO_AUTH_TOKEN', 'FLY_API_TOKEN', 'SMARTPROXY_ENDPOINT', 'SMARTPROXY_USERNAME', 'SMARTPROXY_PASSWORD']",
+    "timestamp": "2025-09-14T16:29:23.603630"
+  },
+  "SMS System": {
+    "status": "ERROR",
+    "details": "No module named 'email.parser'",
+    "timestamp": "2025-09-14T16:29:23.625992"
+  },
+  "Email System": {
+    "status": "MISSING",
+    "details": "Import error: No module named 'email.utils'",
+    "timestamp": "2025-09-14T16:29:23.916280"
+  },
+  "Anti-Detection System": {
+    "status": "ERROR",
+    "details": "No module named 'email.utils'",
+    "timestamp": "2025-09-14T16:29:23.916890"
+  },
+  "Android System": {
+    "status": "ERROR",
+    "details": "module 'email' has no attribute 'message_from_string'",
+    "timestamp": "2025-09-14T16:29:23.931540"
+  },
+  "Snapchat Automation": {
+    "status": "ERROR",
+    "details": "No module named 'email.parser'",
+    "timestamp": "2025-09-14T16:29:23.932599"
+  },
+  "Telegram Bot": {
+    "status": "ERROR",
+    "details": "No module named 'email.parser'",
+    "timestamp": "2025-09-14T16:29:23.950254"
+  },
+  "Fly.io Integration": {
+    "status": "ERROR",
+    "details": "No module named 'email.parser'",
+    "timestamp": "2025-09-14T16:29:23.951366"
+  },
+  "Database System": {
+    "status": "ERROR",
+    "details": "No module named 'email.parser'",
+    "timestamp": "2025-09-14T16:29:23.952414"
+  }
+}

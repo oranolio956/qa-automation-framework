@@ -1,0 +1,84 @@
+{
+  "test_execution": {
+    "start_time": "2025-09-13T18:55:46.832926",
+    "end_time": "2025-09-13T18:55:50.880448",
+    "duration_seconds": 4.047522,
+    "duration_formatted": "0:00:04.047522"
+  },
+  "test_summary": {
+    "total_tests": 7,
+    "passed": 5,
+    "failed": 2,
+    "not_tested": 0,
+    "success_rate": 0.7142857142857143
+  },
+  "test_results": {
+    "sms_verification": {
+      "status": "failed",
+      "details": {
+        "error": "TWILIO_ACCOUNT_SID and TWILIO_AUTH_TOKEN must be set"
+      }
+    },
+    "anti_detection": {
+      "status": "passed",
+      "details": {
+        "initialization": "success",
+        "fingerprint_creation": "success",
+        "behavior_patterns": "5/5 valid timings",
+        "touch_patterns": "20 points generated",
+        "stealth_verification": "3/4 components passed"
+      }
+    },
+    "redis_queue": {
+      "status": "passed",
+      "details": {
+        "connection": "success",
+        "basic_operations": "success",
+        "queue_operations": "3 items processed",
+        "pub_sub": "0 subscribers",
+        "performance": "50 clients, 1.92M memory"
+      }
+    },
+    "risk_scoring": {
+      "status": "passed",
+      "details": {
+        "api_availability": "available",
+        "feature_extraction": "6 features extracted",
+        "risk_calculation": "0.000 score (Low risk)",
+        "api_integration": "success"
+      }
+    },
+    "health_monitoring": {
+      "status": "failed",
+      "details": {
+        "error": "(pid=71604)"
+      }
+    },
+    "device_fingerprinting": {
+      "status": "passed",
+      "details": {
+        "imports": "success",
+        "fingerprint_creation": "3 fingerprints created",
+        "consistency": "8/8 fields consistent",
+        "uniqueness": "3 models, 2 versions, 2 resolutions",
+        "variation": "present"
+      }
+    },
+    "proxy_system": {
+      "status": "passed",
+      "details": {
+        "imports": "success",
+        "session_creation": "success",
+        "basic_connectivity": "success",
+        "configuration": "invalid",
+        "verification_logic": "failed"
+      }
+    }
+  },
+  "system_info": {
+    "python_version": "3.9.6 (default, Apr 30 2025, 02:07:17) \n[Clang 17.0.0 (clang-1700.0.13.5)]",
+    "platform": "darwin",
+    "working_directory": "/Users/daltonmetzler/Desktop/Tinder",
+    "test_script": "/Users/daltonmetzler/Desktop/Tinder/test_automation_system.py"
+  }
+}

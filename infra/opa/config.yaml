@@ -1,0 +1,16 @@
+services:
+  authz:
+    url: http://localhost:8181
+
+decision_logs:
+  console: true
+  
+bundles:
+  authz:
+    resource: "infra/opa/policies/"
+
+default_decision: "/app/authz/allow"
+
+plugins:
+  discovery:
+    name: discovery

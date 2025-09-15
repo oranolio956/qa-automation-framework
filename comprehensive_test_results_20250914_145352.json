@@ -1,0 +1,173 @@
+{
+  "timestamp": "2025-09-14T14:53:51.207568",
+  "test_results": {
+    "import_system": {
+      "status": "failed",
+      "imports_tested": 10,
+      "imports_successful": 3,
+      "failed_imports": [
+        "automation.email.business_email_service - No module named 'google_auth_oauthlib'",
+        "automation.email.temp_email_services.TempEmailService - class not found",
+        "automation.snapchat.stealth_creator.StealthCreator - class not found",
+        "automation.telegram_bot.database.Database - class not found",
+        "automation.telegram_bot.main_bot.TelegramBot - class not found",
+        "utils.twilio_pool.TwilioPool - class not found",
+        "utils.sms_webhook_handler.SMSWebhookHandler - class not found"
+      ],
+      "modules_verified": [
+        "automation.core.anti_detection.AntiDetectionSystem",
+        "automation.email.captcha_solver.CaptchaSolver",
+        "utils.sms_verifier.SMSVerifier",
+        "Config: .env",
+        "Config: automation/requirements.txt",
+        "Config: infra/docker-compose.yml"
+      ],
+      "success_rate": 0.3
+    },
+    "configuration_system": {
+      "status": "failed",
+      "configs_tested": 3,
+      "configs_loaded": 2,
+      "failed_configs": [
+        "docker-compose.yml missing critical services"
+      ],
+      "config_details": {
+        ".env": {
+          "found_vars": [
+            "TELEGRAM_BOT_TOKEN",
+            "TWILIO_ACCOUNT_SID",
+            "TWILIO_AUTH_TOKEN",
+            "DATABASE_URL",
+            "REDIS_URL"
+          ],
+          "missing_vars": [],
+          "total_lines": 226
+        },
+        "requirements.txt": {
+          "found_packages": [
+            "asyncio",
+            "aiohttp",
+            "twilio",
+            "opencv-python",
+            "selenium"
+          ],
+          "total_packages": 61
+        }
+      },
+      "success_rate": 0.6666666666666666
+    },
+    "sms_verification": {
+      "status": "failed",
+      "components_tested": 3,
+      "components_working": 1,
+      "async_patterns": [
+        "SMSVerifier methods: ['clean_phone_number', 'cleanup_expired_codes', 'generate_verification_code', 'get_daily_cost_status', 'get_rate_limit_status', 'get_statistics', 'get_verification_status', 'resend_verification', 'send_verification_sms', 'update_delivery_status', 'verify_sms_code']"
+      ],
+      "failed_components": [
+        "TwilioPool: cannot import name 'TwilioPool' from 'utils.twilio_pool' (/Users/daltonmetzler/Desktop/Tinder/automation/snapchat/../email/../../utils/twilio_pool.py)",
+        "SMSWebhookHandler: cannot import name 'SMSWebhookHandler' from 'utils.sms_webhook_handler' (/Users/daltonmetzler/Desktop/Tinder/automation/snapchat/../email/../../utils/sms_webhook_handler.py)"
+      ],
+      "success_rate": 0.3333333333333333
+    },
+    "android_automation": {
+      "status": "passed",
+      "features_tested": 3,
+      "features_working": 2,
+      "android_features": [
+        "Device fingerprinting: ['_generate_hardware_fingerprint', 'create_device_fingerprint', 'device_fingerprints']",
+        "Android files found: ['android', 'android', 'test_android_fixes_simple.py', 'test_android_automation_fixes.py', 'test_android_automation_fixes_clean.py']"
+      ],
+      "failed_features": [
+        "StealthCreator: cannot import name 'StealthCreator' from 'automation.snapchat.stealth_creator' (/Users/daltonmetzler/Desktop/Tinder/automation/snapchat/stealth_creator.py)"
+      ],
+      "success_rate": 0.6666666666666666
+    },
+    "account_creation": {
+      "status": "passed",
+      "workflow_steps": 4,
+      "steps_verified": 3,
+      "workflow_details": [
+        "Creation scripts: ['create_snapchat_credentials_batch.py', 'test_bulk_creation.py', 'email_creation_service.py']",
+        "Verification systems: ['verification_results_1757856792', 'verification_results_1757859316', 'verification_results_1757859410']",
+        "Output generation: ['account_export_system.py']"
+      ],
+      "failed_steps": [
+        "Email service: No module named 'google_auth_oauthlib'"
+      ],
+      "success_rate": 0.75
+    },
+    "telegram_bot": {
+      "status": "failed",
+      "bot_features": 3,
+      "features_working": 1,
+      "telegram_features": [
+        "Telegram modules: ['real_time_order_tracker.py', 'run_bot.py', 'config.py', 'database.py', 'payment_handler.py', '__init__.py', 'customer_service.py', 'demo_real_time_system.py', 'admin_panel.py', 'order_manager.py', 'beautiful_ui_components.py', 'main_bot.py', 'webhook_server.py', 'live_notification_system.py', 'test_bot.py', 'enhanced_main_bot.py']"
+      ],
+      "failed_features": [
+        "TelegramBot: cannot import name 'TelegramBot' from 'automation.telegram_bot.main_bot' (/Users/daltonmetzler/Desktop/Tinder/automation/telegram_bot/main_bot.py)",
+        "Database: cannot import name 'Database' from 'automation.telegram_bot.database' (/Users/daltonmetzler/Desktop/Tinder/automation/telegram_bot/database.py)"
+      ],
+      "success_rate": 0.3333333333333333
+    },
+    "output_formats": {
+      "status": "passed",
+      "formats_tested": 5,
+      "formats_working": 5,
+      "export_details": [
+        "csv: 6 files, sample size: 190 chars",
+        "json: 55 files, sample size: 1926 chars",
+        "txt: 26 files, sample size: 2435 chars",
+        "JSON export: programmatic creation works",
+        "CSV export: programmatic creation works"
+      ],
+      "failed_formats": [],
+      "success_rate": 1.0
+    },
+    "nsfw_compliance": {
+      "status": "passed",
+      "safety_features": 3,
+      "features_implemented": 3,
+      "compliance_details": [
+        "NSFW files: ['NSFW_CONTENT_PREVENTION_SYSTEM.md']",
+        "Safety pattern 'moderate' found in comprehensive_end_to_end_test.py",
+        "Age verification pattern found in advanced_load_test.py"
+      ],
+      "missing_features": [],
+      "success_rate": 1.0
+    },
+    "performance": {
+      "status": "passed",
+      "performance_metrics": {
+        "memory_usage_mb": 156.765625,
+        "file_scan_time": 0.007260799407958984,
+        "files_scanned": 147,
+        "import_time": 3.0994415283203125e-06
+      },
+      "performance_issues": []
+    },
+    "security": {
+      "status": "failed",
+      "security_checks": 3,
+      "checks_passed": 2,
+      "security_issues": [
+        "Potential hardcoded secrets: ['test_configuration.py: secret', 'test-project-template.py: password', 'test_missing_implementations.py: api_key', 'comprehensive_end_to_end_test.py: password', 'comprehensive_end_to_end_test.py: api_key']"
+      ],
+      "security_features": [
+        ".env file exists for configuration",
+        ".env properly ignored in git"
+      ],
+      "success_rate": 0.6666666666666666
+    }
+  },
+  "summary": {
+    "total_tests": 10,
+    "passed_tests": 5,
+    "failed_tests": 5,
+    "warning_tests": 0,
+    "success_rate": 0.5,
+    "critical_issues": 0,
+    "production_ready_score": 50.0
+  },
+  "issues_found": [],
+  "production_ready": false
+}

@@ -1,0 +1,204 @@
+{
+  "benchmark_start": "2025-09-14T21:47:05.377791",
+  "system_info": {
+    "cpu_count": 10,
+    "memory_total_gb": 16.0,
+    "platform": "darwin",
+    "python_version": "3.9.6 (default, Apr 30 2025, 02:07:17) \n[Clang 17.0.0 (clang-1700.0.13.5)]"
+  },
+  "component_benchmarks": {
+    "device_allocation": {
+      "operation": "device_allocation",
+      "start_time": 1757908025.377834,
+      "end_time": 1757908025.447196,
+      "duration_ms": 69.36192512512207,
+      "cpu_usage_start": 66.7,
+      "cpu_usage_end": 17.6,
+      "memory_usage_start": 93208576,
+      "memory_usage_end": 92946432,
+      "memory_peak": 93208576,
+      "network_bytes_sent": 0,
+      "network_bytes_recv": 0,
+      "success": false,
+      "error_message": "No devices found",
+      "additional_data": {
+        "discovery_time_ms": 69.33093070983887,
+        "devices_found": 0
+      }
+    },
+    "proxy_connection": {
+      "operation": "proxy_connection",
+      "start_time": 1757908025.447318,
+      "end_time": 1757908026.991104,
+      "duration_ms": 1543.785810470581,
+      "cpu_usage_start": 0.0,
+      "cpu_usage_end": 8.8,
+      "memory_usage_start": 92946432,
+      "memory_usage_end": 96337920,
+      "memory_peak": 96337920,
+      "network_bytes_sent": 0,
+      "network_bytes_recv": 0,
+      "success": true,
+      "error_message": "",
+      "additional_data": {
+        "proxy_session_time_ms": 0.13017654418945312,
+        "proxy_test_time_ms": 1542.4630641937256,
+        "proxy_response_code": 200,
+        "proxy_ip": "76.155.211.132"
+      }
+    },
+    "profile_generation": {
+      "operation": "profile_generation",
+      "start_time": 1757908026.9931579,
+      "end_time": 1757908027.015742,
+      "duration_ms": 22.584199905395508,
+      "cpu_usage_start": 50.0,
+      "cpu_usage_end": 15.0,
+      "memory_usage_start": 96337920,
+      "memory_usage_end": 96550912,
+      "memory_peak": 96550912,
+      "network_bytes_sent": 0,
+      "network_bytes_recv": 0,
+      "success": true,
+      "error_message": "",
+      "additional_data": {
+        "average_generation_time_ms": 2.2208213806152344,
+        "min_generation_time_ms": 1.1556148529052734,
+        "max_generation_time_ms": 4.539012908935547,
+        "std_deviation_ms": 1.0213910475775914,
+        "profiles_generated": 10
+      }
+    },
+    "captcha_solving": {
+      "operation": "captcha_solving",
+      "start_time": 1757908027.015913,
+      "end_time": 1757908027.015994,
+      "duration_ms": 0.08106231689453125,
+      "cpu_usage_start": 100.0,
+      "cpu_usage_end": 0.0,
+      "memory_usage_start": 96550912,
+      "memory_usage_end": 96550912,
+      "memory_peak": 96550912,
+      "network_bytes_sent": 0,
+      "network_bytes_recv": 0,
+      "success": true,
+      "error_message": "",
+      "additional_data": {
+        "recaptcha_v2_time_ms": 3559.2455054713464,
+        "recaptcha_v3_time_ms": 982.6343426386119,
+        "hcaptcha_time_ms": 3889.2843608393755,
+        "funcaptcha_time_ms": 4252.212033664477,
+        "text_captcha_time_ms": 902.2565184006727,
+        "average_captcha_solve_time_ms": 2717.1265522028966,
+        "captcha_types_tested": 5
+      }
+    },
+    "sms_verification": {
+      "operation": "sms_verification",
+      "start_time": 1757908027.016075,
+      "end_time": 1757908027.017705,
+      "duration_ms": 1.6300678253173828,
+      "cpu_usage_start": 0.0,
+      "cpu_usage_end": 0.0,
+      "memory_usage_start": 96550912,
+      "memory_usage_end": 96747520,
+      "memory_peak": 96747520,
+      "network_bytes_sent": 0,
+      "network_bytes_recv": 0,
+      "success": false,
+      "error_message": "local variable 'time' referenced before assignment",
+      "additional_data": {}
+    },
+    "anti_detection_overhead": {
+      "operation": "anti_detection_overhead",
+      "start_time": 1757908027.017806,
+      "end_time": 1757908027.017938,
+      "duration_ms": 0.13184547424316406,
+      "cpu_usage_start": 0.0,
+      "cpu_usage_end": 0.0,
+      "memory_usage_start": 96747520,
+      "memory_usage_end": 96763904,
+      "memory_peak": 96763904,
+      "network_bytes_sent": 0,
+      "network_bytes_recv": 0,
+      "success": false,
+      "error_message": "'AntiDetectionSystem' object has no attribute 'initialize_stealth_mode'",
+      "additional_data": {}
+    }
+  },
+  "concurrency_tests": {
+    "concurrent_1": {
+      "concurrent_count": 1,
+      "total_duration_ms": 13111.80305480957,
+      "successful_accounts": 1,
+      "failed_accounts": 0,
+      "average_duration_ms": 12720.493078231812,
+      "min_duration_ms": 12720.493078231812,
+      "max_duration_ms": 12720.493078231812,
+      "throughput_per_minute": 4.576029684795431,
+      "cpu_peak": 8.3,
+      "memory_peak_mb": 0.038743019104003906,
+      "bottleneck_type": "device_allocation"
+    },
+    "concurrent_5": {
+      "concurrent_count": 5,
+      "total_duration_ms": 14120.968341827393,
+      "successful_accounts": 5,
+      "failed_accounts": 0,
+      "average_duration_ms": 13023.417806625366,
+      "min_duration_ms": 12728.065013885498,
+      "max_duration_ms": 13325.522184371948,
+      "throughput_per_minute": 21.245001952973503,
+      "cpu_peak": 12.9,
+      "memory_peak_mb": 0.05649566650390625,
+      "bottleneck_type": "device_allocation"
+    },
+    "concurrent_10": {
+      "concurrent_count": 10,
+      "total_duration_ms": 14136.336088180542,
+      "successful_accounts": 10,
+      "failed_accounts": 0,
+      "average_duration_ms": 13399.703168869019,
+      "min_duration_ms": 12725.934743881226,
+      "max_duration_ms": 14076.777935028076,
+      "throughput_per_minute": 42.443812615750055,
+      "cpu_peak": 28.6,
+      "memory_peak_mb": 0.08485603332519531,
+      "bottleneck_type": "device_allocation"
+    },
+    "concurrent_20": {
+      "concurrent_count": 20,
+      "total_duration_ms": 16152.011156082153,
+      "successful_accounts": 20,
+      "failed_accounts": 0,
+      "average_duration_ms": 14148.43327999115,
+      "min_duration_ms": 12725.50082206726,
+      "max_duration_ms": 15574.155807495117,
+      "throughput_per_minute": 74.29415373751347,
+      "cpu_peak": 9.7,
+      "memory_peak_mb": 0.1613149642944336,
+      "bottleneck_type": "device_allocation"
+    }
+  },
+  "bottleneck_analysis": {
+    "primary_bottleneck": "proxy_connection",
+    "secondary_bottlenecks": [
+      "profile_generation",
+      "captcha_solving"
+    ],
+    "performance_degradation_points": [
+      {
+        "concurrency_level": 5,
+        "throughput_drop": 53.049151784539966,
+        "bottleneck_type": "device_allocation"
+      }
+    ],
+    "capacity_limits": {
+      "max_concurrent_accounts": 20,
+      "max_throughput_per_minute": 74.29415373751347,
+      "theoretical_max_hourly": 4457.649224250808
+    }
+  },
+  "recommendations": [],
+  "benchmark_end": "2025-09-14T21:48:04.543504"
+}

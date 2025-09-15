@@ -1,0 +1,301 @@
+# Risk Engine Kubernetes Deployment
+# High-performance, fault-tolerant ML-based risk assessment service
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: risk-engine
+  namespace: antibot-security
+  labels:
+    app: risk-engine
+    component: ml-inference
+    tier: backend
+spec:
+  replicas: 3
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 1
+  selector:
+    matchLabels:
+      app: risk-engine
+  template:
+    metadata:
+      labels:
+        app: risk-engine
+        component: ml-inference
+        tier: backend
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8001"
+        prometheus.io/path: "/api/v1/metrics/prometheus"
+    spec:
+      serviceAccountName: antibot-service-account
+      priorityClassName: antibot-critical
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+      containers:
+      - name: risk-engine
+        image: antibot-security/risk-engine:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8001
+          name: http
+          protocol: TCP
+        env:
+        - name: REDIS_URL
+          value: "redis://redis-service:6379"
+        - name: MONGODB_URL
+          valueFrom:
+            secretKeyRef:
+              name: mongodb-secret
+              key: connection-string
+        - name: SERVICE_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: LOG_LEVEL
+          value: "INFO"
+        - name: PYTHONUNBUFFERED
+          value: "1"
+        - name: WORKER_PROCESSES
+          value: "4"
+        - name: MAX_WORKERS
+          value: "8"
+        - name: PROMETHEUS_MULTIPROC_DIR
+          value: "/tmp/prometheus"
+        resources:
+          requests:
+            cpu: 1000m
+            memory: 2Gi
+          limits:
+            cpu: 2000m
+            memory: 4Gi
+        livenessProbe:
+          httpGet:
+            path: /api/v1/health
+            port: 8001
+          initialDelaySeconds: 60
+          periodSeconds: 30
+          timeoutSeconds: 10
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /api/v1/health
+            port: 8001
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 2
+        startupProbe:
+          httpGet:
+            path: /api/v1/health
+            port: 8001
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 10
+        volumeMounts:
+        - name: ml-models
+          mountPath: /app/models
+          readOnly: true
+        - name: tmp-prometheus
+          mountPath: /tmp/prometheus
+        - name: config
+          mountPath: /app/config.yaml
+          subPath: config.yaml
+          readOnly: true
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - ALL
+          readOnlyRootFilesystem: true
+      volumes:
+      - name: ml-models
+        persistentVolumeClaim:
+          claimName: ml-models-pvc
+      - name: tmp-prometheus
+        emptyDir: {}
+      - name: config
+        configMap:
+          name: risk-engine-config
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                  - risk-engine
+              topologyKey: kubernetes.io/hostname
+      tolerations:
+      - key: "compute-intensive"
+        operator: "Equal"
+        value: "true"
+        effect: "NoSchedule"
+---
+# Service for Risk Engine
+apiVersion: v1
+kind: Service
+metadata:
+  name: risk-engine-service
+  namespace: antibot-security
+  labels:
+    app: risk-engine
+  annotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "8001"
+spec:
+  selector:
+    app: risk-engine
+  ports:
+  - name: http
+    port: 8001
+    targetPort: 8001
+    protocol: TCP
+  type: ClusterIP
+  sessionAffinity: None
+---
+# Horizontal Pod Autoscaler
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: risk-engine-hpa
+  namespace: antibot-security
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: risk-engine
+  minReplicas: 3
+  maxReplicas: 20
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 80
+  - type: Pods
+    pods:
+      metric:
+        name: risk_engine_requests_per_second
+      target:
+        type: AverageValue
+        averageValue: "100"
+  behavior:
+    scaleUp:
+      stabilizationWindowSeconds: 60
+      policies:
+      - type: Percent
+        value: 100
+        periodSeconds: 15
+      - type: Pods
+        value: 2
+        periodSeconds: 60
+    scaleDown:
+      stabilizationWindowSeconds: 300
+      policies:
+      - type: Percent
+        value: 10
+        periodSeconds: 60
+---
+# Pod Disruption Budget
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: risk-engine-pdb
+  namespace: antibot-security
+spec:
+  minAvailable: 2
+  selector:
+    matchLabels:
+      app: risk-engine
+---
+# ConfigMap for Risk Engine Configuration
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: risk-engine-config
+  namespace: antibot-security
+data:
+  config.yaml: |
+    # Risk Engine Configuration
+    service:
+      name: risk-engine
+      port: 8001
+      workers: 4
+      max_workers: 8
+      log_level: INFO
+      
+    redis:
+      pool_size: 10
+      max_connections: 50
+      health_check_interval: 30
+      
+    mongodb:
+      pool_size: 20
+      max_pool_size: 100
+      w_timeout: 5000
+      
+    ml_models:
+      model_path: /app/models
+      ensemble_weights:
+        isolation_forest: 0.3
+        random_forest: 0.4
+        xgboost: 0.3
+      confidence_threshold: 0.8
+      retrain_interval_hours: 24
+      
+    security:
+      rate_limiting:
+        default_limit: 1000
+        burst_limit: 1500
+        window_seconds: 60
+      input_validation:
+        max_payload_size: 1000000
+        max_events_per_request: 1000
+        
+    monitoring:
+      prometheus:
+        enabled: true
+        metrics_path: /api/v1/metrics/prometheus
+      health_check:
+        path: /api/v1/health
+        timeout_seconds: 5
+        
+    performance:
+      request_timeout: 30
+      inference_timeout: 5
+      circuit_breaker:
+        failure_threshold: 5
+        recovery_timeout: 30
+        monitor_timeout: 10
+---
+# Persistent Volume Claim for ML Models
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: ml-models-pvc
+  namespace: antibot-security
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 10Gi
+  storageClassName: fast-ssd

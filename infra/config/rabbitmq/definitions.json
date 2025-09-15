@@ -1,0 +1,92 @@
+{
+  "vhosts": [
+    {
+      "name": "/",
+      "description": "Default virtual host",
+      "tags": ["default"]
+    }
+  ],
+  "users": [
+    {
+      "name": "admin_user",
+      "password_hash": "PLACEHOLDER_WILL_BE_OVERRIDDEN_BY_ENV_VAR",
+      "hashing_algorithm": "rabbit_password_hashing_sha512",
+      "tags": ["administrator", "management"]
+    }
+  ],
+  "permissions": [
+    {
+      "user": "admin_user",
+      "vhost": "/",
+      "configure": ".*",
+      "write": ".*", 
+      "read": ".*"
+    }
+  ],
+  "policies": [
+    {
+      "vhost": "/",
+      "name": "ha-all",
+      "pattern": ".*",
+      "apply-to": "all",
+      "definition": {
+        "ha-mode": "all",
+        "ha-sync-mode": "automatic"
+      },
+      "priority": 0
+    }
+  ],
+  "queues": [
+    {
+      "name": "sms.priority.high",
+      "vhost": "/",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {
+        "x-max-priority": 10,
+        "x-message-ttl": 3600000
+      }
+    },
+    {
+      "name": "email.creation",
+      "vhost": "/", 
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {
+        "x-message-ttl": 1800000
+      }
+    }
+  ],
+  "exchanges": [
+    {
+      "name": "sms_exchange",
+      "vhost": "/",
+      "type": "topic", 
+      "durable": true,
+      "auto_delete": false
+    },
+    {
+      "name": "email_exchange",
+      "vhost": "/",
+      "type": "topic",
+      "durable": true,
+      "auto_delete": false
+    }
+  ],
+  "bindings": [
+    {
+      "source": "sms_exchange",
+      "vhost": "/",
+      "destination": "sms.priority.high",
+      "destination_type": "queue",
+      "routing_key": "sms.high"
+    },
+    {
+      "source": "email_exchange",
+      "vhost": "/", 
+      "destination": "email.creation",
+      "destination_type": "queue",
+      "routing_key": "email.create"
+    }
+  ]
+}

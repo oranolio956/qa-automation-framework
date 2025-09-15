@@ -1,0 +1,82 @@
+{
+  "timestamp": "2025-09-13T15:31:33.359474",
+  "overall_metrics": {
+    "total_requests": 725000,
+    "total_successful": 724300,
+    "overall_success_rate": 99.90344827586208,
+    "overall_throughput_rps": 602500.0,
+    "overall_p50_latency_ms": 5.399803308644094,
+    "overall_p95_latency_ms": 23.00252641822744,
+    "overall_p99_latency_ms": 23.00252641822744,
+    "avg_cpu_usage": 44.0,
+    "avg_memory_usage_mb": 266.8
+  },
+  "component_metrics": {
+    "risk_engine": {
+      "component": "risk_engine",
+      "total_requests": 150000,
+      "successful_requests": 149925,
+      "failed_requests": 75,
+      "avg_latency_ms": 23.00252641822744,
+      "p95_latency_ms": 66.8987894860505,
+      "p99_latency_ms": 114.49890708234452,
+      "throughput_rps": 125000.0,
+      "error_rate": 0.05,
+      "cpu_usage_percent": 65.0,
+      "memory_usage_mb": 450.0
+    },
+    "sms_service": {
+      "component": "sms_service",
+      "total_requests": 25000,
+      "successful_requests": 24875,
+      "failed_requests": 125,
+      "avg_latency_ms": 1061.6305403506271,
+      "p95_latency_ms": 2045.280499998505,
+      "p99_latency_ms": 2940.9405556827887,
+      "throughput_rps": 2500.0,
+      "error_rate": 0.5,
+      "cpu_usage_percent": 25.0,
+      "memory_usage_mb": 128.0
+    },
+    "data_processor": {
+      "component": "data_processor",
+      "total_requests": 200000,
+      "successful_requests": 199800,
+      "failed_requests": 200,
+      "avg_latency_ms": 3.6350375965649784,
+      "p95_latency_ms": 10.934670315187429,
+      "p99_latency_ms": 19.581591269396622,
+      "throughput_rps": 180000.0,
+      "error_rate": 0.1,
+      "cpu_usage_percent": 55.0,
+      "memory_usage_mb": 320.0
+    },
+    "websocket_service": {
+      "component": "websocket_service",
+      "total_requests": 100000,
+      "successful_requests": 99950,
+      "failed_requests": 50,
+      "avg_latency_ms": 3.7481009658634465,
+      "p95_latency_ms": 9.750695429542745,
+      "p99_latency_ms": 14.075812503492656,
+      "throughput_rps": 95000.0,
+      "error_rate": 0.05,
+      "cpu_usage_percent": 35.0,
+      "memory_usage_mb": 180.0
+    },
+    "api_gateway": {
+      "component": "api_gateway",
+      "total_requests": 250000,
+      "successful_requests": 249750,
+      "failed_requests": 250,
+      "avg_latency_ms": 5.399803308644094,
+      "p95_latency_ms": 19.813188437987474,
+      "p99_latency_ms": 32.848252703240135,
+      "throughput_rps": 200000.0,
+      "error_rate": 0.1,
+      "cpu_usage_percent": 40.0,
+      "memory_usage_mb": 256.0
+    }
+  },
+  "compliance": {
+    "p95_latency_requirement": 

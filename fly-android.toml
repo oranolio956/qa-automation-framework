@@ -1,0 +1,82 @@
+# Fly.io configuration for Android Device Farm
+app = "android-device-farm-prod"
+primary_region = "ord"
+
+[build]
+dockerfile = "Dockerfile.android"
+
+# Higher memory and CPU for Android emulators
+[[vm]]
+size = "shared-cpu-4x"  # 4 vCPU, 8GB RAM
+cpu_kind = "shared"
+memory_mb = 8192
+
+[env]
+PORT = "5000"
+DISPLAY = ":99"
+ANDROID_HOME = "/opt/android-sdk"
+ANDROID_SDK_ROOT = "/opt/android-sdk"
+PATH = "/opt/android-sdk/cmdline-tools/latest/bin:/opt/android-sdk/platform-tools:/opt/android-sdk/emulator:/usr/local/bin:/usr/bin:/bin"
+
+# Enable Android emulator with hardware acceleration
+[mounts]
+source = "android_data"
+destination = "/opt/android-data"
+
+[http_service]
+internal_port = 5000
+force_https = true
+auto_stop_machines = false  # Keep running
+auto_start_machines = true
+min_machines_running = 1
+processes = ["app"]
+
+[[services]]
+internal_port = 5000
+protocol = "tcp"
+script_checks = []
+
+[services.concurrency]
+type = "connections"
+hard_limit = 10
+soft_limit = 8
+
+[[services.ports]]
+force_https = true
+handlers = ["http"]
+port = 80
+
+[[services.ports]]
+handlers = ["tls", "http"]  
+port = 443
+
+# ADB port for external connections
+[[services]]
+internal_port = 5555
+protocol = "tcp"
+
+[[services.ports]]
+port = 5555
+
+# VNC port for remote emulator access (optional)
+[[services]]
+internal_port = 5900
+protocol = "tcp"
+
+[[services.ports]]
+port = 5900
+
+[[services.tcp_checks]]
+grace_period = "30s"
+interval = "30s" 
+restart_limit = 3
+timeout = "10s"
+
+[[services.http_checks]]
+interval = "60s"
+grace_period = "30s"
+method = "get"
+path = "/health"
+protocol = "http"
+restart_limit = 3
+timeout = "15s"
