@@ -45,17 +45,17 @@ class TelegramBotConfig:
     """Main bot configuration"""
     
     # Bot credentials
-    BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "8163343176:AAGnfDmoyeL7NSU0nLfLMqEohWxL5hZA6_0")
+    BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "")
     BOT_URL = "t.me/buytinderadds"
     
     # Payment configuration
     PAYMENT_PROVIDER_TOKEN = os.getenv("PAYMENT_PROVIDER_TOKEN", "")
     STRIPE_SECRET_KEY = os.getenv("STRIPE_SECRET_KEY", "")
-    WEBHOOK_SECRET = os.getenv("WEBHOOK_SECRET", "your-webhook-secret-here")
+    WEBHOOK_SECRET = os.getenv("WEBHOOK_SECRET", "")
     WEBHOOK_URL = os.getenv("WEBHOOK_URL", "https://your-domain.com/webhook")
     
     # Database configuration
-    DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://user:pass@localhost/tinder_bot")
+    DATABASE_URL = os.getenv("DATABASE_URL", "")
     REDIS_URL = os.getenv("REDIS_URL", "redis://localhost:6379")
     
     # Service configuration
@@ -260,21 +260,28 @@ Business hours: 24/7 automated + human support 9AM-11PM EST
 def validate_config():
     """Validate critical configuration"""
     errors = []
+    warnings = []
     
-    if not TelegramBotConfig.BOT_TOKEN or TelegramBotConfig.BOT_TOKEN.startswith("your-token"):
-        errors.append("Missing or invalid BOT_TOKEN")
+    if not TelegramBotConfig.BOT_TOKEN:
+        errors.append("Missing TELEGRAM_BOT_TOKEN")
     
+    # Payments are optional; run in demo mode if not configured
     if not TelegramBotConfig.PAYMENT_PROVIDER_TOKEN:
-        errors.append("Missing PAYMENT_PROVIDER_TOKEN for Telegram payments")
+        warnings.append("PAYMENT_PROVIDER_TOKEN not set - Telegram payments disabled (demo mode)")
     
     if not TelegramBotConfig.STRIPE_SECRET_KEY:
-        errors.append("Missing STRIPE_SECRET_KEY for payment processing")
+        warnings.append("STRIPE_SECRET_KEY not set - Stripe payments disabled (demo mode)")
     
+    if not TelegramBotConfig.DATABASE_URL:
+        errors.append("Missing DATABASE_URL")
+
     if not TelegramBotConfig.ADMIN_USER_IDS:
-        errors.append("No admin users configured")
+        warnings.append("ADMIN_USER_IDS empty - no admins configured")
     
     if errors:
         raise ValueError(f"Configuration errors: {', '.join(errors)}")
+    if warnings:
+        print("⚠️ Config warnings:", "; ".join(warnings))
     
     return True
 

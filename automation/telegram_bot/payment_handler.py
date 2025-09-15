@@ -35,6 +35,9 @@ class PaymentProcessor:
         self.webhook_secret = TelegramBotConfig.WEBHOOK_SECRET
         self.max_retries = 3
         self.retry_delays = [30, 300, 1800]  # 30s, 5min, 30min
+        self.payments_demo_mode = not (
+            TelegramBotConfig.PAYMENT_PROVIDER_TOKEN and TelegramBotConfig.STRIPE_SECRET_KEY
+        )
     
     async def create_telegram_payment_invoice(self, 
                                             user_id: int, 
@@ -75,7 +78,7 @@ class PaymentProcessor:
                 'amount': total_price
             }
             
-            return {
+            result = {
                 'success': True,
                 'payment_id': payment_id,
                 'title': title,
@@ -84,6 +87,9 @@ class PaymentProcessor:
                 'prices': prices,
                 'currency': 'USD'
             }
+            if self.payments_demo_mode:
+                result['demo_mode'] = True
+            return result
             
         except Exception as e:
             logger.error(f"Error creating Telegram invoice: {e}")
@@ -109,26 +115,36 @@ class PaymentProcessor:
             )
             
             # Create Stripe payment intent
-            intent = stripe.PaymentIntent.create(
-                amount=int(total_price * 100),  # Convert to cents
-                currency='usd',
-                metadata={
+            if self.payments_demo_mode:
+                return {
+                    'success': True,
                     'payment_id': payment_id,
-                    'order_id': order_id,
-                    'user_id': str(user_id),
-                    'package_id': package_id,
-                    'quantity': str(quantity)
-                },
-                description=f"Tinder Accounts - {package.name} (x{quantity})"
-            )
-            
-            return {
-                'success': True,
-                'payment_id': payment_id,
-                'client_secret': intent.client_secret,
-                'amount': total_price,
-                'currency': 'USD'
-            }
+                    'client_secret': 'demo_client_secret',
+                    'amount': total_price,
+                    'currency': 'USD',
+                    'demo_mode': True
+                }
+            else:
+                intent = stripe.PaymentIntent.create(
+                    amount=int(total_price * 100),  # Convert to cents
+                    currency='usd',
+                    metadata={
+                        'payment_id': payment_id,
+                        'order_id': order_id,
+                        'user_id': str(user_id),
+                        'package_id': package_id,
+                        'quantity': str(quantity)
+                    },
+                    description=f"Tinder Accounts - {package.name} (x{quantity})"
+                )
+                
+                return {
+                    'success': True,
+                    'payment_id': payment_id,
+                    'client_secret': intent.client_secret,
+                    'amount': total_price,
+                    'currency': 'USD'
+                }
             
         except Exception as e:
             logger.error(f"Error creating Stripe payment intent: {e}")
