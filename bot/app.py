@@ -34,12 +34,14 @@ logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
 
-# Rate limiting configuration (with Redis storage)
+# Rate limiting configuration
+# Use in-memory storage if REDIS_URL is not configured to avoid connection errors on /health
+_redis_storage_uri = os.environ.get('REDIS_URL') or 'memory://'
 limiter = Limiter(
     app=app,
     key_func=get_remote_address,
     default_limits=[f"{os.environ.get('RATE_LIMIT_PER_MIN', '100')} per minute"],
-    storage_uri=os.environ.get('REDIS_URL', 'redis://localhost:6379')
+    storage_uri=_redis_storage_uri
 )
 
 # Redis connection
