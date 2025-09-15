@@ -47,7 +47,7 @@ RUN sdkmanager "platform-tools" "platforms;android-30" "build-tools;30.0.3" \
 RUN echo "no" | avdmanager create avd \
     --name "snapchat_device" \
     --package "system-images;android-30;google_apis;x86_64" \
-    --device "Nexus_6P"
+    --device "pixel_4"
 
 # Copy application files
 COPY . /app
