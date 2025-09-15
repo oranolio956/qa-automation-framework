@@ -19,15 +19,33 @@ export ANDROID_HOME=${ANDROID_HOME:-/opt/android-sdk}
 export ANDROID_SDK_ROOT=${ANDROID_SDK_ROOT:-/opt/android-sdk}
 export PATH=$PATH:$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$ANDROID_HOME/emulator
 
-# Boot emulator
-echo "Starting Android emulator..."
-cd "$ANDROID_HOME/emulator"
-./emulator -avd snapchat_device -no-window -no-audio -no-boot-anim -accel off -gpu swiftshader_indirect -netfast &
+# Prepare AVD (force ARM64 AVD)
+AVD_NAME=${AVD_NAME:-snapchat_device_arm}
+echo "Preparing AVD $AVD_NAME..."
+rm -rf "$HOME/.android/avd/${AVD_NAME}.avd" "$HOME/.android/avd/${AVD_NAME}.ini" || true
+yes | avdmanager delete avd -n "$AVD_NAME" >/dev/null 2>&1 || true
+yes | avdmanager create avd -n "$AVD_NAME" -k "system-images;android-30;google_apis;arm64-v8a" -d "pixel_4" --abi arm64-v8a --force
 
-# Wait for device
-echo "Waiting for emulator to boot..."
-adb wait-for-device
-sleep 30
+# Start ADB server
+adb start-server || true
+
+# Boot emulator
+echo "Starting Android emulator ($AVD_NAME)..."
+cd "$ANDROID_HOME/emulator"
+./emulator -avd "$AVD_NAME" -no-window -no-audio -no-boot-anim -accel off -gpu swiftshader_indirect -netfast &
+
+# Wait for device to appear and boot
+echo "Waiting for emulator to be detected by ADB..."
+for i in $(seq 1 120); do
+  if adb devices | grep -q "emulator-"; then break; fi
+  sleep 2
+done
+echo "Waiting for Android to report boot_completed..."
+for i in $(seq 1 120); do
+  bc=$(adb shell getprop sys.boot_completed 2>/dev/null | tr -d '\r') || true
+  if [ "$bc" = "1" ]; then break; fi
+  sleep 2
+done
 
 # Configure device for automation
 adb shell settings put global development_settings_enabled 1 || true
