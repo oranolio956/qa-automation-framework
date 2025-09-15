@@ -52,8 +52,8 @@ RUN echo "no" | avdmanager create avd \
 # Copy application files
 COPY . /app
 
-# Install Python dependencies
-RUN pip3 install --no-cache-dir -r automation/requirements.txt
+# Install minimal farm Python dependencies (avoid heavy/conflicting packages)
+RUN pip3 install --no-cache-dir -r automation/android/requirements-farm.txt
 
 # Create directories for Android automation
 RUN mkdir -p /app/device_farm /app/logs /app/.android

@@ -1,0 +1,8 @@
+uiautomator2==2.16.23
+adbutils==2.10.2
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+httpx==0.25.2
+requests==2.31.0
+packaging==20.9
+
