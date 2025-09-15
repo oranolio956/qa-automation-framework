@@ -41,13 +41,14 @@ ENV PATH=$PATH:$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-too
 # Accept licenses and install SDK components
 RUN yes | sdkmanager --licenses
 RUN sdkmanager "platform-tools" "platforms;android-30" "build-tools;30.0.3" \
-    "system-images;android-30;google_apis;x86_64" "emulator"
+    "system-images;android-30;google_apis;arm64-v8a" "emulator"
 
 # Create Android Virtual Device (AVD)
 RUN echo "no" | avdmanager create avd \
     --name "snapchat_device" \
-    --package "system-images;android-30;google_apis;x86_64" \
-    --device "pixel_4"
+    --package "system-images;android-30;google_apis;arm64-v8a" \
+    --device "pixel_4" \
+    --abi arm64-v8a
 
 # Copy application files
 COPY . /app

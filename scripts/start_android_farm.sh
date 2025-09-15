@@ -22,7 +22,7 @@ export PATH=$PATH:$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-
 # Boot emulator
 echo "Starting Android emulator..."
 cd "$ANDROID_HOME/emulator"
-./emulator -avd snapchat_device -no-window -no-audio -no-boot-anim -accel auto -netfast &
+./emulator -avd snapchat_device -no-window -no-audio -no-boot-anim -accel off -gpu swiftshader_indirect -netfast &
 
 # Wait for device
 echo "Waiting for emulator to boot..."
