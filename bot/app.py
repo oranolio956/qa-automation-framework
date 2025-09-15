@@ -295,6 +295,7 @@ def cancel_job(job_id):
         return jsonify({'error': 'Internal server error'}), 500
 
 @app.route('/health')
+@limiter.exempt
 def health():
     """Health check endpoint with proxy status"""
     health_data = {
@@ -332,6 +333,7 @@ def health():
     return jsonify(health_data), status_code
 
 @app.route('/metrics')
+@limiter.exempt
 def metrics():
     """Prometheus metrics endpoint"""
     try:
